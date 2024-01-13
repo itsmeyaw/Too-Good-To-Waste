@@ -38,6 +38,11 @@ dependencies:
   firebase_auth: ^4.16.0
   logger: ^2.0.2+1
   location: ^5.0.3
+  sqflite: ^2.3.0
+  animated_text_kit: ^4.2.2
+  rive: ^0.12.4
+  flutter_slidable: ^3.0.1
+  syncfusion_flutter_charts: ^24.1.45+2
 
 dev_dependencies:
   flutter_test:

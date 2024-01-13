@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:tooGoodToWaste/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:tooGoodToWaste/pages/Account.dart';
+import 'package:tooGoodToWaste/pages/AddInventory.dart';
 import 'package:tooGoodToWaste/pages/Home.dart';
 
 void main() async {
@@ -99,7 +100,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ]
       ),
       floatingActionButton: _activePage == 1 ? FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => AddInventoryPage()));
+        },
         tooltip: 'Add new item',
         child: const Icon(Icons.add),
       ) : null, // This trailing comma makes auto-formatting nicer for build methods.
