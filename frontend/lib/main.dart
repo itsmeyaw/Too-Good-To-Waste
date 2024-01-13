@@ -3,8 +3,8 @@ import 'dart:ffi';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:wisefood/firebase_options.dart';
 import 'package:flutter/material.dart';
-import 'package:wisefood/account.dart';
-import 'package:wisefood/home.dart';
+import 'package:wisefood/pages/account.dart';
+import 'package:wisefood/pages/home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

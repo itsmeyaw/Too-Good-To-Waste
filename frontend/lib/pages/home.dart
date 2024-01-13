@@ -41,7 +41,7 @@ class Home extends StatelessWidget {
       child: SizedBox(
               height: 200,
               child: Card(
-                child: Text('Here shall be map'),
+                child: Text('Here shall be map showing locations of available items'),
             ),
           ),
         ),
@@ -123,19 +123,31 @@ class Post extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FractionallySizedBox(
+    return TextButton(
+      onPressed: () { Navigator.push(context, MaterialPageRoute(builder: (context) => PostPage(postData: postData))); },
+      style: ButtonStyle(
+          overlayColor: MaterialStatePropertyAll(Theme.of(context).colorScheme.background),
+          textStyle: MaterialStatePropertyAll(
+            TextStyle(
+              color: Colors.black,
+            )
+          ),
+          padding: MaterialStatePropertyAll(EdgeInsets.zero),
+      ),
+      child: FractionallySizedBox(
       widthFactor: 1.0,
       child: Container(
         padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Item name: ${postData.title}'),
-            Text('Amount: ${postData.amount} ${postData.measurement}'),
-            Text('Distance: ${postData.distance} km')
+            Text('Item name: ${postData.title}', style: const TextStyle(color: Colors.black),),
+            Text('Amount: ${postData.amount} ${postData.measurement}', style: const TextStyle(color: Colors.black),),
+            Text('Distance: ${postData.distance} km', style: const TextStyle(color: Colors.black),)
           ],
         )
       ),
+      )
     );
   }
 }
@@ -150,12 +162,32 @@ class PostPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(postData.title, style: Theme.of(context).textTheme.headlineLarge,),
-        Text('Amount: ${postData.amount} ${postData.measurement}', style: Theme.of(context).textTheme.headlineSmall),
-        FilledButton(onPressed: () {Navigator.pop(context);}, child: const Text('Back'))
-      ],
+    return Scaffold(
+      appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: Text('Shared Item Information'),
+          actions: [],
+      ),
+      body: Container(
+        padding: EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const FractionallySizedBox(
+              widthFactor: 1.0,
+              child: SizedBox(
+                height: 200,
+                child: Card(
+                  child: Text('Here shall be map giving the range of the location of the item publisher'),
+                ),
+              ),
+            ),
+            SizedBox(height: 10,),
+            Text(postData.title, style: Theme.of(context).textTheme.headlineLarge,),
+            Text('Amount: ${postData.amount} ${postData.measurement}', style: Theme.of(context).textTheme.headlineSmall),
+          ],
+        )
+      )
     );
   }
 }
