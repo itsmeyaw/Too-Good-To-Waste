@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:tooGoodToWaste/dto/User.dart';
 import 'package:tooGoodToWaste/dto/PostData.dart';
 
+import 'chat.dart';
+
 // The social places timeline
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -125,8 +127,6 @@ class SearchBar extends StatelessWidget {
   }
 }
 
-
-
 class Post extends StatelessWidget {
   final PostData postData;
 
@@ -199,9 +199,12 @@ class PostPage extends StatelessWidget {
             const SizedBox(height: 20,),
             Text(postData.title, style: Theme.of(context).textTheme.headlineLarge,),
             Text('Amount: ${postData.amount} ${postData.measurement}', style: Theme.of(context).textTheme.headlineSmall),
+            Text('Person: ${postData.user.name} (${postData.user.rate} stars)'),
             const Spacer(),
             FilledButton(
-                onPressed: () {},
+                onPressed: () {
+
+                },
                 child: FractionallySizedBox(
                   widthFactor: 1,
                   child: Text('Chat with ${postData.user.name}', textAlign: TextAlign.center,),
