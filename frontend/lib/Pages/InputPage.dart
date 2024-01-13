@@ -118,6 +118,7 @@ class _InputPageState extends State<InputPage> {
     print(await dbhelper.queryAll('foods'));
 
   }
+  
   Future<void> addItemName(value) async {
   
     List<String> items = await dbhelper.getAllUncosumedFoodStringValues('name');
