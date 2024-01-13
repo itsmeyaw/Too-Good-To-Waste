@@ -1,4 +1,11 @@
+import 'dart:ffi';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:TooGoodToWaste/firebase_options.dart';
 import 'package:flutter/material.dart';
+import 'package:TooGoodToWaste/pages/account.dart';
+import 'package:TooGoodToWaste/pages/home.dart';
+
 import 'frame.dart';
 import 'dart:async';
 import 'Helper/DB_Helper.dart';
