@@ -1,111 +1,125 @@
-import 'dart:ffi';
-
-import 'package:firebase_core/firebase_core.dart';
-import 'package:wisefood/firebase_options.dart';
 import 'package:flutter/material.dart';
-import 'package:wisefood/account.dart';
-import 'package:wisefood/home.dart';
+import 'frame.dart';
+import 'dart:async';
+import 'Helper/DB_Helper.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(const MyApp());
+
+void main() {
+  runApp(MyApp());
+  const oneDay = Duration(minutes: 1);
+  MyApp myapp = MyApp();
+
+    Timer.periodic(oneDay, (Timer timer) {
+        //myapp.autocheckWaste();
+        //pop up  a propmt
+        print("Repeat task every day");  // This statement will be printed after every one second
+    }); 
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  //const MyApp({Key? key}) : super(key: key);
+late BuildContext context;
+DBHelper dbhelper = DBHelper();
+DateTime timeNowDate = DateTime.now();
+int timeNow = DateTime.now().millisecondsSinceEpoch;
 
+  MyApp({Key? key}) : super(key: key);
+
+// This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    this.context = context;
     return MaterialApp(
-      title: 'WiseFood',
+      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-        useMaterial3: true,
+        primarySwatch: createMaterialColor(const Color.fromRGBO(178, 207, 135, 1)),
       ),
-      home: const MyHomePage(title: 'WiseFood'),
+      home: const Frame(),
     );
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  //when to call this function? At a certain time evey day.
+  Future<void> autocheckWaste() async{
+    //get every instance out of Foods table and compare its expiretime with current time
+    //int maxID = await dbhelper.getMaxId();
+    var foods = await dbhelper.queryAllUnconsumedFood();
 
-  final String title;
+    for(int i = 0; i < foods.length ; i++ ){
+      var expiretime = await dbhelper.getAllUncosumedFoodIntValues('expiretime');
+      var foodName = await dbhelper.getAllUncosumedFoodStringValues('name');
+      if(expiretime[i] < timeNow){
+        dbhelper.updateFoodWaste(foodName[i]);
+        print('###########################${foodName[i]} is wasted###########################');
+      }
+    }
+     for(int i = 0; i < foods.length ; i++ ){
+      var expiretime = await dbhelper.getAllUncosumedFoodIntValues('expiretime');
+      var foodName = await dbhelper.getAllUncosumedFoodStringValues('name');
+      int remainDays = DateTime.fromMillisecondsSinceEpoch(expiretime[i]).difference(timeNowDate).inDays;
+      if(remainDays < 2){
+        //pop up a toast
+        dbhelper.updateFoodConsumed(foodName[i], 'expiring');
+        showExpiringDialog(foodName[i]);
+        print('###########################${foodName[i]} is expiring!!!###########################');
+      }
+    }
+  }
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _activePage = 0;
-
-  // Called when setState is called
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-        actions: [],
-      ),
-      body: <Widget>[
-        const Home(),
-        Card(
-          shadowColor: Colors.transparent,
-          margin: const EdgeInsets.all(8.0),
-          child: SizedBox.expand(
-            child: Center(
-              child: Text(
-                'Inventory',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ),
-          ),
+  //toast contains 'Alert! Your ***  will expire in two days'
+  showExpiringDialog(String foodname){
+    //double width= MediaQuery.of(context).size.width;
+    //double height= MediaQuery.of(context).size.height;
+    AlertDialog dialog = AlertDialog(
+      title: const Text("Alert!",textAlign: TextAlign.center),
+      content:
+      Container(
+        width: 50,
+        height: 10,
+        padding: const EdgeInsets.all(10.0),
+        child:
+        Column(
+          children: [
+            //Expanded(child: stateIndex>-1? Image.asset(imageList[stateIndex]):Image.asset(imageList[12])),
+            Text(
+                'Your $foodname will expire in two days!',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold))
+          ],
         ),
-        const AccountPage()
-      ].map((e) => Container(
-        padding: const EdgeInsets.all(10),
-        child: e
-      )).toList()[_activePage],
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (int index) {
-          setState(() {
-            _activePage = index;
-          });
-        },
-        selectedIndex: _activePage,
-        destinations: const <Widget>[
-          NavigationDestination(
-              selectedIcon: Icon(Icons.home),
-              icon: Icon(Icons.home_outlined),
-              label: 'Home'
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.inventory_2),
-              icon: Icon(Icons.inventory_2_outlined),
-              label: 'Inventory'
-          ),
-          NavigationDestination(
-              selectedIcon: Icon(Icons.person),
-              icon: Icon(Icons.person_outline),
-              label: 'Account'
-          )
-        ]
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context,'OK'),
+          child: const Text('OK'),
+        ),
+      ],
     );
+    showDialog(context: context, builder: (BuildContext context){
+      return dialog;
+    });
   }
+
+  
+
+  MaterialColor createMaterialColor(Color color) {
+    List strengths = <double>[.05];
+    final swatch = <int, Color>{};
+    final int r = color.red, g = color.green, b = color.blue;
+
+    for (int i = 1; i < 10; i++) {
+      strengths.add(0.1 * i);
+    }
+    for (var strength in strengths) {
+      final double ds = 0.5 - strength;
+      swatch[(strength * 1000).round()] = Color.fromRGBO(
+        r + ((ds < 0 ? r : (255 - r)) * ds).round(),
+        g + ((ds < 0 ? g : (255 - g)) * ds).round(),
+        b + ((ds < 0 ? b : (255 - b)) * ds).round(),
+        1,
+      );
+    }
+    return MaterialColor(color.value, swatch);
+  }
+  
 }
