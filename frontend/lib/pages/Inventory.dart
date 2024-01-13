@@ -1,25 +1,22 @@
-
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:rive/rive.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-
-import '../Pages/account.dart';
 import 'package:tooGoodToWaste/helper/DBHelper.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'dart:async';
 
 
 class Inventory extends StatefulWidget {
-  const Inventory({Key? key}) : super(key: key);
+  const Inventory({super.key});
 
   @override
-  _BottomTopScreenState createState() => _BottomTopScreenState();
+  State<StatefulWidget> createState() => _BottomTopScreenState();
 }
 
-class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMixin{
+class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMixin {
   TextEditingController nameController = TextEditingController();
   TextEditingController expireTimeController = TextEditingController();
   TextEditingController boughtTimeController = TextEditingController();
@@ -344,8 +341,6 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
     return Scaffold(
       appBar: AppBar(
         bottom: TabBar(
-          labelColor: Colors.white,
-          indicatorColor: Colors.white,
           controller: _tabController,
           tabs: const [
             Tab(icon: Icon(Icons.storefront), text: "Current"),

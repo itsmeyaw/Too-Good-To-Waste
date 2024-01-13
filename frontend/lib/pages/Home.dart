@@ -62,39 +62,42 @@ class Home extends StatelessWidget {
           user: users[1]
       )
     ];
-    return Column(
-      children: [
-      const FractionallySizedBox(
-      widthFactor: 1.0,
-      child: SizedBox(
-              height: 200,
-              child: Card(
-                child: Text('Here shall be map showing locations of available items'),
+    return Container(
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        children: [
+        const FractionallySizedBox(
+        widthFactor: 1.0,
+        child: SizedBox(
+                height: 200,
+                child: Card(
+                  child: Text('Here shall be map showing locations of available items'),
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 10,),
-        const SearchBar(),
-        const SizedBox(height: 20,),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              'Results',
-            style: Theme.of(context).textTheme.headlineMedium,
-            )
-          ],
-        ),
-        Expanded(child: ListView.separated(
-          itemCount: postData.length,
-          itemBuilder: (_, index) {
-            return Post(postData: postData[index],);
-          },
-          separatorBuilder: (_, index) {
-            return const Divider();
-          },
-        ))
-      ],
+          const SizedBox(height: 10,),
+          const SearchBar(),
+          const SizedBox(height: 20,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                'Results',
+              style: Theme.of(context).textTheme.headlineMedium,
+              )
+            ],
+          ),
+          Expanded(child: ListView.separated(
+            itemCount: postData.length,
+            itemBuilder: (_, index) {
+              return Post(postData: postData[index],);
+            },
+            separatorBuilder: (_, index) {
+              return const Divider();
+            },
+          ))
+        ],
+      ),
     );
   }
 }
@@ -183,7 +186,7 @@ class PostPage extends StatelessWidget {
           actions: [],
       ),
       body: Container(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

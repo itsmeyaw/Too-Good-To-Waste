@@ -31,9 +31,15 @@ class _MyAccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
     if (user != null) {
-      return AccountLoginPage();
+      return Container(
+        padding: const EdgeInsets.all(10),
+        child: AccountLoginPage(),
+      );
     } else {
-      return AccountSettingPage();
+      return Container(
+          padding: const EdgeInsets.all(10),
+          child: AccountSettingPage()
+      );
     }
   }
 }
@@ -110,7 +116,9 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
 
   @override
   void initState() {
-    user = FirebaseAuth.instance.currentUser;
+    setState(() {
+      user = FirebaseAuth.instance.currentUser;
+    });
     super.initState();
   }
 
@@ -120,8 +128,11 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Name', textAlign: TextAlign.start,),
-          Text('${FirebaseAuth.instance.currentUser?.displayName}')
+          Text('Name'),
+          Text('${user?.displayName}', style: Theme.of(context).textTheme.bodyLarge,),
+          SizedBox(height: 10,),
+          Text('E-Mail'),
+          Text('${user?.email}', style: Theme.of(context).textTheme.bodyLarge,)
         ],
       ),
     );
