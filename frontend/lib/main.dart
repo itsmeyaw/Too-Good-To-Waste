@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/home.dart';
+import 'package:wisefood/account.dart';
+import 'package:wisefood/home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -47,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: <Widget>[
-        Home(),
+        const Home(),
         Card(
           shadowColor: Colors.transparent,
           margin: const EdgeInsets.all(8.0),
@@ -60,18 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
-        Card(
-          shadowColor: Colors.transparent,
-          margin: const EdgeInsets.all(8.0),
-          child: SizedBox.expand(
-            child: Center(
-              child: Text(
-                'Account',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ),
-          ),
-        ),
+        const AccountPage()
       ].map((e) => Container(
         child: e,
       )).toList()[_activePage],

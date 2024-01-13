@@ -25,3 +25,8 @@ export const anotherHelloWorld = onRequest((request, response) => {
   logger.info("Hello logs!", {structuredData: true});
   response.send("Hello from Firebase App!");
 });
+
+export const addUserInventory = onRequest((request, response) => {
+  logger.info("Adding new item to user inventory", {structuredData: true});
+
+})
