@@ -234,8 +234,8 @@ class _FrameState extends State<Frame> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text('Too Good To Waste'),
-        actions: [],
+        title: const Text('Too Good To Waste'),
+        actions: const [],
       ),
     body: Container(
       decoration: const BoxDecoration(color: Colors.white),

@@ -282,39 +282,6 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
 
   }
 
-  // String checkIfPrimaryStateChanged(int value){
-  //   if (value==0){
-  //     return Achievements.stateList[0];
-  //   }
-  //   else if (value==2){
-  //     return Achievements.stateList[1];
-  //   }
-  //   else if (value==7){
-  //     return Achievements.stateList[2];
-  //   }
-  //   else if (value==15){
-  //     return Achievements.stateList[3];
-  //   }
-  //   else if (value==31){
-  //     return Achievements.stateList[4];
-  //   }
-  //   else if (value==47){
-  //     return Achievements.stateList[5];
-  //   }
-  //   else if (value==79){
-  //     return Achievements.stateList[6];
-  //   }
-  //   else if (value==83){
-  //     return Achievements.stateList[7];
-  //   }
-  //   else if (value==92){
-  //     return Achievements.stateList[8];
-  //   }
-  //   else{
-  //     return "None";
-  //   }
-  // }
-
   var txt = TextEditingController();
   late TooltipBehavior _tooltipBehavior;
   //late bool _isLoading;
