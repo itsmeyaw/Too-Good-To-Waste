@@ -30,7 +30,7 @@ class _MyAccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (user != null) {
+    if (user == null) {
       return Container(
         padding: const EdgeInsets.all(10),
         child: AccountLoginPage(),
