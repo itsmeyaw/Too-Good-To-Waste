@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -46,13 +47,14 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: <Widget>[
+        Home(),
         Card(
           shadowColor: Colors.transparent,
           margin: const EdgeInsets.all(8.0),
           child: SizedBox.expand(
             child: Center(
               child: Text(
-                'Home page',
+                'Inventory',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
@@ -70,7 +72,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
-      ][_activePage],
+      ].map((e) => Container(
+        child: e,
+      )).toList()[_activePage],
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
           setState(() {
@@ -85,7 +89,12 @@ class _MyHomePageState extends State<MyHomePage> {
               label: 'Home'
           ),
           NavigationDestination(
-            selectedIcon: Icon(Icons.person),
+            selectedIcon: Icon(Icons.inventory_2),
+              icon: Icon(Icons.inventory_2_outlined),
+              label: 'Inventory'
+          ),
+          NavigationDestination(
+              selectedIcon: Icon(Icons.person),
               icon: Icon(Icons.person_outline),
               label: 'Account'
           )
