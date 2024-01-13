@@ -92,11 +92,15 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {},
             ),
             IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.inventory)
+            ),
+            IconButton(
               tooltip: 'Account',
               icon: const Icon(Icons.person),
               onPressed: () {},
             ),
-            ],
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -104,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
