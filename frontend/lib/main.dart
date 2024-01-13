@@ -11,7 +11,11 @@ import 'dart:async';
 import 'Helper/DB_Helper.dart';
 
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
   const oneDay = Duration(minutes: 1);
   MyApp myapp = MyApp();
@@ -37,10 +41,11 @@ int timeNow = DateTime.now().millisecondsSinceEpoch;
   Widget build(BuildContext context) {
     this.context = context;
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Too Good To Waste',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: createMaterialColor(const Color.fromRGBO(178, 207, 135, 1)),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        useMaterial3: true,
       ),
       home: const Frame(),
     );

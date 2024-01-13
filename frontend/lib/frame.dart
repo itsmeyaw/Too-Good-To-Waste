@@ -215,9 +215,9 @@ class _FrameState extends State<Frame> {
   _getPage(int page) {
     switch (page) {
       case 0:       
-        return const BottomTopScreen();
-      case 1:
         return const HomePage();
+      case 1:
+        return const BottomTopScreen();
       default:
       return const AccountPage();
     }
