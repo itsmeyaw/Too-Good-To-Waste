@@ -10,15 +10,27 @@ class AccountPage extends StatefulWidget {
 }
 
 class _MyAccountPageState extends State<AccountPage> {
-  bool isSignedIn = false;
+  User? user;
+  Logger logger = Logger();
+
+  @override
+  void initState() {
+    _checkLoginState();
+    super.initState();
+  }
+
+  void _checkLoginState() async {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      logger.d(user);
+      setState(() {
+        user = user;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      isSignedIn = user != null;
-    });
-
-    if (!isSignedIn) {
+    if (user != null) {
       return AccountLoginPage();
     } else {
       return AccountSettingPage();
@@ -60,24 +72,58 @@ class AccountLoginPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10,),
-          FilledButton(onPressed: () {
-            try {
-              FirebaseAuth.instance.signInWithEmailAndPassword(email: _emailController.text, password: _passwordController.text);
-            } on FirebaseAuthException catch (e) {
-              logger.e(e);
-            }
-          }, child: const Text('Login'))
+          FilledButton(
+              onPressed: () async {
+                try {
+                  await FirebaseAuth.instance.signInWithEmailAndPassword(email: _emailController.text, password: _passwordController.text);
+                } on FirebaseAuthException catch (e) {
+                  logger.e(e);
+                }
+              },
+              child: const Text('Login')
+          ),
+          const SizedBox(height: 10,),
+          TextButton(
+              onPressed: () async {
+              try {
+                await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _emailController.text, password: _passwordController.text);
+              } on FirebaseAuthException catch (e) {
+                logger.e(e);
+              }
+            },
+          child: const Text('Sign Up'))
         ],
       ),
     );
   }
 }
 
-class AccountSettingPage extends StatelessWidget {
+class AccountSettingPage extends StatefulWidget {
   const AccountSettingPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Text('You are logged in!');
+  State<StatefulWidget> createState() => _AccountSettingPageState();
+}
+
+class _AccountSettingPageState extends State<AccountSettingPage> {
+  User? user;
+
+  @override
+  void initState() {
+    FirebaseAuth.instance.currentUser;
+    super.initState();
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          Text('Name'),
+          Text('${FirebaseAuth.instance.currentUser?.displayName}')
+        ],
+      ),
+    );
+  }
+
 }
