@@ -10,7 +10,7 @@ class AccountPage extends StatefulWidget {
 }
 
 class _MyAccountPageState extends State<AccountPage> {
-  bool isSignedIn = false;
+  User? user;
   Logger logger = Logger();
 
   @override
@@ -23,14 +23,14 @@ class _MyAccountPageState extends State<AccountPage> {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       logger.d(user);
       setState(() {
-        isSignedIn = user != null;
+        user = user;
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!isSignedIn) {
+    if (user != null) {
       return AccountLoginPage();
     } else {
       return AccountSettingPage();
@@ -98,11 +98,24 @@ class AccountLoginPage extends StatelessWidget {
   }
 }
 
-class AccountSettingPage extends StatelessWidget {
-  const AccountSettingPage({super.key});
+class AccountSettingPage extends StatefulWidget {
+  User? user;
+  AccountSettingPage({super.key});
 
   @override
+  State<StatefulWidget> createState() => _AccountSettingPageState();
+}
+
+class _AccountSettingPageState extends State<AccountSettingPage> {
+  @override
   Widget build(BuildContext context) {
-    return Text('You are logged in!');
+    return Container(
+      child: Column(
+        children: [
+          Text('Name')
+        ],
+      ),
+    );
   }
+
 }
