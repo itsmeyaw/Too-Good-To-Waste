@@ -11,13 +11,25 @@ class AccountPage extends StatefulWidget {
 
 class _MyAccountPageState extends State<AccountPage> {
   bool isSignedIn = false;
+  Logger logger = Logger();
+
+  @override
+  void initState() {
+    _checkLoginState();
+    super.initState();
+  }
+
+  void _checkLoginState() async {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      logger.d(user);
+      setState(() {
+        isSignedIn = user != null;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      isSignedIn = user != null;
-    });
-
     if (!isSignedIn) {
       return AccountLoginPage();
     } else {
@@ -60,13 +72,26 @@ class AccountLoginPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10,),
-          FilledButton(onPressed: () {
-            try {
-              FirebaseAuth.instance.signInWithEmailAndPassword(email: _emailController.text, password: _passwordController.text);
-            } on FirebaseAuthException catch (e) {
-              logger.e(e);
-            }
-          }, child: const Text('Login'))
+          FilledButton(
+              onPressed: () async {
+                try {
+                  await FirebaseAuth.instance.signInWithEmailAndPassword(email: _emailController.text, password: _passwordController.text);
+                } on FirebaseAuthException catch (e) {
+                  logger.e(e);
+                }
+              },
+              child: const Text('Login')
+          ),
+          const SizedBox(height: 10,),
+          TextButton(
+              onPressed: () async {
+              try {
+                await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _emailController.text, password: _passwordController.text);
+              } on FirebaseAuthException catch (e) {
+                logger.e(e);
+              }
+            },
+          child: const Text('Sign Up'))
         ],
       ),
     );
