@@ -1,9 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:ffi';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:wisefood/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:wisefood/account.dart';
 import 'package:wisefood/home.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -47,6 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        actions: [],
       ),
       body: <Widget>[
         const Home(),
@@ -64,7 +72,8 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         const AccountPage()
       ].map((e) => Container(
-        child: e,
+        padding: const EdgeInsets.all(10),
+        child: e
       )).toList()[_activePage],
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
