@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:location/location.dart';
+import 'package:tooGoodToWaste/dto/User.dart';
+import 'package:tooGoodToWaste/dto/PostData.dart';
 
 // The social places timeline
 class Home extends StatelessWidget {
@@ -7,32 +8,57 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const postData = [
+    var users = [
+      User (
+        name: 'Yudhis',
+        rate: 4
+      ),
+      User(
+        name: 'XiYue',
+        rate: 5
+      ),
+      User(
+        name: 'Nana',
+        rate: 4
+      )
+    ];
+
+    var postData = [
       PostData(
           title: 'Red bell pepper',
           distance: 0.2,
           measurement: 'items',
-          amount: 2),
+          amount: 2,
+          user: users[0]
+      ),
       PostData(
           title: 'Green bell pepper',
           distance: 0.3,
           measurement: 'items',
-          amount: 1),
+          amount: 1,
+          user: users[1]
+      ),
       PostData(
           title: 'Grated gouda cheese',
           distance: 0.5,
           measurement: 'grams',
-          amount: 200),
+          amount: 200,
+          user: users[2]
+      ),
       PostData(
           title: 'Green bell pepper',
           distance: 0.6,
           measurement: 'items',
-          amount: 1),
+          amount: 1,
+          user: users[0]
+      ),
       PostData(
           title: 'Green bell pepper',
           distance: 1,
           measurement: 'items',
-          amount: 1)
+          amount: 1,
+          user: users[1]
+      )
     ];
     return Column(
       children: [
@@ -99,19 +125,7 @@ class SearchBar extends StatelessWidget {
   }
 }
 
-class PostData {
-  final String title;
-  final double distance;
-  final String measurement;
-  final double amount;
 
-  const PostData({
-    required this.title,
-    required this.distance,
-    required this.measurement,
-    required this.amount
-  });
-}
 
 class Post extends StatelessWidget {
   final PostData postData;
@@ -157,7 +171,7 @@ class PostPage extends StatelessWidget {
   
   const PostPage({
     super.key,
-    required this.postData
+    required this.postData,
   });
 
   @override
@@ -182,9 +196,17 @@ class PostPage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 20,),
+            const SizedBox(height: 20,),
             Text(postData.title, style: Theme.of(context).textTheme.headlineLarge,),
             Text('Amount: ${postData.amount} ${postData.measurement}', style: Theme.of(context).textTheme.headlineSmall),
+            const Spacer(),
+            FilledButton(
+                onPressed: () {},
+                child: FractionallySizedBox(
+                  widthFactor: 1,
+                  child: Text('Chat with ${postData.user.name}', textAlign: TextAlign.center,),
+                )
+            )
           ],
         )
       )

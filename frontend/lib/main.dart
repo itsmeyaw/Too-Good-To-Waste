@@ -1,10 +1,8 @@
-import 'dart:ffi';
-
 import 'package:firebase_core/firebase_core.dart';
-import 'package:wisefood/firebase_options.dart';
+import 'package:tooGoodToWaste/firebase_options.dart';
 import 'package:flutter/material.dart';
-import 'package:wisefood/pages/account.dart';
-import 'package:wisefood/pages/home.dart';
+import 'package:tooGoodToWaste/pages/account.dart';
+import 'package:tooGoodToWaste/pages/home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,12 +18,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'WiseFood',
+      title: 'Too Good To Waste',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'WiseFood'),
+      home: const MyHomePage(title: 'Too Good To Waste'),
     );
   }
 }
@@ -100,11 +98,11 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ]
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: _activePage == 1 ? FloatingActionButton(
         onPressed: () {},
-        tooltip: 'Increment',
+        tooltip: 'Add new item',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ) : null, // This trailing comma makes auto-formatting nicer for build methods.
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
