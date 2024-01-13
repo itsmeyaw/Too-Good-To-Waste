@@ -238,6 +238,7 @@ class _FrameState extends State<Frame> {
         actions: [],
       ),
     body: Container(
+      padding: const EdgeInsets.all(10),
       decoration: const BoxDecoration(color: Colors.white),
       child: Center(
         child: _getPage(currentPage),
