@@ -1,4 +1,6 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,11 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tooGoodToWaste/helper/DBHelper.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'dart:async';
+
+import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:http/http.dart' as http;
+import 'dart:io';
 
 
 class Inventory extends StatefulWidget {
@@ -24,6 +31,13 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
   TextEditingController quanNumController = TextEditingController();
   TextEditingController quanNumAndTypeController = TextEditingController();
   TextEditingController categoryController = TextEditingController();
+
+ // camera related
+  late String imagePath;
+  late File imageFile;
+  late String imageData;
+  DateTime timeNowDate = DateTime.now();
+  int timeNow = DateTime.now().millisecondsSinceEpoch;
 
   @override
   void dispose(){
@@ -57,8 +71,6 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
   List<String> items = [];
   List<String> itemsWaste = [];
   //List<String> items = ['eggs','milk','butter];
-  DateTime timeNowDate = DateTime.now();
-  int timeNow = DateTime.now().millisecondsSinceEpoch;
 
   //Create Databse Object
   DBHelper dbhelper = DBHelper();
@@ -143,7 +155,7 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
 
   }
 
-   Future<List<dynamic>> getAllItems(String dbname) async {
+  Future<List<dynamic>> getAllItems(String dbname) async {
     //await insertItem();
 
     //get all foods name as a list of string
@@ -184,14 +196,14 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
     return num;
   }
 
-   Future<List<String>> getItemQuanType() async{
+  Future<List<String>> getItemQuanType() async{
     //get all foods quantity number as a list of integers
     List<String> type = await dbhelper.getAllUncosumedFoodStringValues('quantitytype');
 
     return type;
   }
 
-   Future<List<DateTime>> getItemExpiringTime() async{
+  Future<List<DateTime>> getItemExpiringTime() async{
     List<int> expire = await dbhelper.getAllUncosumedFoodIntValues('expiretime') ;
     var expireDate = List<DateTime>.generate(expire.length, (i) => DateTime.fromMillisecondsSinceEpoch(expire[i]));
     return expireDate;
@@ -279,38 +291,101 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
 
   }
 
-  // String checkIfPrimaryStateChanged(int value){
-  //   if (value==0){
-  //     return Achievements.stateList[0];
-  //   }
-  //   else if (value==2){
-  //     return Achievements.stateList[1];
-  //   }
-  //   else if (value==7){
-  //     return Achievements.stateList[2];
-  //   }
-  //   else if (value==15){
-  //     return Achievements.stateList[3];
-  //   }
-  //   else if (value==31){
-  //     return Achievements.stateList[4];
-  //   }
-  //   else if (value==47){
-  //     return Achievements.stateList[5];
-  //   }
-  //   else if (value==79){
-  //     return Achievements.stateList[6];
-  //   }
-  //   else if (value==83){
-  //     return Achievements.stateList[7];
-  //   }
-  //   else if (value==92){
-  //     return Achievements.stateList[8];
-  //   }
-  //   else{
-  //     return "None";
-  //   }
-  // }
+  Future pickImage(bool isCamera) async {
+    XFile? image;
+    if (isCamera == true) {
+      image = await ImagePicker().pickImage(source: ImageSource.camera);
+    } else {
+      image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    }
+    if (image == null) return;
+    CroppedFile? croppedFile = await ImageCropper().cropImage(sourcePath: image.path,
+        aspectRatioPresets: Platform.isAndroid
+            ? [
+          CropAspectRatioPreset.square,
+          CropAspectRatioPreset.ratio3x2,
+          CropAspectRatioPreset.original,
+          CropAspectRatioPreset.ratio4x3,
+          CropAspectRatioPreset.ratio16x9
+        ]
+            : [
+          CropAspectRatioPreset.original,
+          CropAspectRatioPreset.square,
+          CropAspectRatioPreset.ratio3x2,
+          CropAspectRatioPreset.ratio4x3,
+          CropAspectRatioPreset.ratio5x3,
+          CropAspectRatioPreset.ratio5x4,
+          CropAspectRatioPreset.ratio7x5,
+          CropAspectRatioPreset.ratio16x9
+        ],
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Cropper',
+            toolbarColor: Colors.deepOrange,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false),
+          IOSUiSettings(
+          title: 'Cropper',),
+          WebUiSettings(
+            context: context),
+        ],
+      );
+    if(croppedFile != null) {
+      setState(() {
+        imageFile = File(croppedFile.path);
+        imageData = base64Encode(imageFile.readAsBytesSync());
+      });
+    }
+    doUpload();
+  }
+
+  //upload picture request related
+  final url_to_api = "http://34.65.81.128:5000/";
+
+  doUpload() async {
+    Map<String, dynamic> jsonMap = {
+      "image": imageData,
+      "headers": {"Content-Type": "application/json"}
+    };
+    String jsonString = json.encode(jsonMap);
+    http.Response response =
+        await http.post(Uri.parse(url_to_api), body: jsonString);
+    var parsed = jsonDecode(response.body);
+    //fromJson(parsed);
+    parsed.forEach((key, value) async {
+      //record the key and value
+      await insertDBbyKey(key, value);
+      print('#####$key######$value############');
+    });
+    //updateUserValue();
+    print(response.body);
+  }
+
+  Future<void> insertDBbyKey(String name, int number) async {
+    // var maxId = await dbhelper.getMaxId();
+    //print('##########################MaxID = $maxId###############################');
+    //maxId = maxId + 1;
+    //timeNow -> DateTime, + 7 days, --> int timestamp
+    var expireDate = timeNowDate.add(const Duration(days: 7)).millisecondsSinceEpoch;
+    print('#########################$expireDate##################');
+    var newFood = Food(
+        name: name,
+        category: 'Meat',
+        boughttime: timeNow,
+        expiretime: expireDate,
+        quantitytype: 'bag',
+        quantitynum: number,
+        consumestate: 0.0,
+        state: 'good');
+
+    print(newFood);
+
+    await dbhelper.insertFood(newFood);
+    print(await dbhelper.queryAll('foods'));
+  }
+
+
 
   var txt = TextEditingController();
   late TooltipBehavior _tooltipBehavior;
@@ -587,16 +662,38 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
         ],
       ),
 
-      floatingActionButton: FloatingActionButton(
-        tooltip: "Add item",
-        onPressed: () {
-          // clear out txt buffer before entering new screen
-          txt.value = const TextEditingValue();
-          //pushAddItemPage();
-          pushAddItemScreen();
-        },
-        child: const Icon(Icons.add, color: Colors.white,),
-      ),
+      floatingActionButton:
+        Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+          FloatingActionButton(
+            tooltip: "Add item",
+            backgroundColor: const Color.fromRGBO(178,207, 135, 0.8),
+            onPressed: () {
+              // clear out txt buffer before entering new screen
+              txt.value = const TextEditingValue();
+              //pushAddItemPage();
+              pushAddItemScreen();
+            },
+            child: const Icon(Icons.add, color: Colors.white,),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          FloatingActionButton(
+            backgroundColor: const Color.fromRGBO(178,207, 135, 0.8),
+            onPressed: () => pickImage(false),
+            heroTag: null,
+            child: const Icon(Icons.photo_album, color: Colors.white,),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          FloatingActionButton(
+                backgroundColor: const Color.fromRGBO(178,207, 135, 0.8),
+                onPressed: () => pickImage(true),
+                heroTag: null,
+                child: const Icon(Icons.camera_alt, color: Colors.white),
+          )
+        ]),
     );
     }
 
@@ -1051,6 +1148,7 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
   {
     return Row(children: strings.map((item) => Text(item)).toList());
   }
+
   Widget heightSpacer(double myHeight) => SizedBox(height: myHeight);
   /// opens add new item screen
   void pushAddItemScreen() {
