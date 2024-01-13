@@ -99,20 +99,28 @@ class AccountLoginPage extends StatelessWidget {
 }
 
 class AccountSettingPage extends StatefulWidget {
-  User? user;
-  AccountSettingPage({super.key});
+  const AccountSettingPage({super.key});
 
   @override
   State<StatefulWidget> createState() => _AccountSettingPageState();
 }
 
 class _AccountSettingPageState extends State<AccountSettingPage> {
+  User? user;
+
+  @override
+  void initState() {
+    FirebaseAuth.instance.currentUser;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       child: Column(
         children: [
-          Text('Name')
+          Text('Name'),
+          Text('${FirebaseAuth.instance.currentUser?.displayName}')
         ],
       ),
     );
