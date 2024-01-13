@@ -2,25 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:tooGoodToWaste/Pages/home.dart';
 import 'package:tooGoodToWaste/Pages/account.dart';
 import 'package:tooGoodToWaste/pages/Inventory.dart';
-// import 'components/bottomTopScreen.dart';
 import 'package:tooGoodToWaste/helper/DBHelper.dart';
-// import 'package:fancy_bottom_navigation/fancy_bottom_navigation.dart';
 import 'dart:async';
+
+
 class Frame extends StatefulWidget {
-  const Frame({Key? key}) : super(key: key);
+  const Frame({super.key});
 
   @override
-  _FrameState createState() => _FrameState();
+  State<StatefulWidget> createState() => _FrameState();
 }
 
 class _FrameState extends State<Frame> {
   bool b = false;
 
-  //Create Databse Object
-  DBHelper dbhelper = DBHelper(); 
+  // Create Database Object
+  DBHelper dbHelper = DBHelper();
   DateTime timeNowDate = DateTime.now();
   int timeNow = DateTime.now().millisecondsSinceEpoch;
-  // navigationbar related
+  // Navigation Bar related
   AnimationController? animationController;
   
 
@@ -44,7 +44,7 @@ class _FrameState extends State<Frame> {
   Future<void> autocheckWaste() async{
     //get every instance out of Foods table and compare its expiretime with current time
     //int maxID = await dbhelper.getMaxId();
-    var foods = await dbhelper.queryAllGoodFood('good');
+    var foods = await dbHelper.queryAllGoodFood('good');
     //var foods = await dbhelper.queryAllUnconsumedFood();
     print('######################$foods#################');
 
@@ -55,11 +55,11 @@ class _FrameState extends State<Frame> {
       var foodState = foods[i].state;
       if(expiretime < timeNow){
         if(foodState == 'good' || foodState == 'expiring') {
-          await dbhelper.updateFoodWaste(foodName);
+          await dbHelper.updateFoodWaste(foodName);
         }
         //update uservalue negative
 
-        String category = await dbhelper.getOneFoodValue(foodName, 'category');
+        String category = await dbHelper.getOneFoodValue(foodName, 'category');
         showExpiredDialog(foodName, category);
         print('###########################$foodName is wasted###########################');
       }
@@ -73,8 +73,8 @@ class _FrameState extends State<Frame> {
       // ignore: unrelated_type_equality_checks
       if(remainDays < 2 && foodState == 'good' && remainDays > 0){
         //pop up a toast
-        await dbhelper.updateFoodExpiring(foodName);
-        String category = await dbhelper.getOneFoodValue(foodName, 'category');
+        await dbHelper.updateFoodExpiring(foodName);
+        String category = await dbHelper.getOneFoodValue(foodName, 'category');
         showExpiringDialog(foodName, category);
         print('###########################$foodName is expiring!!!###########################');
       }
@@ -177,7 +177,7 @@ class _FrameState extends State<Frame> {
         quantitynum: 3,
         consumestate: 0.50,
         state: 'good');
-    await dbhelper.insertFood(butter);
+    await dbHelper.insertFood(butter);
     var egg = Food(
         name: 'eggs',
         category: 'Egg',
@@ -187,7 +187,7 @@ class _FrameState extends State<Frame> {
         quantitynum: 4,
         consumestate: 0,
         state: 'good');
-    await dbhelper.insertFood(egg);
+    await dbHelper.insertFood(egg);
 
     //Insert a new UserValue instance
     var user1 = UserValue(name: "user1",
@@ -202,8 +202,8 @@ class _FrameState extends State<Frame> {
         fatherstate: "single",
         motherstate: "single",
         time: timeNow);
-    await dbhelper.insertUser(user1);
-    print(await dbhelper.queryAll("users"));
+    await dbHelper.insertUser(user1);
+    print(await dbHelper.queryAll("users"));
 
     //await dbhelper.testDB();
   }
@@ -240,9 +240,7 @@ class _FrameState extends State<Frame> {
     body: Container(
       padding: const EdgeInsets.all(10),
       decoration: const BoxDecoration(color: Colors.white),
-      child: Center(
-        child: _getPage(currentPage),
-      ),
+      child: _getPage(currentPage),
     ),
     bottomNavigationBar: NavigationBar(
       onDestinationSelected: (int index) {

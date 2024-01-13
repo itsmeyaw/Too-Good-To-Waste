@@ -110,7 +110,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
 
   @override
   void initState() {
-    FirebaseAuth.instance.currentUser;
+    user = FirebaseAuth.instance.currentUser;
     super.initState();
   }
 
@@ -118,8 +118,9 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
   Widget build(BuildContext context) {
     return Container(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Name'),
+          Text('Name', textAlign: TextAlign.start,),
           Text('${FirebaseAuth.instance.currentUser?.displayName}')
         ],
       ),
