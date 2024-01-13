@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sg2024/components/dialog.dart';
+import 'package:TooGoodToWaste/components/dialog.dart';
 
 import '../components/datePicker.dart';
 import '../components/quantityDialog.dart';
-import 'package:sg2024/Helper/DB_Helper.dart';
+import 'package:TooGoodToWaste/Helper/DB_Helper.dart';
 
-import 'AchievementPage.dart';
+import 'account.dart';
 
 class InputPage extends StatefulWidget {
   const InputPage({Key? key}) : super(key: key);
@@ -314,7 +314,7 @@ class _InputPageState extends State<InputPage> {
                     var remainExpireDays = ExpireDays.difference(timeNowDate).inDays;
                     addItemExpi(remainExpireDays);
                     addItemName(food[0]);
-                    showAchievementDialog(Achievements.achievementNameList[4]);
+                    //showAchievementDialog(Achievements.achievementNameList[4]);
                     print(food);
 
                     //Calculate the current state of the new food
@@ -332,10 +332,10 @@ class _InputPageState extends State<InputPage> {
                     print('#########${user1[0].primarystate}#############');
                     print(user1[0].positive-user1[0].negative);
                     print("===========================");
-                    String check = checkIfPrimaryStateChanged(user1[0].positive-user1[0].negative);
-                    if (check!='None'){
-                      showAchievementDialog(check);
-                    }
+                    // String check = checkIfPrimaryStateChanged(user1[0].positive-user1[0].negative);
+                    // if (check!='None'){
+                    //   showAchievementDialog(check);
+                    // }
 
                     } on FormatException{
                       print('Format Error!');
@@ -418,68 +418,68 @@ class _InputPageState extends State<InputPage> {
    );
   }
 
-  String checkIfPrimaryStateChanged(int value){
-    if (value==2){
-      return Achievements.achievementNameList[1];
-    }
-    else if (value==7){
-      return Achievements.achievementNameList[2];
-    }
-    else if (value==15){
-      return Achievements.achievementNameList[3];
-    }
-    else if (value==31){
-      return Achievements.achievementNameList[4];
-    }
-    else if (value==47){
-      return Achievements.achievementNameList[5];
-    }
-    else if (value==79){
-      return Achievements.achievementNameList[6];
-    }
-    else if (value==83){
-      return Achievements.achievementNameList[7];
-    }
-    else if (value==92){
-      return Achievements.achievementNameList[8];
-    }
-    else{
-      return "None";
-    }
-  }
+  // String checkIfPrimaryStateChanged(int value){
+  //   if (value==2){
+  //     return Achievements.achievementNameList[1];
+  //   }
+  //   else if (value==7){
+  //     return Achievements.achievementNameList[2];
+  //   }
+  //   else if (value==15){
+  //     return Achievements.achievementNameList[3];
+  //   }
+  //   else if (value==31){
+  //     return Achievements.achievementNameList[4];
+  //   }
+  //   else if (value==47){
+  //     return Achievements.achievementNameList[5];
+  //   }
+  //   else if (value==79){
+  //     return Achievements.achievementNameList[6];
+  //   }
+  //   else if (value==83){
+  //     return Achievements.achievementNameList[7];
+  //   }
+  //   else if (value==92){
+  //     return Achievements.achievementNameList[8];
+  //   }
+  //   else{
+  //     return "None";
+  //   }
+  // }
 
-  showAchievementDialog(String state){
-    double width= MediaQuery.of(context).size.width;
-    double height= MediaQuery.of(context).size.height;
-    int stateIndex= Achievements.stateMap[state]??-1;
-    AlertDialog dialog = AlertDialog(
-      title: const Text("Congratulations!"),
-      content:
-      Container(
-        width: 3*width/5,
-        height: height/3,
-        padding: const EdgeInsets.all(10.0),
-        child:
-        Column(
-          children: [
-            Expanded(child: stateIndex>-1? Image.asset(Achievements.imageList[stateIndex]):Image.asset(Achievements.imageList[12])),
-            Text(
-                stateIndex>-1?"You have made the achievement ${Achievements.achievementNameList[stateIndex]}":"Something goes wrong. We are fixing it.",
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.bold))
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, 'OK'),
-          child: const Text('OK'),
-        ),
-      ],
-    );
-    showDialog(context: context, builder: (BuildContext context){
-      return dialog;
-    });
-  }
+  // showAchievementDialog(String state){
+  //   double width= MediaQuery.of(context).size.width;
+  //   double height= MediaQuery.of(context).size.height;
+  //   int stateIndex= Achievements.stateMap[state]??-1;
+  //   AlertDialog dialog = AlertDialog(
+  //     title: const Text("Congratulations!"),
+  //     content:
+  //     Container(
+  //       width: 3*width/5,
+  //       height: height/3,
+  //       padding: const EdgeInsets.all(10.0),
+  //       child:
+  //       Column(
+  //         children: [
+  //           Expanded(child: stateIndex>-1? Image.asset(Achievements.imageList[stateIndex]):Image.asset(Achievements.imageList[12])),
+  //           Text(
+  //               stateIndex>-1?"You have made the achievement ${Achievements.achievementNameList[stateIndex]}":"Something goes wrong. We are fixing it.",
+  //               textAlign: TextAlign.center,
+  //               overflow: TextOverflow.ellipsis,
+  //               style: const TextStyle(fontWeight: FontWeight.bold))
+  //         ],
+  //       ),
+  //     ),
+  //     actions: [
+  //       TextButton(
+  //         onPressed: () => Navigator.pop(context, 'OK'),
+  //         child: const Text('OK'),
+  //       ),
+  //     ],
+  //   );
+  //   showDialog(context: context, builder: (BuildContext context){
+  //     return dialog;
+  //   });
+  // }
 }

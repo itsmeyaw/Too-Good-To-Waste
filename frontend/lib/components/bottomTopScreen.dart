@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:rive/rive.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-import '../Pages/AchievementPage.dart';
-import 'package:sg2024/Helper/DB_Helper.dart';
+import '../Pages/account.dart';
+import 'package:TooGoodToWaste/Helper/DB_Helper.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'dart:async';
 
@@ -72,7 +72,7 @@ class _BottomTopScreenState extends State<BottomTopScreen> with TickerProviderSt
     var user1 = await dbhelper.queryAll('users');
     int value = user1[0].positive - user1[0].negative;
     String primaryState;
-    String check = checkIfPrimaryStateChanged(value);
+    // String check = checkIfPrimaryStateChanged(value);
     String secondaryState = user1[0].secondarystate;
 
     if (value < 2){
@@ -113,7 +113,8 @@ class _BottomTopScreenState extends State<BottomTopScreen> with TickerProviderSt
       await dbhelper.updateUserPrimary(primaryState);
     }
 
-    if (secondaryState=="true"&&check!="None"){
+    // if (secondaryState=="true" && check!="None"){
+      if (secondaryState=="true"){
         await dbhelper.updateUserSecondary("false");
     }
   }
@@ -281,38 +282,38 @@ class _BottomTopScreenState extends State<BottomTopScreen> with TickerProviderSt
 
   }
 
-  String checkIfPrimaryStateChanged(int value){
-    if (value==0){
-      return Achievements.stateList[0];
-    }
-    else if (value==2){
-      return Achievements.stateList[1];
-    }
-    else if (value==7){
-      return Achievements.stateList[2];
-    }
-    else if (value==15){
-      return Achievements.stateList[3];
-    }
-    else if (value==31){
-      return Achievements.stateList[4];
-    }
-    else if (value==47){
-      return Achievements.stateList[5];
-    }
-    else if (value==79){
-      return Achievements.stateList[6];
-    }
-    else if (value==83){
-      return Achievements.stateList[7];
-    }
-    else if (value==92){
-      return Achievements.stateList[8];
-    }
-    else{
-      return "None";
-    }
-  }
+  // String checkIfPrimaryStateChanged(int value){
+  //   if (value==0){
+  //     return Achievements.stateList[0];
+  //   }
+  //   else if (value==2){
+  //     return Achievements.stateList[1];
+  //   }
+  //   else if (value==7){
+  //     return Achievements.stateList[2];
+  //   }
+  //   else if (value==15){
+  //     return Achievements.stateList[3];
+  //   }
+  //   else if (value==31){
+  //     return Achievements.stateList[4];
+  //   }
+  //   else if (value==47){
+  //     return Achievements.stateList[5];
+  //   }
+  //   else if (value==79){
+  //     return Achievements.stateList[6];
+  //   }
+  //   else if (value==83){
+  //     return Achievements.stateList[7];
+  //   }
+  //   else if (value==92){
+  //     return Achievements.stateList[8];
+  //   }
+  //   else{
+  //     return "None";
+  //   }
+  // }
 
   var txt = TextEditingController();
   late TooltipBehavior _tooltipBehavior;

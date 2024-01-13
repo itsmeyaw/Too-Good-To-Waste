@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sg2024/Pages/homePage.dart';
-import 'package:sg2024/Pages/AchievementPage.dart';
+import 'package:TooGoodToWaste/Pages/home.dart';
+import 'package:TooGoodToWaste/Pages/account.dart';
 import 'components/bottomTopScreen.dart';
-import 'package:sg2024/Helper/DB_Helper.dart';
+import 'package:TooGoodToWaste/Helper/DB_Helper.dart';
 // import 'package:fancy_bottom_navigation/fancy_bottom_navigation.dart';
 import 'dart:async';
 class Frame extends StatefulWidget {
@@ -219,7 +219,7 @@ class _FrameState extends State<Frame> {
       case 1:
         return const HomePage();
       default:
-      return Achievements();
+      return const AccountPage();
     }
   }
 
