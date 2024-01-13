@@ -1,8 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:tooGoodToWaste/firebase_options.dart';
 import 'package:flutter/material.dart';
-import 'package:tooGoodToWaste/pages/account.dart';
-import 'package:tooGoodToWaste/pages/home.dart';
+import 'package:tooGoodToWaste/pages/Account.dart';
+import 'package:tooGoodToWaste/pages/Home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tooGoodToWaste/dto/User.dart';
 import 'package:tooGoodToWaste/dto/PostData.dart';
 
-import 'chat.dart';
+import 'Chat.dart';
 
 // The social places timeline
 class Home extends StatelessWidget {
