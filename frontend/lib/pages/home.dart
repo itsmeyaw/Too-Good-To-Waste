@@ -182,7 +182,7 @@ class PostPage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 10,),
+            SizedBox(height: 20,),
             Text(postData.title, style: Theme.of(context).textTheme.headlineLarge,),
             Text('Amount: ${postData.amount} ${postData.measurement}', style: Theme.of(context).textTheme.headlineSmall),
           ],
