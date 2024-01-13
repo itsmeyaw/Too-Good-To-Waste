@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.2.4 <4.0.0'
+  sdk: '>=3.2.3 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -59,8 +59,40 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+# The following section is specific to Flutter.
 flutter:
-
+  assets:
+    - assets/anime/birth.riv
+    - assets/anime/breath.riv
+    - assets/anime/chid-breathe.riv
+    - assets/anime/chid-fly.riv
+    - assets/anime/female_breath.riv
+    - assets/anime/female_fly.riv
+    - assets/anime/hardshake.riv
+    - assets/anime/shake.riv
+    - assets/anime/fly.riv
+    - assets/anime/wasted.riv
+    - assets/anime/noWasted.riv
+    - assets/images/backyard.png
+    - assets/images/tree.png
+    - assets/achievements/initialization.png
+    - assets/achievements/first_encounter.png
+    - assets/achievements/nesting.png
+    - assets/achievements/newborn.png
+    - assets/achievements/courtship.png
+    - assets/achievements/new_coming.png
+    - assets/achievements/snow_owl.png
+    - assets/achievements/tawny_owl.png
+    - assets/achievements/asio_owl.png
+    - assets/achievements/mystery.png
+    - assets/category/fruits.png
+    - assets/category/seafood.png
+    - assets/category/meat.png
+    - assets/category/vegetable.png
+    - assets/category/milk.png
+    - assets/category/egg.png
+    - assets/category/cheese.png
+    - assets/category/others.png
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

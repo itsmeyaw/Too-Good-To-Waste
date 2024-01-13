@@ -114,6 +114,7 @@ class _InputPageState extends State<AddInventoryPage> {
     print(await dbhelper.queryAll('foods'));
 
   }
+  
   Future<void> addItemName(value) async {
 
     List<String> items = await dbhelper.getAllUncosumedFoodStringValues('name');
@@ -158,7 +159,7 @@ class _InputPageState extends State<AddInventoryPage> {
           "Select an expiration date",
           style: TextStyle(
             fontSize: 15,
-            color: Colors.grey,
+            color: Colors.lime,
           ),
         ),
         Row(
@@ -282,7 +283,7 @@ class _InputPageState extends State<AddInventoryPage> {
           ],
         ),
         floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: const Color(0xff03dac6),
+          backgroundColor: Color.fromARGB(255, 2, 200, 181),
           foregroundColor: Colors.black,
           onPressed: () async {
             // Respond to button press  -----> write in database

@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "686754712481",
+    "firebase_url": "https://sc2024-96b48-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "sc2024-96b48",
+    "storage_bucket": "sc2024-96b48.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:686754712481:android:53ff9bd3df9f9d622459e0",
+        "android_client_info": {
+          "package_name": "com.example.frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCP8A9ut7Q7ZtfkMbKGSNpj6fC07Plu63M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
