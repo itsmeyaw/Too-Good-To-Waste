@@ -14,33 +14,24 @@ class _MyAccountPageState extends State<AccountPage> {
   Logger logger = Logger();
 
   @override
-  void initState() {
-    _checkLoginState();
-    super.initState();
-  }
-
-  void _checkLoginState() async {
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      logger.d(user);
-      setState(() {
-        user = user;
-      });
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (user == null) {
-      return Container(
+    return Container(
         padding: const EdgeInsets.all(10),
-        child: AccountLoginPage(),
-      );
-    } else {
-      return Container(
-          padding: const EdgeInsets.all(10),
-          child: AccountSettingPage()
-      );
-    }
+          child: StreamBuilder(stream: FirebaseAuth.instance.authStateChanges(), builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.active) {
+          User? user = snapshot.data;
+          if (user == null) {
+            return AccountLoginPage();
+          } else {
+            return AccountSettingPage(user: user);
+          }
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      })
+    );
   }
 }
 
@@ -104,23 +95,12 @@ class AccountLoginPage extends StatelessWidget {
   }
 }
 
-class AccountSettingPage extends StatefulWidget {
-  const AccountSettingPage({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _AccountSettingPageState();
-}
-
-class _AccountSettingPageState extends State<AccountSettingPage> {
-  User? user;
-
-  @override
-  void initState() {
-    setState(() {
-      user = FirebaseAuth.instance.currentUser;
-    });
-    super.initState();
-  }
+class AccountSettingPage extends StatelessWidget {
+  final User user;
+  const AccountSettingPage({
+    super.key,
+    required this.user
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -129,13 +109,12 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Name'),
-          Text('${user?.displayName}', style: Theme.of(context).textTheme.bodyLarge,),
+          Text('${user.displayName}', style: Theme.of(context).textTheme.bodyLarge,),
           SizedBox(height: 10,),
           Text('E-Mail'),
-          Text('${user?.email}', style: Theme.of(context).textTheme.bodyLarge,)
+          Text('${user.email}', style: Theme.of(context).textTheme.bodyLarge,)
         ],
       ),
     );
   }
-
 }
