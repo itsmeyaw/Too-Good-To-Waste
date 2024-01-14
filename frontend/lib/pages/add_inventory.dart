@@ -1,10 +1,10 @@
-import 'package:tooGoodToWaste/helper/DbHelper.dart';
+import 'package:tooGoodToWaste/helper/db_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../components/datePicker.dart';
+import '../components/date_picker.dart';
 import '../components/dialog.dart';
-import '../components/quantityDialog.dart';
+import '../components/quantity_dialog.dart';
 
 class AddInventoryPage extends StatefulWidget {
   const AddInventoryPage({super.key});

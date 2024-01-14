@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../dto/PostData.dart';
+import '../dto/post_data.dart';
 
 class PostPage extends StatelessWidget {
   final PostData postData;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tooGoodToWaste/dto/User.dart';
-import 'package:tooGoodToWaste/dto/PostData.dart';
-import '../Pages/PostPage.dart';
+import 'package:tooGoodToWaste/dto/user_model.dart';
+import 'package:tooGoodToWaste/dto/post_data.dart';
+import '../Pages/post_page.dart';
 
 // The social places timeline
 class Home extends StatelessWidget {

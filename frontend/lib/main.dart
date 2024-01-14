@@ -4,11 +4,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:tooGoodToWaste/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:tooGoodToWaste/frame.dart';
-import 'package:tooGoodToWaste/helper/DBHelper.dart';
-import 'package:tooGoodToWaste/pages/Account.dart';
-import 'package:tooGoodToWaste/pages/AddInventory.dart';
-import 'package:tooGoodToWaste/pages/Home.dart';
-import 'package:tooGoodToWaste/pages/Inventory.dart';
+import 'package:tooGoodToWaste/helper/db_helper.dart';
+import 'package:tooGoodToWaste/pages/account.dart';
+import 'package:tooGoodToWaste/pages/add_inventory.dart';
+import 'package:tooGoodToWaste/pages/home.dart';
+import 'package:tooGoodToWaste/pages/inventory.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

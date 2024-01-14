@@ -1,4 +1,4 @@
-import 'package:tooGoodToWaste/dto/User.dart';
+import 'package:tooGoodToWaste/dto/user_model.dart';
 
 class Message {
   final String message;
