@@ -3,19 +3,14 @@ import 'package:tooGoodToWaste/dto/Message.dart';
 import '../dto/User.dart';
 
 class ChatPage extends StatefulWidget {
-  User remoteUser;
-
-  ChatPage({
-    super.key,
-    required this.remoteUser
-  });
+  const ChatPage({super.key});
 
   @override
   State<StatefulWidget> createState() => _ChatState();
 }
 
 class _ChatState extends State<ChatPage> {
-  var chats = [
+  var chats = <Message>[
   ];
 
   @override

@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
@@ -110,7 +111,12 @@ class AccountSettingPage extends StatelessWidget {
             Text('Personal Information', style: Theme.of(context).textTheme.headlineSmall,),
             const SizedBox(height: 5,),
             const Text('Name'),
-            Text('${user.displayName}', style: Theme.of(context).textTheme.bodyLarge,),
+            RichText(
+                text: TextSpan(
+                    text: 'Empty',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                )
+            ),
             const SizedBox(height: 10,),
             const Text('E-Mail'),
             Text('${user.email}', style: Theme.of(context).textTheme.bodyLarge,),
@@ -122,7 +128,10 @@ class AccountSettingPage extends StatelessWidget {
             const SizedBox(height: 10,),
             const Text('Carbon Emission Saved'),
             Text('2 kg', style: Theme.of(context).textTheme.bodyLarge,),
-
+            const SizedBox(height: 20,),
+            Text('Active Food Posts', style: Theme.of(context).textTheme.headlineSmall,),
+            const SizedBox(height: 5,),
+            Text('No active food post at the moment', style: Theme.of(context).textTheme.bodyLarge,),
           ],
         )
     );
