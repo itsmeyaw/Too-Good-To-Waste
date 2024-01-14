@@ -416,15 +416,15 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        toolbarHeight: 0,
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
-            Tab(icon: Icon(Icons.storefront), text: "Current"),
-            Tab(icon: Icon(Icons.restore_from_trash_sharp), text: "Wasted"),
-            Tab(icon: Icon(Icons.business), text: "Plan"),
+            Tab(icon: Icon(Icons.storefront_outlined), text: "Current"),
+            Tab(icon: Icon(Icons.delete_outline), text: "Wasted"),
+            Tab(icon: Icon(Icons.calendar_today), text: "Plan"),
           ],
-        ),
-        toolbarHeight: 20,
+        )
       ),
 
       body: TabBarView(

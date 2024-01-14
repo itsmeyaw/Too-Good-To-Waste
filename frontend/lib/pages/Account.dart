@@ -95,6 +95,7 @@ class AccountLoginPage extends StatelessWidget {
 
 class AccountSettingPage extends StatelessWidget {
   final User user;
+
   const AccountSettingPage({
     super.key,
     required this.user
@@ -102,38 +103,79 @@ class AccountSettingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-        height: MediaQuery.of(context).size.height,
-        child: ListView(
-          children: [
-            const SizedBox(height: 10,),
-            Text('Personal Information', style: Theme.of(context).textTheme.headlineSmall,),
-            const SizedBox(height: 5,),
-            const Text('Name'),
-            RichText(
-                text: TextSpan(
-                    text: 'Empty',
-                    style: Theme.of(context).textTheme.bodyLarge,
+    return DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+            toolbarHeight: 0,
+            bottom: const TabBar(
+              tabs: [
+                Tab(
+                  icon: Icon(Icons.person_outline),
+                  text: 'Pers. Info',
+                ),
+                Tab(
+                  icon: Icon(Icons.stars_outlined),
+                  text: 'Achievements',
+                ),
+                Tab(
+                  icon: Icon(Icons.notifications_active_outlined),
+                  text: 'Active Posts',
                 )
+              ],
             ),
-            const SizedBox(height: 10,),
-            const Text('E-Mail'),
-            Text('${user.email}', style: Theme.of(context).textTheme.bodyLarge,),
-            const SizedBox(height: 20,),
-            Text('Achievements', style: Theme.of(context).textTheme.headlineSmall,),
-            const SizedBox(height: 5,),
-            const Text('GoodPoints'),
-            Text('120', style: Theme.of(context).textTheme.bodyLarge,),
-            const SizedBox(height: 10,),
-            const Text('Carbon Emission Saved'),
-            Text('2 kg', style: Theme.of(context).textTheme.bodyLarge,),
-            const SizedBox(height: 20,),
-            Text('Active Food Posts', style: Theme.of(context).textTheme.headlineSmall,),
-            const SizedBox(height: 5,),
-            Text('No active food post at the moment', style: Theme.of(context).textTheme.bodyLarge,),
-          ],
-        )
+          ),
+          body: TabBarView(
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                height: MediaQuery.of(context).size.height,
+                child: ListView(
+                        children: [
+                        const SizedBox(height: 10,),
+                        const Text('Name'),
+                        RichText(
+                            text: TextSpan(
+                              text: 'Empty',
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            )
+                        ),
+                        const SizedBox(height: 10,),
+                        const Text('E-Mail'),
+                        Text('${user.email}', style: Theme.of(context).textTheme.bodyLarge,),
+                        const SizedBox(height: 20,),
+                      ]
+                    ),
+              ),
+              Container(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                height: MediaQuery.of(context).size.height,
+                child: ListView(
+                    children: [
+                      const SizedBox(height: 10,),
+                      const Text('GoodPoints'),
+                      Text('120', style: Theme.of(context).textTheme.bodyLarge,),
+                      const SizedBox(height: 10,),
+                      const Text('Carbon Emission Reduced'),
+                      Text('2 kg', style: Theme.of(context).textTheme.bodyLarge,),
+                      const SizedBox(height: 20,),
+                    ]
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                height: MediaQuery.of(context).size.height,
+                child: ListView(
+                    children: const [
+                      SizedBox(height: 10,),
+                      Text('You have no active post currently'),
+                    ]
+                ),
+              )
+            ],
+          ),
+      )
     );
   }
 }
