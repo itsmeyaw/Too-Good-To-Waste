@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:rive/rive.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tooGoodToWaste/helper/DBHelper.dart';
@@ -521,69 +522,72 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
           ),
           Container(
             padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 10,),
-                  Text('Your Statistic', style: Theme.of(context).textTheme.headlineMedium,),
-                  const SizedBox(height: 5,),
-                  Text('Month: January'),
-                  const SizedBox(height: 10,),
-                  Container (
-                      height: 200,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 200,
-                            child: PieChart(
-                                PieChartData(
-                                    sections: [
-                                      PieChartSectionData(
-                                          value: 10,
-                                          title: 'Wasted',
-                                          color: Colors.red
-                                      ),
-                                      PieChartSectionData(
-                                          value: 50,
-                                          title: 'Used',
-                                          color: Colors.blue
-                                      ),
-                                      PieChartSectionData(
-                                          value: 25,
-                                          title: 'Shared',
-                                          color: Colors.green
-                                      ),
-                                      PieChartSectionData(
-                                          value: 10,
-                                          title: 'Almost Expired',
-                                          color: Colors.yellow
-                                      )
-                                    ]
-                                )
-                            ),
-                          )
-                        ],
-                      )
-                  ),
-                  const SizedBox(height: 20,),
-                  Text('Period: Jan 2023 - Des 2023'),
-                  const SizedBox(height: 10,),
-                  Container (
-                      height: 200,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width - 20, // 20 is padding left + right
-                            child: _LineChart(),
-                          )
-                        ],
-                      )
-                  ),
-                ]
-            ),
+            child: ListView(children: [
+              Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10,),
+                    Text('Your Statistic', style: Theme.of(context).textTheme.headlineMedium,),
+                    const SizedBox(height: 5,),
+                    Text('Month: January'),
+                    const SizedBox(height: 10,),
+                    Container (
+                        height: 200,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 200,
+                              child: PieChart(
+                                  PieChartData(
+                                      sections: [
+                                        PieChartSectionData(
+                                            value: 10,
+                                            title: 'Wasted',
+                                            color: Colors.red
+                                        ),
+                                        PieChartSectionData(
+                                            value: 50,
+                                            title: 'Used',
+                                            color: Colors.blue
+                                        ),
+                                        PieChartSectionData(
+                                            value: 25,
+                                            title: 'Shared',
+                                            color: Colors.green
+                                        ),
+                                        PieChartSectionData(
+                                            value: 10,
+                                            title: 'Almost Expired',
+                                            color: Colors.yellow
+                                        )
+                                      ]
+                                  )
+                              ),
+                            )
+                          ],
+                        )
+                    ),
+                    const SizedBox(height: 20,),
+                    Text('Period: Jan 2023 - Des 2023'),
+                    const SizedBox(height: 10,),
+                    Container (
+                        height: 200,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width - 20, // 20 is padding left + right
+                              child: _LineChart(),
+                            )
+                          ],
+                        )
+                    ),
+                  ]
+              ),
+            ],
+            )
           ),
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -1054,6 +1058,7 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
               builder: (BuildContext context) {
                 return Scaffold(
                   appBar: AppBar(
+                      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
                       title: const Text('Item Detail Page')
                   ),
                   body: Column(
