@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tooGoodToWaste/Pages/home.dart';
 import 'package:tooGoodToWaste/Pages/account.dart';
 import 'package:tooGoodToWaste/pages/inventory.dart';
-import 'package:tooGoodToWaste/helper/db_helper.dart';
+import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'dart:async';
 
 

@@ -1,4 +1,4 @@
-import 'package:tooGoodToWaste/helper/db_helper.dart';
+import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
