@@ -63,7 +63,7 @@ class Home extends StatelessWidget {
       )
     ];
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.fromLTRB(10, 10, 10 ,0),
       child: Column(
         children: [
         const FractionallySizedBox(

@@ -15,7 +15,6 @@ class Frame extends StatefulWidget {
 
 class _FrameState extends State<Frame> {
   bool b = false;
-  TabBar? bottomAppBar;
 
   // Create Database Object
   DBHelper dbHelper = DBHelper();
@@ -205,15 +204,12 @@ class _FrameState extends State<Frame> {
         time: timeNow);
     await dbHelper.insertUser(user1);
     print(await dbHelper.queryAll("users"));
-
-    //await dbhelper.testDB();
   }
-
-  //bottom navigation
 
   int currentPage = 1;
  
   GlobalKey bottomNavigationKey = GlobalKey();
+
   _getPage(int page) {
     switch (page) {
       case 0:       
@@ -221,47 +217,46 @@ class _FrameState extends State<Frame> {
       case 1:
         return const Inventory();
       default:
-      return const AccountPage();
+        return const AccountPage();
     }
   }
 
-@override
-  Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Too Good To Waste'),
-        bottom: bottomAppBar,
-        actions: [],
+  @override
+    Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: const Text('Too Good To Waste'),
+          actions: [],
+        ),
+      body: Container(
+        child: _getPage(currentPage),
       ),
-    body: Container(
-      child: _getPage(currentPage),
-    ),
-    bottomNavigationBar: NavigationBar(
-      onDestinationSelected: (int index) {
-          setState(() {
-            currentPage = index;
-          });
-        },
-        selectedIndex: currentPage,
-        destinations: const <Widget>[
-          NavigationDestination(
-              selectedIcon: Icon(Icons.home),
-              icon: Icon(Icons.home_outlined),
-              label: 'Home'
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.inventory_2),
-              icon: Icon(Icons.inventory_2_outlined),
-              label: 'Inventory'
-          ),
-          NavigationDestination(
-              selectedIcon: Icon(Icons.person),
-              icon: Icon(Icons.person_outline),
-              label: 'Account'
-          )
-        ]
-      )
-  );
-}
+      bottomNavigationBar: NavigationBar(
+          onDestinationSelected: (int index) {
+            setState(() {
+              currentPage = index;
+            });
+          },
+          selectedIndex: currentPage,
+          destinations: const <Widget>[
+            NavigationDestination(
+                selectedIcon: Icon(Icons.home),
+                icon: Icon(Icons.home_outlined),
+                label: 'Home'
+            ),
+            NavigationDestination(
+              selectedIcon: Icon(Icons.inventory_2),
+                icon: Icon(Icons.inventory_2_outlined),
+                label: 'Inventory'
+            ),
+            NavigationDestination(
+                selectedIcon: Icon(Icons.person),
+                icon: Icon(Icons.person_outline),
+                label: 'Account'
+            )
+          ]
+        )
+    );
+  }
 }

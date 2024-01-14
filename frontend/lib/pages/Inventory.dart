@@ -415,6 +415,7 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -423,7 +424,6 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
             Tab(icon: Icon(Icons.business), text: "Plan"),
           ],
         ),
-        title: const Text("Item List", style: TextStyle(color: Colors.white),),
         toolbarHeight: 20,
       ),
 
@@ -433,25 +433,10 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
           Column(
             children: [
               TextField(
-                style: const TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontFamily: "SegoeUI",
-                    fontStyle: FontStyle.normal,
-                    fontSize: 16.0
-                ),
                 decoration: InputDecoration(
-                    enabledBorder: UnderlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(5.5)
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.orange),
-                        borderRadius: BorderRadius.circular(5.5)
-                    ),
                     prefixIcon: const Icon(
                       Icons.search,
                     ),
-                    hintStyle: const TextStyle(fontWeight: FontWeight.w300),
                     hintText: "Search"
                 ),
               ),
@@ -666,32 +651,29 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
         Column(mainAxisAlignment: MainAxisAlignment.end, children: [
           FloatingActionButton(
             tooltip: "Add item",
-            backgroundColor: const Color.fromRGBO(178,207, 135, 0.8),
             onPressed: () {
               // clear out txt buffer before entering new screen
               txt.value = const TextEditingValue();
               //pushAddItemPage();
               pushAddItemScreen();
             },
-            child: const Icon(Icons.add, color: Colors.white,),
+            child: const Icon(Icons.add),
           ),
           const SizedBox(
             height: 10,
           ),
           FloatingActionButton(
-            backgroundColor: const Color.fromRGBO(178,207, 135, 0.8),
             onPressed: () => pickImage(false),
             heroTag: null,
-            child: const Icon(Icons.photo_album, color: Colors.white,),
+            child: const Icon(Icons.photo_album),
           ),
           const SizedBox(
             height: 10,
           ),
           FloatingActionButton(
-                backgroundColor: const Color.fromRGBO(178,207, 135, 0.8),
                 onPressed: () => pickImage(true),
                 heroTag: null,
-                child: const Icon(Icons.camera_alt, color: Colors.white),
+                child: const Icon(Icons.camera_alt),
           )
         ]),
     );
@@ -1092,8 +1074,9 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
      Navigator.push(context, MaterialPageRoute<void>(
               builder: (BuildContext context) {
                 return Scaffold(
-                  appBar: AppBar(title: const Text('Detail Page')),
-
+                  appBar: AppBar(
+                      title: const Text('Item Detail Page')
+                  ),
                   body: Column(
                     children: <Widget>[
                       TextButton(
@@ -1173,35 +1156,19 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
             builder: (context) {
               return Scaffold(
                 appBar: AppBar(
-                  iconTheme: const IconThemeData(color: Colors.white),
-                  title: const Text('Add an item', style: TextStyle(color: Colors.white),),
+                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                  title: const Text('Add an Item'),
                 ),
                 body: Padding(
                   padding: const EdgeInsets.all(15),
                   child: ListView(
                     children: <Widget>[
                       TextField(
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "SegoeUI",
-                            fontStyle: FontStyle.normal,
-                            fontSize: 24.0
-                        ),
-                        decoration: InputDecoration(
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(5.5)
-                          ),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: textFieldColor),
-                              borderRadius: BorderRadius.circular(5.5)
-                          ),
+                        decoration: const InputDecoration(
                           prefixIcon: Icon(
-                            Icons.fastfood,
-                            color: textFieldColor,
+                            Icons.fastfood
                           ),
                           hintText: 'e.g. Eggs',
-                          hintStyle: const TextStyle(fontWeight: FontWeight.w300),
                         ),
                         autofocus: true,
                         controller: nameController,
@@ -1209,26 +1176,11 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
                       ),
                       heightSpacer(5),
                       TextField(
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "SegoeUI",
-                            fontStyle: FontStyle.normal,
-                            fontSize: 24.0
-                        ),
-                        decoration: InputDecoration(
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(5.5)
-                          ),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: textFieldColor),
-                              borderRadius: BorderRadius.circular(5.5)
-                          ),
+                        decoration: const InputDecoration(
                           prefixIcon: Icon(
-                            Icons.food_bank,
-                            color: textFieldColor,
+                            Icons.food_bank
                           ),
-                          hintStyle: const TextStyle(fontWeight: FontWeight.w300),
+                          hintText: 'Food type',
                         ),
                         onTap: () {
                           FocusScope.of(context).requestFocus(FocusNode());
@@ -1261,26 +1213,11 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
                       ),
                       heightSpacer(5),
                       TextField(
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "SegoeUI",
-                            fontStyle: FontStyle.normal,
-                            fontSize: 24.0
-                        ),
-                        decoration: InputDecoration(
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(5.5)
-                          ),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: textFieldColor),
-                              borderRadius: BorderRadius.circular(5.5)
-                          ),
+                        decoration: const InputDecoration(
                           prefixIcon: Icon(
                             Icons.shopping_bag,
-                            color: textFieldColor,
                           ),
-                          hintStyle: const TextStyle(fontWeight: FontWeight.w300),
+                          hintText: 'Amount',
                         ),
                         onTap: () {
                           FocusScope.of(context).requestFocus(FocusNode());
@@ -1347,26 +1284,11 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
                       ),
                       heightSpacer(5),
                       TextField(
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "SegoeUI",
-                            fontStyle: FontStyle.normal,
-                            fontSize: 24.0
-                        ),
-                        decoration: InputDecoration(
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(5.5)
-                          ),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: textFieldColor),
-                              borderRadius: BorderRadius.circular(5.5)
-                          ),
+                        decoration: const InputDecoration(
                           prefixIcon: Icon(
                             Icons.calendar_today,
-                            color: textFieldColor,
                           ),
-                          hintStyle: const TextStyle(fontWeight: FontWeight.w300),
+                          hintText: 'Buy date'
                         ),
                         onTap: () {
                           FocusScope.of(context).requestFocus(FocusNode());
@@ -1423,26 +1345,20 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
                       Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          const Text(
-                            "Expiration date ",
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.grey,
-                            ),
-                          ),
+                          const Text('Expiration date',),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               //需要添加只能選擇一個的判斷
-                              _buildButtonColumn1(color, 1),
-                              _buildButtonColumn1(color, 4),
+                              _buildButtonColumn1(1),
+                              _buildButtonColumn1(4),
                             ],
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              _buildButtonColumn1(color, 7),
-                              _buildButtonColumn1(color, 14),
+                              _buildButtonColumn1(7),
+                              _buildButtonColumn1(14),
                             ],
                           ),
                         ],
@@ -1450,7 +1366,7 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
                     ],
                   ),
                 ),
-                floatingActionButton: FloatingActionButton(
+                floatingActionButton: FloatingActionButton.extended(
                   onPressed: ()  async{
                           try{
                               food[0] = nameController.text;
@@ -1495,8 +1411,9 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
                         Navigator.pop(context);
 
                       },
-                      tooltip: 'Add food',
-                      child: const Icon(Icons.add,color: Colors.white),
+                      tooltip: 'Add item',
+                      label: Text('Add item'),
+                      icon: const Icon(Icons.add),
                     ),
                   );
             }
@@ -1505,8 +1422,8 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
   }
 
   // button list for expiring date (only button)
-  ElevatedButton _buildButtonColumn1(Color color, int value) {
-    return ElevatedButton.icon(
+  OutlinedButton _buildButtonColumn1(int value) {
+    return OutlinedButton.icon(
         onPressed: () {
           //record new expire time ----> value
           var later = timeNowDate.add(Duration(days: value));
@@ -1516,13 +1433,9 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
           int day = later.day;
           expireTimeController.text = "$year-$month-$day";
         },
-        icon: const Icon(Icons.calendar_today, size: 18,color: Colors.white),
-        label: Text("+ $value days", style: const TextStyle(color: Colors.white),),
-        style: ButtonStyle(
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                    side: const BorderSide(color: Colors.white)))));
+        icon: const Icon(Icons.calendar_today),
+        label: Text("+ $value days"),
+      );
   }
 
 
@@ -1533,22 +1446,19 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
             builder: (context) {
               return Scaffold(
                 appBar: AppBar(
+                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
                   title: const Text('Edit item..'),
                 ),
 
                 body: TextField(
                   autofocus: true,
-
                   decoration: const InputDecoration(
                       hintText: 'e.g. Eggs',
-                      contentPadding: EdgeInsets.all(16)
+                      border: OutlineInputBorder(),
                   ),
-
                   controller: txt,
-
                   onSubmitted: (value) {
                     editItem(index, value);
-
                     Navigator.pop(context);
                     buildList();
                   },

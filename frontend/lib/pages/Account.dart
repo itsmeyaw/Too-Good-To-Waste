@@ -15,23 +15,20 @@ class _MyAccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        padding: const EdgeInsets.all(10),
-          child: StreamBuilder(stream: FirebaseAuth.instance.authStateChanges(), builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.active) {
-          User? user = snapshot.data;
-          if (user == null) {
-            return AccountLoginPage();
-          } else {
-            return AccountSettingPage(user: user);
-          }
-        } else {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-      })
-    );
+    return StreamBuilder(stream: FirebaseAuth.instance.authStateChanges(), builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.active) {
+              User? user = snapshot.data;
+              if (user == null) {
+                return AccountLoginPage();
+              } else {
+                return AccountSettingPage(user: user);
+              }
+            } else {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+      }
+    });
   }
 }
 
@@ -105,16 +102,29 @@ class AccountSettingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Name'),
-          Text('${user.displayName}', style: Theme.of(context).textTheme.bodyLarge,),
-          SizedBox(height: 10,),
-          Text('E-Mail'),
-          Text('${user.email}', style: Theme.of(context).textTheme.bodyLarge,)
-        ],
-      ),
+        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+        height: MediaQuery.of(context).size.height,
+        child: ListView(
+          children: [
+            const SizedBox(height: 10,),
+            Text('Personal Information', style: Theme.of(context).textTheme.headlineSmall,),
+            const SizedBox(height: 5,),
+            const Text('Name'),
+            Text('${user.displayName}', style: Theme.of(context).textTheme.bodyLarge,),
+            const SizedBox(height: 10,),
+            const Text('E-Mail'),
+            Text('${user.email}', style: Theme.of(context).textTheme.bodyLarge,),
+            const SizedBox(height: 20,),
+            Text('Achievements', style: Theme.of(context).textTheme.headlineSmall,),
+            const SizedBox(height: 5,),
+            const Text('GoodPoints'),
+            Text('120', style: Theme.of(context).textTheme.bodyLarge,),
+            const SizedBox(height: 10,),
+            const Text('Carbon Emission Saved'),
+            Text('2 kg', style: Theme.of(context).textTheme.bodyLarge,),
+
+          ],
+        )
     );
   }
 }
