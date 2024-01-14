@@ -1,4 +1,5 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -385,8 +386,6 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
     print(await dbhelper.queryAll('foods'));
   }
 
-
-
   var txt = TextEditingController();
   late TooltipBehavior _tooltipBehavior;
   //late bool _isLoading;
@@ -405,7 +404,6 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
     _tabController = TabController(length: 3, vsync: this);
   }
 
-
   @override
   Widget build(BuildContext context) {
     DateTime dateToday = DateTime.now();
@@ -421,7 +419,7 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
           controller: _tabController,
           tabs: const [
             Tab(icon: Icon(Icons.storefront_outlined), text: "Current"),
-            Tab(icon: Icon(Icons.delete_outline), text: "Wasted"),
+            Tab(icon: Icon(Icons.bar_chart), text: "Statistic"),
             Tab(icon: Icon(Icons.calendar_today), text: "Plan"),
           ],
         )
@@ -521,90 +519,71 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
                 ),
             ],
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Flexible(
-                flex: 1,
-                child: GestureDetector(
-                  child: const RiveAnimation.asset(
-                    'assets/anime/wasted.riv',
+          Container(
+            padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10,),
+                  Text('Your Statistic', style: Theme.of(context).textTheme.headlineMedium,),
+                  const SizedBox(height: 5,),
+                  Text('Month: January'),
+                  const SizedBox(height: 10,),
+                  Container (
+                      height: 200,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 200,
+                            child: PieChart(
+                                PieChartData(
+                                    sections: [
+                                      PieChartSectionData(
+                                          value: 10,
+                                          title: 'Wasted',
+                                          color: Colors.red
+                                      ),
+                                      PieChartSectionData(
+                                          value: 50,
+                                          title: 'Used',
+                                          color: Colors.blue
+                                      ),
+                                      PieChartSectionData(
+                                          value: 25,
+                                          title: 'Shared',
+                                          color: Colors.green
+                                      ),
+                                      PieChartSectionData(
+                                          value: 10,
+                                          title: 'Almost Expired',
+                                          color: Colors.yellow
+                                      )
+                                    ]
+                                )
+                            ),
+                          )
+                        ],
+                      )
                   ),
-                ),
-              ),       
-             Expanded(
-               child: FutureBuilder(
-        future: Future.wait([
-          getWasteItemString('name'),
-        
-          //getWasteItemInt('expiretime'),
-          getWasteItemInt('quantitynum'),
-          getWasteItemString('quantitytype'),
-          getWasteItemString('category'),
-          //getWasteItemInt('boughttime'),
-        ]),
-        builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
-
-          if (!snapshot.hasData) {
-            return const Text('Loading...'); // still loading
-          }
-          // alternatively use snapshot.connectionState != ConnectionState.done
-          if (snapshot.hasError) return const Text('Something went wrong.');
-          List<String> itemsWaste = snapshot.requireData[0];
-          print('#####################3${snapshot.requireData}##########################');
-          if (itemsWaste.isEmpty) {
-            return const Center(
-              child: Text("Nothing yet...",
-                style: TextStyle(
-                  fontSize: 20,
-                ),
-              ),
-            );
-          }
-      
-          //List<dynamic> foodItems = getFoodItems(snapshot.requireData);
-
-          //final List<DateTime> expires = List<DateTime>.from(foodItems[1]);
-          List<int> num = snapshot.requireData[1];
-          List<String> type = snapshot.requireData[2];
-          List<String> categoryies = snapshot.requireData[3];
-
-          return ListTileTheme(
-              contentPadding: const EdgeInsets.all(15),
-              textColor: Colors.black54,
-              style: ListTileStyle.list,
-              dense: true,
-              child: ListView.builder(
-                
-                  itemCount: itemsWaste.length,
-                  itemBuilder: (context, index) {
-                    var item = itemsWaste[index];
-                    //how to show the quantity tyoe and quantity number?
-
-                    //var expires = getItemExpiringTime();
-                    //how to show the listsby sequence of expire time?
-                    //var remainDays = remainingTime[index].inDays;
-                    //var progressPercentage = remainDays / (expires[index].difference(boughtTime[index]).inDays);
-                    var foodNum = num[index];
-                    var foodType = type[index];
-
-                    var category = categoryies[index];
-
-                    return buildWasteItem(
-                        item,
-                        //remainDays,
-                        foodNum,
-                        foodType,
-                    
-                        category);
-                        //progressPercentage);
-                  }
-              )
-          );
-        }
-    )
-               ),       
-            ],
+                  const SizedBox(height: 20,),
+                  Text('Period: Jan 2023 - Des 2023'),
+                  const SizedBox(height: 10,),
+                  Container (
+                      height: 200,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width - 20, // 20 is padding left + right
+                            child: _LineChart(),
+                          )
+                        ],
+                      )
+                  ),
+                ]
+            ),
           ),
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -764,7 +743,7 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
 
   Widget buildWasteItem(String item, int num, String type, String category ) {
     String? categoryIconImagePath;
-    var progressColor;
+
     if(GlobalCateIconMap[category] == null) {
       categoryIconImagePath = GlobalCateIconMap["Others"];
     } else {
@@ -1523,4 +1502,237 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
     }
     return remainingTime;
   }
+}
+
+class _LineChart extends StatelessWidget {
+  const _LineChart({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return LineChart(
+      sampleData2,
+      duration: const Duration(milliseconds: 250),
+    );
+  }
+
+  LineChartData get sampleData2 => LineChartData(
+    lineTouchData: lineTouchData2,
+    gridData: gridData,
+    titlesData: titlesData2,
+    lineBarsData: lineBarsData2,
+    minX: 0,
+    maxX: 13,
+    maxY: 17,
+    minY: 0,
+  );
+
+  LineTouchData get lineTouchData1 => LineTouchData(
+    handleBuiltInTouches: true,
+    touchTooltipData: LineTouchTooltipData(
+      tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+    ),
+  );
+
+  FlTitlesData get titlesData1 => FlTitlesData(
+    bottomTitles: AxisTitles(
+      sideTitles: bottomTitles,
+    ),
+    rightTitles: const AxisTitles(
+      sideTitles: SideTitles(showTitles: false),
+    ),
+    topTitles: const AxisTitles(
+      sideTitles: SideTitles(showTitles: false),
+    ),
+    leftTitles: AxisTitles(
+      sideTitles: leftTitles(),
+    ),
+  );
+
+
+  LineTouchData get lineTouchData2 => const LineTouchData(
+    enabled: false,
+  );
+
+  FlTitlesData get titlesData2 => FlTitlesData(
+    bottomTitles: AxisTitles(
+      sideTitles: bottomTitles,
+    ),
+    rightTitles: const AxisTitles(
+      sideTitles: SideTitles(showTitles: false),
+    ),
+    topTitles: const AxisTitles(
+      sideTitles: SideTitles(showTitles: false),
+    ),
+    leftTitles: AxisTitles(
+      sideTitles: leftTitles(),
+    ),
+  );
+
+  List<LineChartBarData> get lineBarsData2 => [
+    lineChartBarData2_1,
+    lineChartBarData2_2,
+    lineChartBarData2_3,
+  ];
+
+  Widget leftTitleWidgets(double value, TitleMeta meta) {
+    const style = TextStyle(
+      fontSize: 10,
+    );
+    String text;
+    switch (value.toInt()) {
+      case 5:
+        text = '5kg';
+        break;
+      case 10:
+        text = '10kg';
+        break;
+      case 15:
+        text = '15kg';
+        break;
+      default:
+        return Container();
+    }
+
+    return Text(text, style: style, textAlign: TextAlign.center);
+  }
+
+  SideTitles leftTitles() => SideTitles(
+    getTitlesWidget: leftTitleWidgets,
+    showTitles: true,
+    interval: 1,
+    reservedSize: 40,
+  );
+
+  Widget bottomTitleWidgets(double value, TitleMeta meta) {
+    const style = TextStyle(
+      fontSize: 10,
+    );
+    Widget text;
+    switch (value.toInt()) {
+      case 1:
+        text = const Text('JAN', style: style);
+        break;
+      case 2:
+        text = const Text('FEB', style: style);
+        break;
+      case 3:
+        text = const Text('MAR', style: style);
+        break;
+      case 4:
+        text = const Text('APR', style: style);
+        break;
+      case 5:
+        text = const Text('MAY', style: style);
+        break;
+      case 6:
+        text = const Text('JUN', style: style);
+        break;
+      case 7:
+        text = const Text('JUL', style: style);
+        break;
+      case 8:
+        text = const Text('AUG', style: style);
+        break;
+      case 9:
+        text = const Text('SEP', style: style);
+        break;
+      case 10:
+        text = const Text('OCT', style: style);
+        break;
+      case 11:
+        text = const Text('NOV', style: style);
+        break;
+      case 12:
+        text = const Text('DEC', style: style);
+        break;
+      default:
+        text = const Text('');
+        break;
+    }
+
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      space: 10,
+      child: text,
+    );
+  }
+
+  SideTitles get bottomTitles => SideTitles(
+    showTitles: true,
+    reservedSize: 32,
+    interval: 1,
+    getTitlesWidget: bottomTitleWidgets,
+  );
+
+  FlGridData get gridData => const FlGridData(show: false);
+
+  LineChartBarData get lineChartBarData2_1 => LineChartBarData(
+    isCurved: true,
+    curveSmoothness: 0,
+    color: Colors.green,
+    barWidth: 1,
+    isStrokeCapRound: true,
+    dotData: const FlDotData(show: false),
+    belowBarData: BarAreaData(show: false),
+    spots: const [
+      FlSpot(1, 1),
+      FlSpot(2, 3),
+      FlSpot(3, 4),
+      FlSpot(4, 2),
+      FlSpot(5, 1.8),
+      FlSpot(6, 4),
+      FlSpot(7, 7),
+      FlSpot(8, 5),
+      FlSpot(9, 3),
+      FlSpot(10, 2),
+      FlSpot(11, 1),
+      FlSpot(12, 2.2),
+    ],
+  );
+
+  LineChartBarData get lineChartBarData2_2 => LineChartBarData(
+    isCurved: true,
+    curveSmoothness: 0,
+    color: Colors.blue,
+    barWidth: 1,
+    isStrokeCapRound: true,
+    dotData: const FlDotData(show: false),
+    spots: const [
+      FlSpot(1, 12),
+      FlSpot(2, 11),
+      FlSpot(3, 14),
+      FlSpot(4, 9),
+      FlSpot(5, 11),
+      FlSpot(6, 10),
+      FlSpot(7, 12),
+      FlSpot(8, 13),
+      FlSpot(9, 14),
+      FlSpot(10, 11),
+      FlSpot(11, 10),
+      FlSpot(12, 12),
+    ],
+  );
+
+  LineChartBarData get lineChartBarData2_3 => LineChartBarData(
+    isCurved: true,
+    curveSmoothness: 0,
+    color: Colors.red,
+    barWidth: 1,
+    isStrokeCapRound: true,
+    dotData: const FlDotData(show: false),
+    spots: const [
+      FlSpot(1, 3.8),
+      FlSpot(2, 2),
+      FlSpot(3, 1.9),
+      FlSpot(4, 2),
+      FlSpot(5, 1),
+      FlSpot(6, 5),
+      FlSpot(7, 1),
+      FlSpot(8, 2),
+      FlSpot(9, 4),
+      FlSpot(10, 3.3),
+      FlSpot(11, 2),
+      FlSpot(12, 4),
+    ],
+  );
 }
