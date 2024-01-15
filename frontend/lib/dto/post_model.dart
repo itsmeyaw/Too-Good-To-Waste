@@ -1,13 +1,13 @@
 import 'package:tooGoodToWaste/dto/user_model.dart';
 
-class PostData {
+class PostModel {
   final String title;
   final double distance;
   final String measurement;
   final double amount;
   final User user;
 
-  PostData({
+  PostModel({
     required this.title,
     required this.distance,
     required this.measurement,
