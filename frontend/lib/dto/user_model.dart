@@ -1,62 +1,34 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:flutter/material.dart';
 
+import './public_user_model.dart';
+import './user_name_model.dart';
+
+part 'user_model.g.dart';
+
 @immutable
-class User {
-  final UserName name;
+@JsonSerializable()
+class User extends PublicUser {
   final UserAddress address;
   final List<String> allergies;
   final List<String> chatroomIds;
-  final int rating;
 
   const User({
-    required this.name,
+    required super.name,
+    required super.rating,
     required this.address,
     required this.allergies,
     required this.chatroomIds,
-    required this.rating,
   });
 
-  User.fromJson(Map<String, Object?> json)
-      : this(
-            name: UserName.fromJson(json['name']! as Map<String, String>),
-            address: UserAddress.fromJson(json['address']! as Map<String, String>),
-            allergies: (json['allergies']! as List).cast<String>(),
-            chatroomIds: (json['chatrooms']! as List).cast<String>(),
-            rating: json['rating']! as int);
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
-  Map<String, Object?> toJson() {
-    return {
-      'name': name.toJson(),
-      'address': address.toJson(),
-      'allergies': allergies,
-      'chatrooms': chatroomIds,
-      'rating': rating,
-    };
-  }
+  @override
+  Map<String, dynamic> toJson() => _$UserToJson(this);
 }
 
 @immutable
-class UserName {
-  final String first;
-  final String last;
-
-  const UserName({required this.first, required this.last});
-
-  UserName.fromJson(Map<String, Object?> json)
-      : this(
-          first: json['first']! as String,
-          last: json['last']! as String,
-        );
-
-  Map<String, Object?> toJson() {
-    return {
-      'first': first,
-      'last': last
-    };
-  }
-}
-
-@immutable
+@JsonSerializable()
 class UserAddress {
   final String city;
   final String country;
@@ -72,22 +44,7 @@ class UserAddress {
     required this.zipCode,
   });
 
-  UserAddress.fromJson(Map<String, Object?> json)
-      : this(
-          city: json['city']! as String,
-          country: json['country']! as String,
-          line1: json['line_1']! as String,
-          line2: json['line_2']! as String,
-          zipCode: json['zipCode']! as String,
-        );
+  factory UserAddress.fromJson(Map<String, Object?> json) => _$UserAddressFromJson(json);
 
-  Map<String, Object?> toJson() {
-    return {
-      'city': city,
-      'country': country,
-      'line_1': line1,
-      'line_2': line2,
-      'zip_code': zipCode
-    };
-  }
+  Map<String, Object?> toJson() => _$UserAddressToJson(this);
 }
