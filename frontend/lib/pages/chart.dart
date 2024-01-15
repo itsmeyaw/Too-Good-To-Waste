@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tooGoodToWaste/dto/message.dart';
+import 'package:tooGoodToWaste/dto/message_model.dart';
 import '../dto/user_model.dart';
 
 class ChatPage extends StatefulWidget {

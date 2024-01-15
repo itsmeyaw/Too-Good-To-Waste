@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart';
-import 'package:tooGoodToWaste/dto/post_data.dart';
+import 'package:tooGoodToWaste/dto/post_model.dart';
 import '../Pages/post_page.dart';
 
 // The social places timeline
@@ -10,50 +10,38 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var users = [
-      User (
-        name: 'Yudhis',
-        rate: 4
-      ),
-      User(
-        name: 'XiYue',
-        rate: 5
-      ),
-      User(
-        name: 'Nana',
-        rate: 4
-      )
     ];
 
     var postData = [
-      PostData(
+      PostModel(
           title: 'Red bell pepper',
           distance: 0.2,
           measurement: 'items',
           amount: 2,
           user: users[0]
       ),
-      PostData(
+      PostModel(
           title: 'Green bell pepper',
           distance: 0.3,
           measurement: 'items',
           amount: 1,
           user: users[1]
       ),
-      PostData(
+      PostModel(
           title: 'Grated gouda cheese',
           distance: 0.5,
           measurement: 'grams',
           amount: 200,
           user: users[2]
       ),
-      PostData(
+      PostModel(
           title: 'Green bell pepper',
           distance: 0.6,
           measurement: 'items',
           amount: 1,
           user: users[0]
       ),
-      PostData(
+      PostModel(
           title: 'Green bell pepper',
           distance: 1,
           measurement: 'items',
@@ -130,7 +118,7 @@ class SearchBar extends StatelessWidget {
 }
 
 class Post extends StatelessWidget {
-  final PostData postData;
+  final PostModel postData;
 
   const Post({
     super.key,

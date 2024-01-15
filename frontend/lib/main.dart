@@ -1,19 +1,18 @@
 import 'dart:async';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:tooGoodToWaste/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:tooGoodToWaste/frame.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
-import 'package:tooGoodToWaste/pages/account.dart';
-import 'package:tooGoodToWaste/pages/add_inventory.dart';
-import 'package:tooGoodToWaste/pages/home.dart';
-import 'package:tooGoodToWaste/pages/inventory.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
   );
   runApp(MyApp());
   const oneDay = Duration(minutes: 1);
