@@ -1,11 +1,22 @@
-import 'package:tooGoodToWaste/dto/user_model.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:flutter/cupertino.dart';
 
+import './user_model.dart';
+
+part 'message_model.g.dart';
+
+@immutable
+@JsonSerializable()
 class Message {
   final String message;
-  final User user;
+  final User initiator;
+  final User receiver;
+  final DateTime timestamp;
 
   const Message({
     required this.message,
-    required this.user
+    required this.initiator,
+    required this.receiver,
+    required this.timestamp,
   });
 }

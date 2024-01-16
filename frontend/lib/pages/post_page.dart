@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../dto/post_model.dart';
+import '../dto/shared_item_model.dart';
 
 class PostPage extends StatelessWidget {
-  final PostModel postData;
+  final SharedItem postData;
 
   const PostPage({
     super.key,
@@ -32,9 +32,9 @@ class PostPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20,),
-                Text(postData.title, style: Theme.of(context).textTheme.headlineLarge,),
-                Text('Amount: ${postData.amount} ${postData.measurement}', style: Theme.of(context).textTheme.headlineSmall),
-                Text('Person: ${postData.user.name} (${postData.user.rating} stars)'),
+                Text(postData.name, style: Theme.of(context).textTheme.headlineLarge,),
+                Text('Amount: ${postData.amount.nominal} ${postData.amount.unit}', style: Theme.of(context).textTheme.headlineSmall),
+                Text('Person: ${postData.user.name.first} ${postData.user.name.last} (${postData.user.rating} stars)'),
                 const Spacer(),
                 FilledButton(
                     onPressed: () {

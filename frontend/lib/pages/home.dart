@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart';
-import 'package:tooGoodToWaste/dto/post_model.dart';
+import 'package:tooGoodToWaste/dto/shared_item_model.dart';
 import '../Pages/post_page.dart';
 
 // The social places timeline
@@ -13,42 +13,8 @@ class Home extends StatelessWidget {
     ];
 
     var postData = [
-      PostModel(
-          title: 'Red bell pepper',
-          distance: 0.2,
-          measurement: 'items',
-          amount: 2,
-          user: users[0]
-      ),
-      PostModel(
-          title: 'Green bell pepper',
-          distance: 0.3,
-          measurement: 'items',
-          amount: 1,
-          user: users[1]
-      ),
-      PostModel(
-          title: 'Grated gouda cheese',
-          distance: 0.5,
-          measurement: 'grams',
-          amount: 200,
-          user: users[2]
-      ),
-      PostModel(
-          title: 'Green bell pepper',
-          distance: 0.6,
-          measurement: 'items',
-          amount: 1,
-          user: users[0]
-      ),
-      PostModel(
-          title: 'Green bell pepper',
-          distance: 1,
-          measurement: 'items',
-          amount: 1,
-          user: users[1]
-      )
     ];
+
     return Container(
       padding: const EdgeInsets.fromLTRB(10, 10, 10 ,0),
       child: Column(
@@ -118,7 +84,7 @@ class SearchBar extends StatelessWidget {
 }
 
 class Post extends StatelessWidget {
-  final PostModel postData;
+  final SharedItem postData;
 
   const Post({
     super.key,
@@ -145,9 +111,9 @@ class Post extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Item name: ${postData.title}', style: const TextStyle(color: Colors.black),),
-            Text('Amount: ${postData.amount} ${postData.measurement}', style: const TextStyle(color: Colors.black),),
-            Text('Distance: ${postData.distance} km', style: const TextStyle(color: Colors.black),)
+            Text('Item name: ${postData.name}', style: const TextStyle(color: Colors.black),),
+            Text('Amount: ${postData.amount.nominal} ${postData.amount.unit}', style: const TextStyle(color: Colors.black),),
+            Text('Distance: ${postData.location}', style: const TextStyle(color: Colors.black),)
           ],
         )
       ),
