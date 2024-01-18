@@ -246,9 +246,11 @@ class _SignUpPageState extends State<SignUpPage> {
     super.initState();
     // Read all values if exists
     secureStorage.read(key: _SIGN_UP_STATE_KEY).then((persistedSignUpState) {
-      signUpState = persistedSignUpState != null
-          ? SignUpState.values.byName(persistedSignUpState)
-          : SignUpState.information;
+      setState(() {
+        signUpState = persistedSignUpState != null
+            ? SignUpState.values.byName(persistedSignUpState)
+            : SignUpState.information;
+      });
     });
   }
 
