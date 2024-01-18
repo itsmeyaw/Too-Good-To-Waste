@@ -32,7 +32,7 @@ class TooGoodToWaste extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: MyApp(),
+      home: HomePage(),
     );
   }
 }

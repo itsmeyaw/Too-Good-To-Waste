@@ -242,20 +242,20 @@ class _SignUpPageState extends State<SignUpPage> {
   SignUpState signUpState = SignUpState.information;
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
     // Read all values if exists
-    String? signUpStateString =
-        await secureStorage.read(key: _SIGN_UP_STATE_KEY);
-    signUpState = signUpStateString != null
-        ? SignUpState.values.byName(signUpStateString)
-        : SignUpState.information;
+    secureStorage.read(key: _SIGN_UP_STATE_KEY).then((persistedSignUpState) {
+      signUpState = persistedSignUpState != null
+          ? SignUpState.values.byName(persistedSignUpState)
+          : SignUpState.information;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     if (signUpState == SignUpState.information) {
-      return const SignUpPage();
+      return const SignUpInformationPage();
     } else {
       return const VerifyPhonePage();
     }
@@ -285,14 +285,8 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
   final requiredValidator = ValidationBuilder().required().build();
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
-    // Read all values if exists
-    String? signUpStateString =
-        await secureStorage.read(key: _SIGN_UP_STATE_KEY);
-    signUpState = signUpStateString != null
-        ? SignUpState.values.byName(signUpStateString)
-        : SignUpState.information;
   }
 
   @override
@@ -516,6 +510,6 @@ class VerifyPhonePage extends StatefulWidget {
 class _VerifyPhoneState extends State<VerifyPhonePage> {
   @override
   Widget build(BuildContext context) {
-    return Placeholder();
+    return const Placeholder();
   }
 }
