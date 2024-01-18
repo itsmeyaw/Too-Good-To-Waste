@@ -1,36 +1,37 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
-
-class DBHelper{
-
+class DBHelper {
   static final DBHelper _instance = DBHelper.internal();
 
   factory DBHelper() => _instance;
 
   DBHelper.internal();
 
-  static Database? _db  ;
+  static Database? _db;
 
   //Avoid errors cause by flutter upgrade.
 
-
-  Future<Database> get db async{
-    if(_db != null){
+  Future<Database> get db async {
+    if (_db != null) {
       return _db!;
-    }else{
+    } else {
       _db ??= await initDb();
       return _db!;
     }
   }
 
-  Future<Database> initDb() async{
+  Future<Database> initDb() async {
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, "dbhelper.db");
 
-    return openDatabase(path,version: 1,onCreate: (Database db,int newerVersion) async{
-      await db.execute('CREATE TABLE users(name TEXT PRIMARY KEY, positive INTEGER, negative INTEGER, primarystate TEXT, secondarystate TEXT, secondaryevent TEXT, thirdstate TEXT, state TEXT, species TEXT, childrennum INTEGER, fatherstate TEXT, motherstate TEXT, time INTEGER)', );
-      await db.execute('CREATE TABLE foods(name TEXT PRIMARY KEY, category TEXT, boughttime INTEGER, expiretime INTEGER, quantitytype TEXT, quantitynum INTEGER, state TEXT, consumestate REAL)');
+    return openDatabase(path, version: 1,
+        onCreate: (Database db, int newerVersion) async {
+      await db.execute(
+        'CREATE TABLE users(name TEXT PRIMARY KEY, positive INTEGER, negative INTEGER, primarystate TEXT, secondarystate TEXT, secondaryevent TEXT, thirdstate TEXT, state TEXT, species TEXT, childrennum INTEGER, fatherstate TEXT, motherstate TEXT, time INTEGER)',
+      );
+      await db.execute(
+          'CREATE TABLE foods(name TEXT PRIMARY KEY, category TEXT, boughttime INTEGER, expiretime INTEGER, quantitytype TEXT, quantitynum INTEGER, state TEXT, consumestate REAL)');
     });
   }
 
@@ -58,9 +59,8 @@ class DBHelper{
   );
   */
 
-
   //Define the function that inserts food into the 'foods' table
-  Future<void> insertFood(Food food) async{
+  Future<void> insertFood(Food food) async {
     //Get a refenrence to the database
 
     Database dbHelper = await db;
@@ -81,26 +81,22 @@ class DBHelper{
     //print('##########################food.id = ${food.id}###############################');
     //}
 
-    //Insert the Food into the correct table. Also specify the 
+    //Insert the Food into the correct table. Also specify the
     //'conflictAlgorithm' to use in case the same food is inserted
     //twice.
 
     //In this case, the quantity for this food should be added. How????
     //Or the backend should judge if the newly request tobe added food already exists in database
-    await dbHelper.insert(
-        'foods',
-        food.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace
-    );
+    await dbHelper.insert('foods', food.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-
   //Define the function that inserts user into the 'users' table
-  Future<void> insertUser(UserValue uservalue) async{
+  Future<void> insertUser(UserValue uservalue) async {
     //Get a refenrence to the database
     Database dbHelper = await db;
 
-    //Insert the UserValue into the correct table. Also specify the 
+    //Insert the UserValue into the correct table. Also specify the
     //'conflictAlgorithm' to use in case the same food is inserted
     //twice.
 
@@ -111,8 +107,6 @@ class DBHelper{
       conflictAlgorithm: ConflictAlgorithm.ignore,
     );
   }
-
-
 
   //Define method that retrieves all the foods from food table
   Future<List> queryAll(String object) async {
@@ -136,7 +130,7 @@ class DBHelper{
           consumestate: maps[i]['consumestate'],
         );
       });
-    } else if(object == "users"){
+    } else if (object == "users") {
       //Query table for all the users.
       final List<Map<String, dynamic>> maps = await dbHelper.query('users');
       //Convert the List<Map<String, dynamic> into a List<Food>
@@ -167,12 +161,12 @@ class DBHelper{
 
     //Query table for all the foods.
     if (object == "foods") {
-
-      final List<Map<String, dynamic>> maps = await dbHelper.rawQuery('SELECT * FROM foods WHERE name = ?', [specName]);
+      final List<Map<String, dynamic>> maps = await dbHelper
+          .rawQuery('SELECT * FROM foods WHERE name = ?', [specName]);
       //Convert the List<Map<String, dynamic> into a List<Food>
 
       //shoud be only one row, how to simplfy the code?
-      return List.generate(maps.length,(i) {
+      return List.generate(maps.length, (i) {
         return Food(
           //id: maps[0]['id'],
           name: maps[0]['name'],
@@ -185,9 +179,10 @@ class DBHelper{
           consumestate: maps[0]['consumestate'],
         );
       });
-    } else if(object == "users"){
+    } else if (object == "users") {
       //Query table for all the users.
-      final List<Map<String, dynamic>> maps = await dbHelper.rawQuery('SELECT * FROM users WHERE name = ?', [specName]);
+      final List<Map<String, dynamic>> maps = await dbHelper
+          .rawQuery('SELECT * FROM users WHERE name = ?', [specName]);
       //Convert the List<Map<String, dynamic> into a List<Food>
 
       return List.generate(maps.length, (i) {
@@ -216,35 +211,37 @@ class DBHelper{
     Database dbHelper = await db;
     //Query table for all the foods.
 
-    final List<Map<String, dynamic>> maps = await dbHelper.query('foods', columns: [value]);
+    final List<Map<String, dynamic>> maps =
+        await dbHelper.query('foods', columns: [value]);
 
     //Convert the List<Map<String, dynamic> into a List<String>
     var foodsname = List<String>.generate(maps.length, (i) => maps[i][value]);
 
     return foodsname;
-
   }
+
   //Define method that retrieves all the foods from food table
   Future<List<int>> getAllFoodIntValues(String value) async {
     //Get a reference to the database.
     Database dbHelper = await db;
     //Query table for all the foods.
 
-    final List<Map<String, dynamic>> maps = await dbHelper.query('foods', columns: [value]);
+    final List<Map<String, dynamic>> maps =
+        await dbHelper.query('foods', columns: [value]);
 
     //Convert the List<Map<String, dynamic> into a List<String>
     var foodsname = List<int>.generate(maps.length, (i) => maps[i][value]);
 
     return foodsname;
-
   }
 
-  Future<String> getOneFoodValue(String name, String value)async{
+  Future<String> getOneFoodValue(String name, String value) async {
     //Get a reference to the database.
     Database dbHelper = await db;
     //Query table for all the foods.
 
-    final List<Map<String, dynamic>> maps = await dbHelper.query('foods', columns: [value], where: '"name" = ?', whereArgs: [name]);
+    final List<Map<String, dynamic>> maps = await dbHelper.query('foods',
+        columns: [value], where: '"name" = ?', whereArgs: [name]);
 
     //Convert the List<Map<String, dynamic> into a String
     var foodname = maps[0][value];
@@ -252,12 +249,14 @@ class DBHelper{
 
     return foodname;
   }
-  Future<int> getOneFoodIntValue(String name, String value)async{
+
+  Future<int> getOneFoodIntValue(String name, String value) async {
     //Get a reference to the database.
     Database dbHelper = await db;
     //Query table for all the foods.
 
-    final List<Map<String, dynamic>> maps = await dbHelper.query('foods', columns: [value], where: '"name" = ?', whereArgs: [name]);
+    final List<Map<String, dynamic>> maps = await dbHelper.query('foods',
+        columns: [value], where: '"name" = ?', whereArgs: [name]);
 
     //Convert the List<Map<int, dynamic> into a String
     var foodname = maps[0][value];
@@ -265,12 +264,14 @@ class DBHelper{
 
     return foodname;
   }
-  Future<double> getOneFoodDoubleValue(String name, String value)async{
+
+  Future<double> getOneFoodDoubleValue(String name, String value) async {
     //Get a reference to the database.
     Database dbHelper = await db;
     //Query table for all the foods.
 
-    final List<Map<String, dynamic>> maps = await dbHelper.query('foods', columns: [value], where: '"name" = ?', whereArgs: [name]);
+    final List<Map<String, dynamic>> maps = await dbHelper.query('foods',
+        columns: [value], where: '"name" = ?', whereArgs: [name]);
 
     //Convert the List<Map<int, dynamic> into a String
     var foodname = maps[0][value];
@@ -280,7 +281,7 @@ class DBHelper{
   }
 
   //NNNNOOOOOOOO NEED!!!!!!
-  Future<int> getMaxId()async{
+  Future<int> getMaxId() async {
     //Get a reference to the database.
     Database dbHelper = await db;
     //Query table for all the foods.
@@ -294,15 +295,15 @@ class DBHelper{
     //maxID ??= -1;
 
     return maxID;
-
   }
 
-  Future<List<Food>> queryByCategory(String category) async{
+  Future<List<Food>> queryByCategory(String category) async {
     //Get the refernce to the database
     Database dbHelper = await db;
 
     //final List<Map<String, dynamic>> maps = await dbHelper.query('foods',columns: ['name', 'expiretime', 'boughttime', 'quantitynum', 'quantitytype', 'state', 'consumestate'], where: '$category = ?', whereArgs: [category]);
-    final List<Map<String, dynamic>> maps = await dbHelper.rawQuery('SELECT * FROM foods WHERE category = ?', [category]);
+    final List<Map<String, dynamic>> maps = await dbHelper
+        .rawQuery('SELECT * FROM foods WHERE category = ?', [category]);
 
     //Convert the List<Map<String, dynamic> into a List
 
@@ -327,21 +328,24 @@ class DBHelper{
     Database dbHelper = await db;
     //Query table for all the foods.
 
-    final List<Map<String, dynamic>> maps = await dbHelper.query('foods', columns: [value], where: 'consumestate < 1');
+    final List<Map<String, dynamic>> maps = await dbHelper.query('foods',
+        columns: [value], where: 'consumestate < 1');
 
     //Convert the List<Map<String, dynamic> into a List<String>
     var foodstring = List<String>.generate(maps.length, (i) => maps[i][value]);
 
     return foodstring;
-
   }
+
   //Define method that retrieves all the foods from food table
-  Future<List<String>> getAllGoodFoodStringValues(String value, String state) async {
+  Future<List<String>> getAllGoodFoodStringValues(
+      String value, String state) async {
     //Get a reference to the database.
     Database dbHelper = await db;
     //Query table for all the foods.
 
-    List<Map<String, dynamic>> maps = await dbHelper.query('foods', columns: [value], where: 'state = ?', whereArgs: [state]);
+    List<Map<String, dynamic>> maps = await dbHelper.query('foods',
+        columns: [value], where: 'state = ?', whereArgs: [state]);
 
     //Convert the List<Map<String, dynamic> into a List<String>
     var foodstring = List<String>.generate(maps.length, (i) => maps[i][value]);
@@ -354,11 +358,11 @@ class DBHelper{
     Database dbHelper = await db;
     //Query table for all the foods.
 
-    List<Map<String, dynamic>> maps = await dbHelper.query('foods' , where: 'state = ?', whereArgs: ['wasted']);
+    List<Map<String, dynamic>> maps = await dbHelper
+        .query('foods', where: 'state = ?', whereArgs: ['wasted']);
     print('########################3$maps########################');
 
     return maps;
-
   }
 
   //Define method that retrieves all the foods from food table
@@ -367,35 +371,37 @@ class DBHelper{
     Database dbHelper = await db;
     //Query table for all the foods.
 
-    final List<Map<String, dynamic>> maps = await dbHelper.query('foods', columns: [value], where: 'consumestate < 1');
+    final List<Map<String, dynamic>> maps = await dbHelper.query('foods',
+        columns: [value], where: 'consumestate < 1');
 
     //Convert the List<Map<String, dynamic> into a List<String>
     var foodsint = List<int>.generate(maps.length, (i) => maps[i][value]);
 
     return foodsint;
-
   }
+
   //Define method that retrieves all the foods with certain state from food table
   Future<List<int>> getAllGoodFoodIntValues(String value, String state) async {
     //Get a reference to the database.
     Database dbHelper = await db;
     //Query table for all the foods.
 
-    final List<Map<String, dynamic>> maps = await dbHelper.query('foods', columns: [value], where: '"state" = ?', whereArgs: [state]);
+    final List<Map<String, dynamic>> maps = await dbHelper.query('foods',
+        columns: [value], where: '"state" = ?', whereArgs: [state]);
 
     //Convert the List<Map<String, dynamic> into a List<String>
     var foodsint = List<int>.generate(maps.length, (i) => maps[i][value]);
 
     return foodsint;
-
   }
 
-  Future<List<Food>> queryAllUnconsumedFood() async{
+  Future<List<Food>> queryAllUnconsumedFood() async {
     //Get the refernce to the database
     Database dbHelper = await db;
 
     //final List<Map<String, dynamic>> maps = await dbHelper.query('foods',columns: ['name', 'expiretime', 'boughttime', 'quantitynum', 'quantitytype', 'state', 'consumestate'], where: '$category = ?', whereArgs: [category]);
-    final List<Map<String, dynamic>> maps = await dbHelper.rawQuery('SELECT * FROM foods WHERE consumestate < ?', [1]);
+    final List<Map<String, dynamic>> maps = await dbHelper
+        .rawQuery('SELECT * FROM foods WHERE consumestate < ?', [1]);
 
     //Convert the List<Map<String, dynamic> into a List
 
@@ -414,12 +420,13 @@ class DBHelper{
     });
   }
 
-  Future<List<Food>> queryAllGoodFood(String state) async{
+  Future<List<Food>> queryAllGoodFood(String state) async {
     //Get the refernce to the database
     Database dbHelper = await db;
 
     //final List<Map<String, dynamic>> maps = await dbHelper.query('foods',columns: ['name', 'expiretime', 'boughttime', 'quantitynum', 'quantitytype', 'state', 'consumestate'], where: '$category = ?', whereArgs: [category]);
-    final List<Map<String, dynamic>> maps = await dbHelper.rawQuery('SELECT * FROM foods WHERE state = ?', [state]);
+    final List<Map<String, dynamic>> maps =
+        await dbHelper.rawQuery('SELECT * FROM foods WHERE state = ?', [state]);
 
     //Convert the List<Map<String, dynamic> into a List
 
@@ -438,9 +445,8 @@ class DBHelper{
     });
   }
 
-
-  //Define method that updates food data 
-  Future<void> updateFood(Food food) async{
+  //Define method that updates food data
+  Future<void> updateFood(Food food) async {
     //Get the reference to the database
     Database dbHelper = await db;
     //update the food data
@@ -452,52 +458,58 @@ class DBHelper{
     );
   }
 
-
   //Define method that updates user data
-  Future<void> updateUser(UserValue uservalue) async{
+  Future<void> updateUser(UserValue uservalue) async {
     //Get the reference to the database
     Database dbHelper = await db;
 
     //update the food data
-    await dbHelper.update(
-        'users',
-        uservalue.toMap(),
+    await dbHelper.update('users', uservalue.toMap(),
         //Ensure the food has a matching id
         where: 'name = ?',
         //Pass the Food's id as a whereArg to prevent SQL injection
-        whereArgs: [uservalue.name]
-    );
+        whereArgs: [uservalue.name]);
   }
-  Future<void> updateFoodWaste(String name) async{
+
+  Future<void> updateFoodWaste(String name) async {
     Database dbHelper = await db;
 
-    await dbHelper.rawUpdate('UPDATE foods SET consumestate = ?, state = ? WHERE name = ?',[1.0, 'wasted', name]);
+    await dbHelper.rawUpdate(
+        'UPDATE foods SET consumestate = ?, state = ? WHERE name = ?',
+        [1.0, 'wasted', name]);
     print('###############update##################');
   }
-  Future<void> updateFoodConsumed(String name, String status) async{
+
+  Future<void> updateFoodConsumed(String name, String status) async {
     Database dbHelper = await db;
 
-    await dbHelper.rawUpdate('UPDATE foods SET quantitynum = ?, consumestate = ?, state = ? WHERE name = ?',[0, 1.0, status, name]);
+    await dbHelper.rawUpdate(
+        'UPDATE foods SET quantitynum = ?, consumestate = ?, state = ? WHERE name = ?',
+        [0, 1.0, status, name]);
     print('###############update##################');
   }
-  Future<void> updateFoodExpiring(String name) async{
+
+  Future<void> updateFoodExpiring(String name) async {
     Database dbHelper = await db;
 
-    await dbHelper.rawUpdate('UPDATE foods SET state = ? WHERE name = ?',['expiring', name]);
+    await dbHelper.rawUpdate(
+        'UPDATE foods SET state = ? WHERE name = ?', ['expiring', name]);
     print('###############update##################');
   }
 
   //Define method that updates user data
-  Future<void> updateUserPrimary(String primaryState) async{
+  Future<void> updateUserPrimary(String primaryState) async {
     //Get the reference to the database
     Database dbHelper = await db;
-    await dbHelper.rawUpdate('UPDATE users SET primarystate = ?', [primaryState]);
+    await dbHelper
+        .rawUpdate('UPDATE users SET primarystate = ?', [primaryState]);
   }
 
-  Future<void> updateUserSecondary(String secondaryState) async{
+  Future<void> updateUserSecondary(String secondaryState) async {
     //Get the reference to the database
     Database dbHelper = await db;
-    await dbHelper.rawUpdate('UPDATE users SET secondarystate = ?', [secondaryState]);
+    await dbHelper
+        .rawUpdate('UPDATE users SET secondarystate = ?', [secondaryState]);
   }
 
   //Define method to delete food
@@ -529,22 +541,35 @@ class DBHelper{
     );
   }
 
-  Future close()async{
+  Future close() async {
     Database dbhelper = await db;
     dbhelper.close();
   }
 
-
-
   //################Test Database###################
 
-  testDB() async{
-
+  testDB() async {
     DBHelper dbhelper = DBHelper();
 
     //Insert a new Food butter
-    var butter = Food( name: 'milk', category: 'MilkProduct', boughttime: 154893, expiretime: 156432, quantitytype: 'pieces', quantitynum: 3, consumestate: 0.50, state: 'good');
-    var egg = Food( name: 'beaf', category: 'Meat', boughttime: 134554, expiretime: 1654757, quantitytype: 'number', quantitynum: 4, consumestate: 0, state: 'good');
+    var butter = Food(
+        name: 'milk',
+        category: 'MilkProduct',
+        boughttime: 154893,
+        expiretime: 156432,
+        quantitytype: 'pieces',
+        quantitynum: 3,
+        consumestate: 0.50,
+        state: 'good');
+    var egg = Food(
+        name: 'beaf',
+        category: 'Meat',
+        boughttime: 134554,
+        expiretime: 1654757,
+        quantitytype: 'number',
+        quantitynum: 4,
+        consumestate: 0,
+        state: 'good');
     dbhelper.insertFood(butter);
     dbhelper.insertFood(egg);
 
@@ -569,7 +594,19 @@ class DBHelper{
     //print(await dbhelper.getOneFoodName(1));
 
     //Insert a new UserValue instance
-    var user1 = UserValue(name: "user1", negative: 2, positive: 25, primarystate: "nest", secondarystate: "satisfied", secondaryevent: "single", thirdstate: "move", species: "folca", childrennum: 1, fatherstate: "divorced", motherstate: "divorced", time: 1345443);
+    var user1 = UserValue(
+        name: "user1",
+        negative: 2,
+        positive: 25,
+        primarystate: "nest",
+        secondarystate: "satisfied",
+        secondaryevent: "single",
+        thirdstate: "move",
+        species: "folca",
+        childrennum: 1,
+        fatherstate: "divorced",
+        motherstate: "divorced",
+        time: 1345443);
     await dbhelper.insertUser(user1);
     print(await dbhelper.queryAll("users"));
 
@@ -577,7 +614,19 @@ class DBHelper{
     print(await dbhelper.queryOne('users', 'user1'));
 
     //Update user1's primarystate and....
-    user1 = UserValue(name: 'user1', negative: 6, positive: 25, primarystate: 'mate', secondarystate: "unsuccessful", secondaryevent: "single", thirdstate: "move", species: "folca", childrennum: 1, fatherstate: "divorced", motherstate: "divorced", time: 134654);
+    user1 = UserValue(
+        name: 'user1',
+        negative: 6,
+        positive: 25,
+        primarystate: 'mate',
+        secondarystate: "unsuccessful",
+        secondaryevent: "single",
+        thirdstate: "move",
+        species: "folca",
+        childrennum: 1,
+        fatherstate: "divorced",
+        motherstate: "divorced",
+        time: 134654);
     await dbhelper.updateUser(user1);
     print(await dbhelper.queryAll('users'));
 
@@ -585,7 +634,6 @@ class DBHelper{
     await dbhelper.deleteUser('user1');
     print(await dbhelper.queryAll('users'));
   }
-
 }
 
 class Food {
@@ -599,17 +647,17 @@ class Food {
   String state;
   double consumestate;
 
-  Food({
-    //required this.id,
-    required this.name,
-    required this.category,
-    required this.boughttime,
-    required this.expiretime,
-    required this.quantitytype,
-    required this.quantitynum,
-    required this.consumestate,
-    required this.state
-  });
+  Food(
+      {
+      //required this.id,
+      required this.name,
+      required this.category,
+      required this.boughttime,
+      required this.expiretime,
+      required this.quantitytype,
+      required this.quantitynum,
+      required this.consumestate,
+      required this.state});
 
   /*
   Food.fromMap(Map map){
@@ -627,7 +675,7 @@ class Food {
 
   //Convert a Food into a Map. The keys must correspond to the names
   //of the columns in the databse.
-  Map<String, dynamic> toMap(){
+  Map<String, dynamic> toMap() {
     return {
       //'id': id,
       'name': name,
@@ -646,11 +694,10 @@ class Food {
   @override
   String toString() {
     return 'Food{name: $name, category: $category, boughttime: $boughttime, expiretime: $expiretime, quantitytype: $quantitytype, quantitynum: $quantitynum, state: $state, consumestate: $consumestate}';
-
   }
 }
 
-class UserValue{
+class UserValue {
   final String name;
   final int positive;
   final int negative;
@@ -681,7 +728,7 @@ class UserValue{
 
   //Convert a UserValue into a Map. The keys must correspond to the names
   //of the columns in the databse.
-  Map<String, dynamic> toMap(){
+  Map<String, dynamic> toMap() {
     return {
       'name': name,
       'positive': positive,

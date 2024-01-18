@@ -25,14 +25,15 @@ class _QuantityNumberState extends State<QuantityNumber> {
             color: pressAttention ? Colors.blue : Colors.white,
             child: ListTile(
               onTap: () => setState(() => pressedAttentionIndex = index),
-              title: Text('$index',
-                  // style: (this == pressedAttentionIndex)
-                  //     ? TextStyle(
-                  //         fontSize: 18,
-                  //         color: Colors.white,
-                  //         fontWeight: FontWeight.bold,
-                  //       )
-                  //     : TextStyle(fontSize: 20)
+              title: Text(
+                '$index',
+                // style: (this == pressedAttentionIndex)
+                //     ? TextStyle(
+                //         fontSize: 18,
+                //         color: Colors.white,
+                //         fontWeight: FontWeight.bold,
+                //       )
+                //     : TextStyle(fontSize: 20)
               ),
             ),
           );

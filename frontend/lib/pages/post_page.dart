@@ -27,27 +27,34 @@ class PostPage extends StatelessWidget {
                   child: SizedBox(
                     height: 200,
                     child: Card(
-                      child: Text('Here shall be map giving the range of the location of the item publisher'),
+                      child: Text(
+                          'Here shall be map giving the range of the location of the item publisher'),
                     ),
                   ),
                 ),
-                const SizedBox(height: 20,),
-                Text(postData.name, style: Theme.of(context).textTheme.headlineLarge,),
-                Text('Amount: ${postData.amount.nominal} ${postData.amount.unit}', style: Theme.of(context).textTheme.headlineSmall),
-                Text('Person: ${postData.user.name.first} ${postData.user.name.last} (${postData.user.rating} stars)'),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  postData.name,
+                  style: Theme.of(context).textTheme.headlineLarge,
+                ),
+                Text(
+                    'Amount: ${postData.amount.nominal} ${postData.amount.unit}',
+                    style: Theme.of(context).textTheme.headlineSmall),
+                Text(
+                    'Person: ${postData.user.name.first} ${postData.user.name.last} (${postData.user.rating} stars)'),
                 const Spacer(),
                 FilledButton(
-                    onPressed: () {
-
-                    },
+                    onPressed: () {},
                     child: FractionallySizedBox(
                       widthFactor: 1,
-                      child: Text('Chat with ${postData.user.name}', textAlign: TextAlign.center,),
-                    )
-                )
+                      child: Text(
+                        'Chat with ${postData.user.name}',
+                        textAlign: TextAlign.center,
+                      ),
+                    ))
               ],
-            )
-        )
-    );
+            )));
   }
 }

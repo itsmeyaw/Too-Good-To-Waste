@@ -10,8 +10,7 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatState extends State<ChatPage> {
-  var chats = <Message>[
-  ];
+  var chats = <Message>[];
 
   @override
   Widget build(BuildContext context) {

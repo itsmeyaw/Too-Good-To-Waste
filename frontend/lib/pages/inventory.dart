@@ -17,7 +17,6 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 
-
 class Inventory extends StatefulWidget {
   const Inventory({super.key});
 
@@ -25,7 +24,8 @@ class Inventory extends StatefulWidget {
   State<StatefulWidget> createState() => _BottomTopScreenState();
 }
 
-class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMixin {
+class _BottomTopScreenState extends State<Inventory>
+    with TickerProviderStateMixin {
   TextEditingController nameController = TextEditingController();
   TextEditingController expireTimeController = TextEditingController();
   TextEditingController boughtTimeController = TextEditingController();
@@ -34,7 +34,7 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
   TextEditingController quanNumAndTypeController = TextEditingController();
   TextEditingController categoryController = TextEditingController();
 
- // camera related
+  // camera related
   late String imagePath;
   late File imageFile;
   late String imageData;
@@ -42,7 +42,7 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
   int timeNow = DateTime.now().millisecondsSinceEpoch;
 
   @override
-  void dispose(){
+  void dispose() {
     //Clean up all controllers when the widget is disposed
     nameController.dispose();
     expireTimeController.dispose();
@@ -52,7 +52,7 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
     categoryController.dispose();
     super.dispose();
   }
-  
+
   //FocusNode focusNode1 = FocusNode();
   //FocusNode focusNode2 = FocusNode();
   //FocusScopeNode? focusScopeNode;
@@ -79,82 +79,95 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
   List food = ['name', '', -1, -1, '', -1, -1.0, ''];
 
   //check the primary state of uservalue should be updated or not; if so, update to the latest
-  Future<void> updateStates() async{
+  Future<void> updateStates() async {
     var user1 = await dbhelper.queryAll('users');
     int value = user1[0].positive - user1[0].negative;
     String primaryState;
     // String check = checkIfPrimaryStateChanged(value);
     String secondaryState = user1[0].secondarystate;
 
-    if (value < 2){
-      primaryState='initialization';
+    if (value < 2) {
+      primaryState = 'initialization';
       await dbhelper.updateUserPrimary(primaryState);
-    }
-    else if (value <= 6){
+    } else if (value <= 6) {
       //judge the primary state
-      primaryState='encounter';
+      primaryState = 'encounter';
       await dbhelper.updateUserPrimary(primaryState);
-    }
-    else if(value > 6 && value <= 14){
-      primaryState='mate';
+    } else if (value > 6 && value <= 14) {
+      primaryState = 'mate';
       await dbhelper.updateUserPrimary(primaryState);
-    }
-    else if(value > 14 && value <= 30){
-      primaryState='nest';
+    } else if (value > 14 && value <= 30) {
+      primaryState = 'nest';
       await dbhelper.updateUserPrimary(primaryState);
-    }
-    else if(value > 30 && value <= 46){
-      primaryState='hatch';
+    } else if (value > 30 && value <= 46) {
+      primaryState = 'hatch';
       await dbhelper.updateUserPrimary(primaryState);
-    }
-    else if(value > 46 && value <= 78){
-      primaryState='learn';
+    } else if (value > 46 && value <= 78) {
+      primaryState = 'learn';
       await dbhelper.updateUserPrimary(primaryState);
-    }
-    else if(value > 78 && value <= 82){
-      primaryState='leavehome';
+    } else if (value > 78 && value <= 82) {
+      primaryState = 'leavehome';
       await dbhelper.updateUserPrimary(primaryState);
-    }
-    else if(value > 82 && value <= 91) {
+    } else if (value > 82 && value <= 91) {
       primaryState = 'snow owl';
       await dbhelper.updateUserPrimary(primaryState);
-    }
-    else if(value > 91 && value <= 100){
-      primaryState='tawny owl';
+    } else if (value > 91 && value <= 100) {
+      primaryState = 'tawny owl';
       await dbhelper.updateUserPrimary(primaryState);
     }
 
     // if (secondaryState=="true" && check!="None"){
-      if (secondaryState=="true"){
-        await dbhelper.updateUserSecondary("false");
+    if (secondaryState == "true") {
+      await dbhelper.updateUserSecondary("false");
     }
   }
-  
-  Future<void> insertItem() async{
-       //Insert a new Food butter
-      var butter = Food(name: 'butter', category: 'cheese', boughttime: 154893, expiretime: 156432, quantitytype: 'Piece', quantitynum: 3, consumestate: 0.50, state: 'good');
-      await dbhelper.insertFood(butter);
-      var egg = Food(name: 'eggs', category: 'Egg', boughttime: 134554, expiretime: 1654757, quantitytype: 'Number', quantitynum: 4, consumestate: 0, state: 'good');
-      await dbhelper.insertFood(egg);
 
-      //await dbhelper.testDB();
+  Future<void> insertItem() async {
+    //Insert a new Food butter
+    var butter = Food(
+        name: 'butter',
+        category: 'cheese',
+        boughttime: 154893,
+        expiretime: 156432,
+        quantitytype: 'Piece',
+        quantitynum: 3,
+        consumestate: 0.50,
+        state: 'good');
+    await dbhelper.insertFood(butter);
+    var egg = Food(
+        name: 'eggs',
+        category: 'Egg',
+        boughttime: 134554,
+        expiretime: 1654757,
+        quantitytype: 'Number',
+        quantitynum: 4,
+        consumestate: 0,
+        state: 'good');
+    await dbhelper.insertFood(egg);
 
-      //print('###################################third##################################');
-      //print(await dbhelper.queryAll("foods"));
+    //await dbhelper.testDB();
+
+    //print('###################################third##################################');
+    //print(await dbhelper.queryAll("foods"));
   }
 
-
-  Future<void> insertDB(List food) async{
-
+  Future<void> insertDB(List food) async {
     //var maxId = await dbhelper.getMaxId();
     //print('##########################MaxID = $maxId###############################');
     //maxId = maxId + 1;
-    var newFood = Food(name: food[0], category: food[1], boughttime: food[2], expiretime: food[3], quantitytype: food[4], quantitynum: food[5], consumestate: food[6], state: food[7]);
+    var newFood = Food(
+        name: food[0],
+        category: food[1],
+        boughttime: food[2],
+        expiretime: food[3],
+        quantitytype: food[4],
+        quantitynum: food[5],
+        consumestate: food[6],
+        state: food[7]);
     print(newFood);
 
     await dbhelper.insertFood(newFood);
     print(await dbhelper.queryAll('foods'));
-
   }
 
   Future<List<dynamic>> getAllItems(String dbname) async {
@@ -183,114 +196,135 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
     //await insertItem();
 
     //get all foods name as a list of string
-    List<String> category = await dbhelper.getAllUncosumedFoodStringValues('category');
+    List<String> category =
+        await dbhelper.getAllUncosumedFoodStringValues('category');
     //print('##################################first######################################');
     //print(items);
 
     return category;
   }
 
-
-  Future<List<int>> getItemQuanNum() async{
+  Future<List<int>> getItemQuanNum() async {
     //get all foods quantity number as a list of integers
     List<int> num = await dbhelper.getAllUncosumedFoodIntValues('quantitynum');
 
     return num;
   }
 
-  Future<List<String>> getItemQuanType() async{
+  Future<List<String>> getItemQuanType() async {
     //get all foods quantity number as a list of integers
-    List<String> type = await dbhelper.getAllUncosumedFoodStringValues('quantitytype');
+    List<String> type =
+        await dbhelper.getAllUncosumedFoodStringValues('quantitytype');
 
     return type;
   }
 
-  Future<List<DateTime>> getItemExpiringTime() async{
-    List<int> expire = await dbhelper.getAllUncosumedFoodIntValues('expiretime') ;
-    var expireDate = List<DateTime>.generate(expire.length, (i) => DateTime.fromMillisecondsSinceEpoch(expire[i]));
+  Future<List<DateTime>> getItemExpiringTime() async {
+    List<int> expire =
+        await dbhelper.getAllUncosumedFoodIntValues('expiretime');
+    var expireDate = List<DateTime>.generate(
+        expire.length, (i) => DateTime.fromMillisecondsSinceEpoch(expire[i]));
     return expireDate;
   }
 
-  Future<List<DateTime>> getItemBoughtTime() async{
-    List<int> boughttime = await dbhelper.getAllUncosumedFoodIntValues('boughttime') ;
-    var boughtDate = List<DateTime>.generate(boughttime.length, (i) => DateTime.fromMillisecondsSinceEpoch(boughttime[i]));
+  Future<List<DateTime>> getItemBoughtTime() async {
+    List<int> boughttime =
+        await dbhelper.getAllUncosumedFoodIntValues('boughttime');
+    var boughtDate = List<DateTime>.generate(boughttime.length,
+        (i) => DateTime.fromMillisecondsSinceEpoch(boughttime[i]));
     return boughtDate;
   }
 
   Future<void> addItemName(value) async {
-  
     List<String> items = await dbhelper.getAllUncosumedFoodStringValues('name');
     //items = await getItemName();
     //print(items);
-      
-    setState(() {    
+
+    setState(() {
       items.add(value);
     });
   }
 
   Future<void> addItemExpi(value) async {
-
-    List<int> expires = await dbhelper.getAllUncosumedFoodIntValues('expiretime');
+    List<int> expires =
+        await dbhelper.getAllUncosumedFoodIntValues('expiretime');
     print(expires);
 
-      
     setState(() {
-      
       expires.add(value);
     });
   }
 
-  Future<void> editItem(index, value) async{
-      items = await getItemName();
-    setState(() async{
+  Future<void> editItem(index, value) async {
+    items = await getItemName();
+    setState(() async {
       items[index] = value;
     });
   }
 
-  Future<void> deleteItem(String value) async{
-      //items = await getItemName();
-      await dbhelper.deleteFood(value);
-
+  Future<void> deleteItem(String value) async {
+    //items = await getItemName();
+    await dbhelper.deleteFood(value);
   }
 
-
-  Future<void> updateFoodState(String name, String attribute) async{
-     var updatedFood = await dbhelper.queryOne('foods', name);
-     print(updatedFood);
-     if(attribute == 'consumed'){
-     //var consumedFoodUpdate = Food(id: id, name: name, category: updatedFood[0].category, boughttime: updatedFood[0].boughttime, expiretime: updatedFood[0].expiretime, quantitytype: updatedFood[0].quantitytype, quantitynum: 0, consumestate: 1.0, state: 'consumed');
+  Future<void> updateFoodState(String name, String attribute) async {
+    var updatedFood = await dbhelper.queryOne('foods', name);
+    print(updatedFood);
+    if (attribute == 'consumed') {
+      //var consumedFoodUpdate = Food(id: id, name: name, category: updatedFood[0].category, boughttime: updatedFood[0].boughttime, expiretime: updatedFood[0].expiretime, quantitytype: updatedFood[0].quantitytype, quantitynum: 0, consumestate: 1.0, state: 'consumed');
       await dbhelper.updateFoodConsumed(name, 'consumed');
       print(await dbhelper.queryAll('foods'));
-     }
-     else{
+    } else {
       //var wastedFoodUpdate = Food(id: id, name: name, category: updatedFood[0].category, boughttime: updatedFood[0].boughttime, expiretime: updatedFood[0].expiretime, quantitytype: updatedFood[0].quantitytype, quantitynum: updatedFood[0].quantitynum, consumestate: 1.0, state: 'wasted');
       await dbhelper.updateFoodWaste(name);
       print(await dbhelper.queryAll('foods'));
-     }
+    }
   }
 
   //edit the state to 'consumed' and consumestate to 1, and user positive data adds 1
   //the arugument should be 'positive'(which means positive + 1) or 'negative'(which means negative + 1)
-  Future<void> updateUserValue(String state) async{
+  Future<void> updateUserValue(String state) async {
     var user1 = await dbhelper.queryAll('users');
     //int value = user1[0]['positive'] - user1[0]['negative'];
     print('================= user =================');
     print(user1);
 
-    if(state == 'positive'){
+    if (state == 'positive') {
       //judge the primary state
-      var uservalue = UserValue(name: user1[0].name, negative: user1[0].negative, positive: user1[0].positive + 1, primarystate: user1[0].primarystate, secondarystate: 'true', secondaryevent: "single", thirdstate: "move", species: "folca", childrennum: 0, fatherstate: "single", motherstate: "single", time: timeNow);
+      var uservalue = UserValue(
+          name: user1[0].name,
+          negative: user1[0].negative,
+          positive: user1[0].positive + 1,
+          primarystate: user1[0].primarystate,
+          secondarystate: 'true',
+          secondaryevent: "single",
+          thirdstate: "move",
+          species: "folca",
+          childrennum: 0,
+          fatherstate: "single",
+          motherstate: "single",
+          time: timeNow);
       await dbhelper.updateUser(uservalue);
       await updateStates();
       print(await dbhelper.queryAll("users"));
-      }
-    else{
-      var uservalue = UserValue(name: user1[0].name, negative: user1[0].negative + 1, positive: user1[0].positive, primarystate: user1[0].primarystate, secondarystate: 'true', secondaryevent: "single", thirdstate: "move", species: "folca", childrennum: 0, fatherstate: "single", motherstate: "single", time: timeNow);
+    } else {
+      var uservalue = UserValue(
+          name: user1[0].name,
+          negative: user1[0].negative + 1,
+          positive: user1[0].positive,
+          primarystate: user1[0].primarystate,
+          secondarystate: 'true',
+          secondaryevent: "single",
+          thirdstate: "move",
+          species: "folca",
+          childrennum: 0,
+          fatherstate: "single",
+          motherstate: "single",
+          time: timeNow);
       await dbhelper.updateUser(uservalue);
       await updateStates();
       print(await dbhelper.queryAll("users"));
     }
-
   }
 
   Future pickImage(bool isCamera) async {
@@ -301,39 +335,40 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
       image = await ImagePicker().pickImage(source: ImageSource.gallery);
     }
     if (image == null) return;
-    CroppedFile? croppedFile = await ImageCropper().cropImage(sourcePath: image.path,
-        aspectRatioPresets: Platform.isAndroid
-            ? [
-          CropAspectRatioPreset.square,
-          CropAspectRatioPreset.ratio3x2,
-          CropAspectRatioPreset.original,
-          CropAspectRatioPreset.ratio4x3,
-          CropAspectRatioPreset.ratio16x9
-        ]
-            : [
-          CropAspectRatioPreset.original,
-          CropAspectRatioPreset.square,
-          CropAspectRatioPreset.ratio3x2,
-          CropAspectRatioPreset.ratio4x3,
-          CropAspectRatioPreset.ratio5x3,
-          CropAspectRatioPreset.ratio5x4,
-          CropAspectRatioPreset.ratio7x5,
-          CropAspectRatioPreset.ratio16x9
-        ],
-        uiSettings: [
-          AndroidUiSettings(
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: image.path,
+      aspectRatioPresets: Platform.isAndroid
+          ? [
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio3x2,
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.ratio4x3,
+              CropAspectRatioPreset.ratio16x9
+            ]
+          : [
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio3x2,
+              CropAspectRatioPreset.ratio4x3,
+              CropAspectRatioPreset.ratio5x3,
+              CropAspectRatioPreset.ratio5x4,
+              CropAspectRatioPreset.ratio7x5,
+              CropAspectRatioPreset.ratio16x9
+            ],
+      uiSettings: [
+        AndroidUiSettings(
             toolbarTitle: 'Cropper',
             toolbarColor: Colors.deepOrange,
             toolbarWidgetColor: Colors.white,
             initAspectRatio: CropAspectRatioPreset.original,
             lockAspectRatio: false),
-          IOSUiSettings(
-          title: 'Cropper',),
-          WebUiSettings(
-            context: context),
-        ],
-      );
-    if(croppedFile != null) {
+        IOSUiSettings(
+          title: 'Cropper',
+        ),
+        WebUiSettings(context: context),
+      ],
+    );
+    if (croppedFile != null) {
       setState(() {
         imageFile = File(croppedFile.path);
         imageData = base64Encode(imageFile.readAsBytesSync());
@@ -369,7 +404,8 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
     //print('##########################MaxID = $maxId###############################');
     //maxId = maxId + 1;
     //timeNow -> DateTime, + 7 days, --> int timestamp
-    var expireDate = timeNowDate.add(const Duration(days: 7)).millisecondsSinceEpoch;
+    var expireDate =
+        timeNowDate.add(const Duration(days: 7)).millisecondsSinceEpoch;
     print('#########################$expireDate##################');
     var newFood = Food(
         name: name,
@@ -393,13 +429,13 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
   late TabController _tabController;
 
   @override
-  void initState(){
+  void initState() {
     _tooltipBehavior = TooltipBehavior(enable: true);
     //_controller = TabController(length: 3, vsync: this);
     //Future.delayed(Duration(seconds: 3)).then((value) {
-      //setState(() {
-        //_isLoading = false;
-      //});
+    //setState(() {
+    //_isLoading = false;
+    //});
     //});
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
@@ -414,18 +450,16 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        toolbarHeight: 0,
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(icon: Icon(Icons.storefront_outlined), text: "Current"),
-            Tab(icon: Icon(Icons.bar_chart), text: "Statistic"),
-            Tab(icon: Icon(Icons.calendar_today), text: "Plan"),
-          ],
-        )
-      ),
-
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          toolbarHeight: 0,
+          bottom: TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(icon: Icon(Icons.storefront_outlined), text: "Current"),
+              Tab(icon: Icon(Icons.bar_chart), text: "Statistic"),
+              Tab(icon: Icon(Icons.calendar_today), text: "Plan"),
+            ],
+          )),
       body: TabBarView(
         controller: _tabController,
         children: [
@@ -436,243 +470,250 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
                     prefixIcon: const Icon(
                       Icons.search,
                     ),
-                    hintText: "Search"
-                ),
+                    hintText: "Search"),
               ),
               Expanded(
-                child: FutureBuilder(
-        future: Future.wait([
-          getItemName(),
-          getItemExpiringTime(),
-          getItemQuanNum(),
-          getItemQuanType(),
-          getItemCategory(),
-          getItemBoughtTime(),
-        ]),
-        builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+                  child: FutureBuilder(
+                      future: Future.wait([
+                        getItemName(),
+                        getItemExpiringTime(),
+                        getItemQuanNum(),
+                        getItemQuanType(),
+                        getItemCategory(),
+                        getItemBoughtTime(),
+                      ]),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<List<dynamic>> snapshot) {
+                        if (!snapshot.hasData) {
+                          return const Text('Loading...'); // still loading
+                        }
+                        // alternatively use snapshot.connectionState != ConnectionState.done
+                        if (snapshot.hasError)
+                          return const Text('Something went wrong.');
+                        List<String> items = snapshot.requireData[0];
+                        print(
+                            '#################$items#########################');
+                        if (items.isEmpty) {
+                          return const Center(
+                            child: Text(
+                              "Nothing yet...",
+                              style: TextStyle(
+                                fontSize: 20,
+                              ),
+                            ),
+                          );
+                        }
+                        //sort by remaining expiring time
+                        snapshot.requireData.add(
+                            getRemainingExpiringTime(snapshot.requireData[1]));
+                        List<dynamic> foodItems =
+                            getFoodItems(snapshot.requireData);
 
-          if (!snapshot.hasData) {
-            return const Text('Loading...'); // still loading
-          }
-          // alternatively use snapshot.connectionState != ConnectionState.done
-          if (snapshot.hasError) return const Text('Something went wrong.');
-          List<String> items = snapshot.requireData[0];
-          print('#################$items#########################');
-          if (items.isEmpty) {
-          return const Center(
-              child: Text("Nothing yet...",
-                style: TextStyle(
-                  fontSize: 20,
-                ),
-              ),
-            );
-          }
-          //sort by remaining expiring time
-          snapshot.requireData.add(
-              getRemainingExpiringTime(snapshot.requireData[1]));
-          List<dynamic> foodItems = getFoodItems(snapshot.requireData);
+                        // snapshot.requireData.add(value);
+                        items = List<String>.from(foodItems[0]);
+                        print(
+                            '###################################$items#################################');
+                        final List<DateTime> expires =
+                            List<DateTime>.from(foodItems[1]);
+                        final List<int> num = List<int>.from(foodItems[2]);
+                        final List<String> type =
+                            List<String>.from(foodItems[3]);
+                        final List<String> categoryies =
+                            List<String>.from(foodItems[4]);
+                        final List<DateTime> boughtTime =
+                            List<DateTime>.from(foodItems[5]);
+                        final List<Duration> remainingTime =
+                            List<Duration>.from(foodItems[6]);
+                        return ListTileTheme(
+                            contentPadding: const EdgeInsets.all(15),
+                            textColor: Colors.black54,
+                            style: ListTileStyle.list,
+                            dense: true,
+                            child: ListView.builder(
+                                itemCount: items.length,
+                                itemBuilder: (context, index) {
+                                  var item = items[index];
+                                  //how to show the quantity tyoe and quantity number?
 
+                                  //var expires = getItemExpiringTime();
+                                  //how to show the listsby sequence of expire time?
+                                  var remainDays = remainingTime[index].inDays;
+                                  var progressPercentage = remainDays /
+                                      (expires[index]
+                                          .difference(boughtTime[index])
+                                          .inDays);
+                                  var foodNum = num[index];
+                                  var foodType = type[index];
 
-          // snapshot.requireData.add(value);
-          items = List<String>.from(foodItems[0]);
-          print('###################################$items#################################');
-          final List<DateTime> expires = List<DateTime>.from(foodItems[1]);
-          final List<int> num = List<int>.from(foodItems[2]);
-          final List<String> type = List<String>.from(foodItems[3]);
-          final List<String> categoryies = List<String>.from(foodItems[4]);
-          final List<DateTime> boughtTime = List<DateTime>.from(foodItems[5]);
-          final List<Duration> remainingTime = List<Duration>.from(foodItems[6]);
-          return ListTileTheme(
-              contentPadding: const EdgeInsets.all(15),
-              textColor: Colors.black54,
-              style: ListTileStyle.list,
-              dense: true,
-              child: ListView.builder(
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    var item = items[index];
-                    //how to show the quantity tyoe and quantity number?
+                                  var category = categoryies[index];
 
-                    //var expires = getItemExpiringTime();
-                    //how to show the listsby sequence of expire time?
-                    var remainDays = remainingTime[index].inDays;
-                    var progressPercentage = remainDays / (expires[index].difference(boughtTime[index])
-                        .inDays);
-                    var foodNum = num[index];
-                    var foodType = type[index];
-
-                    var category = categoryies[index];
-
-                    return buildItem(
-                        item,
-                        remainDays,
-                        foodNum,
-                        foodType,
-                        index,
-                        category,
-                        progressPercentage
-                    );
-                  }
-            )
-          );
-        }
-      )
-                ),
+                                  return buildItem(
+                                      item,
+                                      remainDays,
+                                      foodNum,
+                                      foodType,
+                                      index,
+                                      category,
+                                      progressPercentage);
+                                }));
+                      })),
             ],
           ),
           Container(
-            padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-            child: ListView(children: [
-              Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 10,),
-                    Text('Your Statistic', style: Theme.of(context).textTheme.headlineMedium,),
-                    const SizedBox(height: 5,),
-                    Text('Month: January'),
-                    const SizedBox(height: 10,),
-                    Container (
-                        height: 200,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 200,
-                              child: PieChart(
-                                  PieChartData(
-                                      sections: [
-                                        PieChartSectionData(
-                                            value: 10,
-                                            title: 'Wasted',
-                                            color: Colors.red
-                                        ),
-                                        PieChartSectionData(
-                                            value: 50,
-                                            title: 'Used',
-                                            color: Colors.blue
-                                        ),
-                                        PieChartSectionData(
-                                            value: 25,
-                                            title: 'Shared',
-                                            color: Colors.green
-                                        ),
-                                        PieChartSectionData(
-                                            value: 10,
-                                            title: 'Almost Expired',
-                                            color: Colors.yellow
-                                        )
-                                      ]
-                                  )
-                              ),
-                            )
-                          ],
-                        )
-                    ),
-                    const SizedBox(height: 20,),
-                    Text('Period: Jan 2023 - Des 2023'),
-                    const SizedBox(height: 10,),
-                    Container (
-                        height: 200,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width - 20, // 20 is padding left + right
-                              child: _LineChart(),
-                            )
-                          ],
-                        )
-                    ),
-                  ]
-              ),
-            ],
-            )
-          ),
+              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+              child: ListView(
+                children: [
+                  Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          'Your Statistic',
+                          style: Theme.of(context).textTheme.headlineMedium,
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Text('Month: January'),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                            height: 200,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 200,
+                                  child: PieChart(PieChartData(sections: [
+                                    PieChartSectionData(
+                                        value: 10,
+                                        title: 'Wasted',
+                                        color: Colors.red),
+                                    PieChartSectionData(
+                                        value: 50,
+                                        title: 'Used',
+                                        color: Colors.blue),
+                                    PieChartSectionData(
+                                        value: 25,
+                                        title: 'Shared',
+                                        color: Colors.green),
+                                    PieChartSectionData(
+                                        value: 10,
+                                        title: 'Almost Expired',
+                                        color: Colors.yellow)
+                                  ])),
+                                )
+                              ],
+                            )),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Text('Period: Jan 2023 - Des 2023'),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                            height: 200,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: MediaQuery.of(context).size.width -
+                                      20, // 20 is padding left + right
+                                  child: _LineChart(),
+                                )
+                              ],
+                            )),
+                      ]),
+                ],
+              )),
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Flexible(
-                  flex: 2,
-                  child: GestureDetector(
-                    child: const RiveAnimation.asset(
+            children: [
+              Flexible(
+                flex: 2,
+                child: GestureDetector(
+                  child: const RiveAnimation.asset(
                     'assets/anime/noWasted.riv',
-                    ),
                   ),
                 ),
-                Flexible(
-                  flex: 1,
-                  child: AnimatedTextKit(
-                    animatedTexts: [
-                      TypewriterAnimatedText(
-                        'No wasted now, keep it!',
-                        textStyle: const TextStyle(
-                          fontSize: 32.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        speed: const Duration(milliseconds: 100),
+              ),
+              Flexible(
+                flex: 1,
+                child: AnimatedTextKit(
+                  animatedTexts: [
+                    TypewriterAnimatedText(
+                      'No wasted now, keep it!',
+                      textStyle: const TextStyle(
+                        fontSize: 32.0,
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
-
-                    totalRepeatCount: 4,
-                    pause: const Duration(milliseconds: 100000),
-                    displayFullTextOnTap: true,
-                    stopPauseOnTap: true,
-                  ),
+                      speed: const Duration(milliseconds: 100),
+                    ),
+                  ],
+                  totalRepeatCount: 4,
+                  pause: const Duration(milliseconds: 100000),
+                  displayFullTextOnTap: true,
+                  stopPauseOnTap: true,
                 ),
-                Flexible(
-                  flex: 1,
-                  child: Container(),
-                ),
+              ),
+              Flexible(
+                flex: 1,
+                child: Container(),
+              ),
             ],
           ),
-         
         ],
       ),
-
       floatingActionButton:
-        Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-          FloatingActionButton(
-            tooltip: "Add item",
-            onPressed: () {
-              // clear out txt buffer before entering new screen
-              txt.value = const TextEditingValue();
-              //pushAddItemPage();
-              pushAddItemScreen();
-            },
-            child: const Icon(Icons.add),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          FloatingActionButton(
-            onPressed: () => pickImage(false),
-            heroTag: null,
-            child: const Icon(Icons.photo_album),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          FloatingActionButton(
-                onPressed: () => pickImage(true),
-                heroTag: null,
-                child: const Icon(Icons.camera_alt),
-          )
-        ]),
+          Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+        FloatingActionButton(
+          tooltip: "Add item",
+          onPressed: () {
+            // clear out txt buffer before entering new screen
+            txt.value = const TextEditingValue();
+            //pushAddItemPage();
+            pushAddItemScreen();
+          },
+          child: const Icon(Icons.add),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        FloatingActionButton(
+          onPressed: () => pickImage(false),
+          heroTag: null,
+          child: const Icon(Icons.photo_album),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        FloatingActionButton(
+          onPressed: () => pickImage(true),
+          heroTag: null,
+          child: const Icon(Icons.camera_alt),
+        )
+      ]),
     );
-    }
+  }
 
-
-  Future<List<String>> getWasteItemString(String value) async{
+  Future<List<String>> getWasteItemString(String value) async {
     List<Map<String, dynamic>> items = await dbhelper.getAllWastedFoodList();
-    print('#################################$items############################');
-    List<String> WasteName = List<String>.generate(items.length, (i) => items[i][value]);
+    print(
+        '#################################$items############################');
+    List<String> WasteName =
+        List<String>.generate(items.length, (i) => items[i][value]);
     return WasteName;
   }
 
-   Future<List<int>> getWasteItemInt(String value) async{
+  Future<List<int>> getWasteItemInt(String value) async {
     List<Map<String, dynamic>> items = await dbhelper.getAllWastedFoodList();
-    List<int> WasteName = List<int>.generate(items.length, (i) => items[i][value]);
+    List<int> WasteName =
+        List<int>.generate(items.length, (i) => items[i][value]);
     return WasteName;
   }
 
@@ -695,28 +736,30 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
           List<String> itemsWaste = snapshot.requireData[0];
           if (itemsWaste.isEmpty) {
             return const Center(
-              child: Text("Nothing yet...",
+              child: Text(
+                "Nothing yet...",
                 style: TextStyle(
                   fontSize: 20,
                 ),
               ),
             );
           }
-      
+
           //List<dynamic> foodItems = getFoodItems(snapshot.requireData);
 
           //final List<DateTime> expires = List<DateTime>.from(foodItems[1]);
           List<int> num = snapshot.requireData[1];
           List<String> type = snapshot.requireData[2];
           List<String> categoryies = snapshot.requireData[3];
-          print('###################$Category##############$num#####################3$type#######################$itemsWaste##################');
+          print(
+              '###################$Category##############$num#####################3$type#######################$itemsWaste##################');
 
           return ListTileTheme(
               contentPadding: const EdgeInsets.all(15),
               textColor: Colors.black54,
               style: ListTileStyle.list,
               dense: true,
-              child: ListView.builder(              
+              child: ListView.builder(
                   itemCount: itemsWaste.length,
                   itemBuilder: (context, index) {
                     var item = itemsWaste[index];
@@ -737,18 +780,15 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
                         foodNum,
                         foodType,
                         category);
-                        //progressPercentage);
-                  }
-              )
-          );
-        }
-    );
+                    //progressPercentage);
+                  }));
+        });
   }
 
-  Widget buildWasteItem(String item, int num, String type, String category ) {
+  Widget buildWasteItem(String item, int num, String type, String category) {
     String? categoryIconImagePath;
 
-    if(GlobalCateIconMap[category] == null) {
+    if (GlobalCateIconMap[category] == null) {
       categoryIconImagePath = GlobalCateIconMap["Others"];
     } else {
       categoryIconImagePath = GlobalCateIconMap[category];
@@ -757,57 +797,57 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
       padding: const EdgeInsets.all(10.0),
-      child: Column(
-      children:[
+      child: Column(children: [
         Flexible(
-                flex: 1,
-                child: AnimatedTextKit(
-                  animatedTexts: [
-                    TypewriterAnimatedText(
-                      'Oh No! You have wasted $num $type $item already...',
-                      textStyle: const TextStyle(
-                        fontSize: 32.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      speed: const Duration(milliseconds: 100),
-                    ),
-                  ],
-                  totalRepeatCount: 4,
-                  pause: const Duration(milliseconds: 100000),
-                  displayFullTextOnTap: true,
-                  stopPauseOnTap: true,
+          flex: 1,
+          child: AnimatedTextKit(
+            animatedTexts: [
+              TypewriterAnimatedText(
+                'Oh No! You have wasted $num $type $item already...',
+                textStyle: const TextStyle(
+                  fontSize: 32.0,
+                  fontWeight: FontWeight.bold,
                 ),
+                speed: const Duration(milliseconds: 100),
+              ),
+            ],
+            totalRepeatCount: 4,
+            pause: const Duration(milliseconds: 100000),
+            displayFullTextOnTap: true,
+            stopPauseOnTap: true,
+          ),
         ),
-      Flexible(
-                flex: 1,
-                child: Column(
-                  children: [
-                    ListTile(
-                      contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                      leading: Container(
-                        padding: const EdgeInsets.only(right: 12.0),
-                        child: Image(
-                          image: AssetImage(categoryIconImagePath!),
-                          width: 32,
-                          height: 32,
-                        ),
-                      ),
-                      title: Text(item, style: const TextStyle( fontSize: 25), ),
-                      // subtitle: Text("Expired in $expire days", style: TextStyle(fontStyle: FontStyle.italic),),
-                      trailing: Text("$num $type", style: const TextStyle(
+        Flexible(
+            flex: 1,
+            child: Column(
+              children: [
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 10.0),
+                  leading: Container(
+                    padding: const EdgeInsets.only(right: 12.0),
+                    child: Image(
+                      image: AssetImage(categoryIconImagePath!),
+                      width: 32,
+                      height: 32,
+                    ),
+                  ),
+                  title: Text(
+                    item,
+                    style: const TextStyle(fontSize: 25),
+                  ),
+                  // subtitle: Text("Expired in $expire days", style: TextStyle(fontStyle: FontStyle.italic),),
+                  trailing: Text("$num $type",
+                      style: const TextStyle(
                         fontFamily: 'Roboto',
                         fontSize: 24,
                       )),
-                    ),
-                  ],
-                )
-      ),
-      ]
-    ),
+                ),
+              ],
+            )),
+      ]),
     );
   }
-  
 
   Widget buildList() {
     //items = await getItemName();
@@ -829,7 +869,8 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
           List<String> items = snapshot.requireData[0];
           if (items.isEmpty) {
             return const Center(
-              child: Text("Nothing yet...",
+              child: Text(
+                "Nothing yet...",
                 style: TextStyle(
                   fontSize: 20,
                 ),
@@ -837,10 +878,9 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
             );
           }
           //sort by remaining expiring time
-          snapshot.requireData.add(
-              getRemainingExpiringTime(snapshot.requireData[1]));
+          snapshot.requireData
+              .add(getRemainingExpiringTime(snapshot.requireData[1]));
           List<dynamic> foodItems = getFoodItems(snapshot.requireData);
-
 
           // snapshot.requireData.add(value);
           items = List<String>.from(foodItems[0]);
@@ -849,8 +889,8 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
           final List<String> type = List<String>.from(foodItems[3]);
           final List<String> categoryies = List<String>.from(foodItems[4]);
           final List<DateTime> boughtTime = List<DateTime>.from(foodItems[5]);
-          final List<Duration> remainingTime = List<Duration>.from(
-              foodItems[6]);
+          final List<Duration> remainingTime =
+              List<Duration>.from(foodItems[6]);
           return ListTileTheme(
               contentPadding: const EdgeInsets.all(15),
               textColor: Colors.black54,
@@ -865,38 +905,29 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
                     //var expires = getItemExpiringTime();
                     //how to show the listsby sequence of expire time?
                     var remainDays = remainingTime[index].inDays;
-                    var progressPercentage = remainDays / (expires[index]
-                        .difference(boughtTime[index])
-                        .inDays);
+                    var progressPercentage = remainDays /
+                        (expires[index].difference(boughtTime[index]).inDays);
                     var foodNum = num[index];
                     var foodType = type[index];
 
                     var category = categoryies[index];
 
-                    return buildItem(
-                        item,
-                        remainDays,
-                        foodNum,
-                        foodType,
-                        index,
-                        category,
-                        progressPercentage);
-                  }
-              )
-          );
-        }
-    );
+                    return buildItem(item, remainDays, foodNum, foodType, index,
+                        category, progressPercentage);
+                  }));
+        });
   }
 
-  Widget buildItem(String text, int expire, int foodNum, String foodType, int index, String category, double progressPercentage ) {
+  Widget buildItem(String text, int expire, int foodNum, String foodType,
+      int index, String category, double progressPercentage) {
     String? categoryIconImagePath;
     Color progressColor;
-    if(GlobalCateIconMap[category] == null) {
+    if (GlobalCateIconMap[category] == null) {
       categoryIconImagePath = GlobalCateIconMap["Others"];
     } else {
       categoryIconImagePath = GlobalCateIconMap[category];
     }
-    if(progressPercentage > 0 && progressPercentage < 49) {
+    if (progressPercentage > 0 && progressPercentage < 49) {
       progressColor = Colors.green;
     } else if (progressPercentage >= 49 && progressPercentage < 66) {
       progressColor = Colors.yellow;
@@ -911,9 +942,9 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
         borderRadius: BorderRadius.circular(10),
       ),
       margin: const EdgeInsets.all(10),
-      color: expire>3?Colors.white:const Color.fromRGBO(238, 162, 164, 0.8),
-      child:
-      Slidable(
+      color:
+          expire > 3 ? Colors.white : const Color.fromRGBO(238, 162, 164, 0.8),
+      child: Slidable(
         key: const ValueKey(0),
         startActionPane: ActionPane(
           // A motion is a widget used to control how the pane animates.
@@ -921,7 +952,7 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
 
           // A pane can dismiss the Slidable.
           dismissible: DismissiblePane(onDismissed: () {
-            setState(() async{
+            setState(() async {
               await updateFoodState(text, 'wasted');
               await updateUserValue('negative');
               items.removeAt(index);
@@ -933,7 +964,7 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
             // A SlidableAction can have an icon and/or a label.
             SlidableAction(
               onPressed: (BuildContext context) async {
-                await updateFoodState( text, 'wasted');
+                await updateFoodState(text, 'wasted');
                 await updateUserValue('negative');
                 //items.removeAt(index);
                 // ignore: list_remove_unrelated_type
@@ -943,7 +974,7 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
 
                 //print(await getAllItems('foods'));
                 // print('#########${user1[0].primarystate}#############');
-},
+              },
               backgroundColor: const Color(0xFFFE4A49),
               foregroundColor: Colors.white,
               icon: Icons.delete,
@@ -956,18 +987,18 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
         endActionPane: ActionPane(
           motion: const ScrollMotion(),
           dismissible: DismissiblePane(onDismissed: () {
-            setState(() async{
+            setState(() async {
               await updateFoodState(text, 'consumed');
               await updateUserValue('positive');
               items.removeAt(index);
             });
           }),
           children: [
-            SlidableAction (
+            SlidableAction(
               // An action can be bigger than the others.
               flex: 2,
-              onPressed: (BuildContext context) async{
-                await updateFoodState( text, 'consumed');
+              onPressed: (BuildContext context) async {
+                await updateFoodState(text, 'consumed');
                 await updateUserValue('positive');
                 //print(await getAllItems('foods'));
                 //items.removeAt(0);
@@ -986,44 +1017,49 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
         // component is not dragged.
         child: ListTile(
           contentPadding:
-          const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+              const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
           leading: Container(
             padding: const EdgeInsets.only(right: 12.0),
             decoration: const BoxDecoration(
-                border: Border(
-                    right: BorderSide(width: 1.0))),
+                border: Border(right: BorderSide(width: 1.0))),
             child: Image(
               image: AssetImage("$categoryIconImagePath"),
               width: 32,
               height: 32,
             ),
           ),
-          title: Text(text, style: const TextStyle( fontSize: 25), ),
+          title: Text(
+            text,
+            style: const TextStyle(fontSize: 25),
+          ),
           subtitle: Row(
             children: <Widget>[
               Expanded(
                   flex: 1,
                   child: Container(
                     child: LinearProgressIndicator(
-                        backgroundColor: const Color.fromRGBO(209, 224, 224, 0.2),
+                        backgroundColor:
+                            const Color.fromRGBO(209, 224, 224, 0.2),
                         value: progressPercentage,
-                        valueColor: AlwaysStoppedAnimation(expire>3?Colors.green:Colors.red)),
-                  )
-              ),
+                        valueColor: AlwaysStoppedAnimation(
+                            expire > 3 ? Colors.green : Colors.red)),
+                  )),
               Expanded(
                 flex: 4,
                 child: Padding(
                     padding: const EdgeInsets.only(left: 10.0),
                     child: Text("$expire Days Left",
-                        style: TextStyle(color: expire>3?Colors.orange:Colors.black))),
+                        style: TextStyle(
+                            color: expire > 3 ? Colors.orange : Colors.black))),
               )
             ],
           ),
           // subtitle: Text("Expired in $expire days", style: TextStyle(fontStyle: FontStyle.italic),),
-          trailing: Text("$foodNum $foodType", style: const TextStyle(
-            fontFamily: 'Roboto',
-            fontSize: 24,
-          )),
+          trailing: Text("$foodNum $foodType",
+              style: const TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 24,
+              )),
           onTap: () {
             //edit one specific card ---------直接跳去詳情頁面吧
             //txt.value = new TextEditingController.fromValue(new TextEditingValue(text: items[index])).value;
@@ -1036,97 +1072,99 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
             //長按卡片刪除
             await deleteItem(text);
             items.removeAt(index);
-            print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%${await getAllItems('foods')}%%%%%%%%%%%%%%%%%%%%%%%%');
+            print(
+                '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%${await getAllItems('foods')}%%%%%%%%%%%%%%%%%%%%%%%%');
           },
         ),
       ),
-
     );
   }
 
-  void pushItemDetailScreen(int index, String text) async{
+  void pushItemDetailScreen(int index, String text) async {
     String quantype = await dbhelper.getOneFoodValue(text, 'quantitytype');
     int quannum = await dbhelper.getOneFoodIntValue(text, 'quantitynum');
     int expitime = await dbhelper.getOneFoodIntValue(text, 'expiretime');
-    var expireDate =DateTime.fromMillisecondsSinceEpoch(expitime);
+    var expireDate = DateTime.fromMillisecondsSinceEpoch(expitime);
     var remainDays = expireDate.difference(timeNowDate).inDays;
 
     String category = await dbhelper.getOneFoodValue(text, 'category');
-    double consumeprogress = await dbhelper.getOneFoodDoubleValue(text, 'consumestate');
+    double consumeprogress =
+        await dbhelper.getOneFoodDoubleValue(text, 'consumestate');
 
-     Navigator.push(context, MaterialPageRoute<void>(
-              builder: (BuildContext context) {
-                return Scaffold(
-                  appBar: AppBar(
-                      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                      title: const Text('Item Detail Page')
-                  ),
-                  body: Column(
-                    children: <Widget>[
-                      TextButton(
-                        child: const Text('Edit'),
-                        onPressed: () {
-                          //var qnum = dbhelper.getOneFoodValue(index, "quantitynum");
-                          Navigator.pop(context);
-                        },
-                      ),
-                      //name
-                      //quantity number and quantity type
-                      Title( color: Colors.blue,
-                        title: text,
-                        child: Column(
-                          children: <Widget>[
-                            Row(
-                              children: <Widget> [
-                                Text('Storage Now: $quannum $quantype'),
-                                //Text(quantype),
-                              ],
-                            ),
-                            Row(
-                              children: <Widget> [
-                                Text('Category: $category')
-                              ]
-                            ),
-                            Row(
-                              children: <Widget> [
-                                Text('Expires in: $remainDays')
-                              ]
-                            ),
-                          ],
-                        ),
-                      //progress bar of cosume state
-                      ),
-                      SizedBox(
-                        height: 5,
-                        child: LinearProgressIndicator(
-                          backgroundColor: Colors.grey[200],
-                          valueColor: const AlwaysStoppedAnimation(Colors.blue),
-                          value: consumeprogress,
-                        ),
-                      ),
-                    ]
-                  ),
-                );
+    Navigator.push(context, MaterialPageRoute<void>(
+      builder: (BuildContext context) {
+        return Scaffold(
+          appBar: AppBar(
+              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+              title: const Text('Item Detail Page')),
+          body: Column(children: <Widget>[
+            TextButton(
+              child: const Text('Edit'),
+              onPressed: () {
+                //var qnum = dbhelper.getOneFoodValue(index, "quantitynum");
+                Navigator.pop(context);
               },
-            ));
+            ),
+            //name
+            //quantity number and quantity type
+            Title(
+              color: Colors.blue,
+              title: text,
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Text('Storage Now: $quannum $quantype'),
+                      //Text(quantype),
+                    ],
+                  ),
+                  Row(children: <Widget>[Text('Category: $category')]),
+                  Row(children: <Widget>[Text('Expires in: $remainDays')]),
+                ],
+              ),
+              //progress bar of cosume state
+            ),
+            SizedBox(
+              height: 5,
+              child: LinearProgressIndicator(
+                backgroundColor: Colors.grey[200],
+                valueColor: const AlwaysStoppedAnimation(Colors.blue),
+                value: consumeprogress,
+              ),
+            ),
+          ]),
+        );
+      },
+    ));
   }
 
-  Widget getTextWidgets(List<String> strings)
-  {
+  Widget getTextWidgets(List<String> strings) {
     return Row(children: strings.map((item) => Text(item)).toList());
   }
 
   Widget heightSpacer(double myHeight) => SizedBox(height: myHeight);
+
   /// opens add new item screen
   void pushAddItemScreen() {
     //String date = dateToday.toString().substring(0, 10);
     Color color = Theme.of(context).primaryColor;
     const double padding = 15;
 
-    final category = ["Vegetable", "Meat", "Fruit", "Milk Product", "Milk", "Sea Food", "Egg", "Others"];
-    List<Widget> categortyList = List<Widget>.generate(8, (index) => Text(category[index]));
+    final category = [
+      "Vegetable",
+      "Meat",
+      "Fruit",
+      "Milk Product",
+      "Milk",
+      "Sea Food",
+      "Egg",
+      "Others"
+    ];
+    List<Widget> categortyList =
+        List<Widget>.generate(8, (index) => Text(category[index]));
     final quanTypes = ["g", "kg", "piece", "bag", "bottle", "num"];
-    List<Widget> quanTypeList = List<Widget>.generate(6, (index) => Text(quanTypes[index]));
+    List<Widget> quanTypeList =
+        List<Widget>.generate(6, (index) => Text(quanTypes[index]));
     final nums = List.generate(10, (index) => index);
     List<Widget> numList = List.generate(10, (index) => Text("$index"));
     int quanNum = 0;
@@ -1134,353 +1172,338 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
     var quanType = "";
     DateTime selectedDate = DateTime.now();
     int expireTimeStamp = 0;
-    Color textFieldColor = const Color.fromRGBO(178,207, 135, 0.8);
-    Navigator.of(context).push(
-        MaterialPageRoute(
-            builder: (context) {
-              return Scaffold(
-                appBar: AppBar(
-                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                  title: const Text('Add an Item'),
+    Color textFieldColor = const Color.fromRGBO(178, 207, 135, 0.8);
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: const Text('Add an Item'),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(15),
+          child: ListView(
+            children: <Widget>[
+              TextField(
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.fastfood),
+                  hintText: 'e.g. Eggs',
                 ),
-                body: Padding(
-                  padding: const EdgeInsets.all(15),
-                  child: ListView(
-                    children: <Widget>[
-                      TextField(
-                        decoration: const InputDecoration(
-                          prefixIcon: Icon(
-                            Icons.fastfood
-                          ),
-                          hintText: 'e.g. Eggs',
-                        ),
-                        autofocus: true,
-                        controller: nameController,
-                        onSubmitted:(value){},
-                      ),
-                      heightSpacer(5),
-                      TextField(
-                        decoration: const InputDecoration(
-                          prefixIcon: Icon(
-                            Icons.food_bank
-                          ),
-                          hintText: 'Food type',
-                        ),
-                        onTap: () {
-                          FocusScope.of(context).requestFocus(FocusNode());
-                          showCupertinoModalPopup(
-                              context: context,
-                              builder: (context) {
-                                return Container(
-                                    height: 200,
-                                    color: Colors.white,
-                                    child: Row(
-                                      children: [
-                                        Expanded(child:
-                                        CupertinoPicker(
-                                          itemExtent: 24.0,
-                                          onSelectedItemChanged: (value) {
-                                            setState(() {
-                                              categoryController.text = category[value];
-                                            });
-                                          },
-                                          children: categortyList,
-                                        ),
-                                        )
-                                      ],
-                                    )
-                                );
-                              }
-                          );
-                        },
-                        controller: categoryController,
-                      ),
-                      heightSpacer(5),
-                      TextField(
-                        decoration: const InputDecoration(
-                          prefixIcon: Icon(
-                            Icons.shopping_bag,
-                          ),
-                          hintText: 'Amount',
-                        ),
-                        onTap: () {
-                          FocusScope.of(context).requestFocus(FocusNode());
-                          showCupertinoModalPopup(
-                              context: context,
-                              builder: (context) {
-                                return Container(
-                                    height: 200,
-                                    color: Colors.white,
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 2,
-                                          child:
-                                          CupertinoPicker(
-                                            itemExtent: 24.0,
-                                            onSelectedItemChanged: (value) {
-                                              setState(() {
-                                                quanNum = nums[value];
-                                                quanNumController.text = "$quanNum.$quanSmallNum";
-                                                quanNumAndTypeController.text = "$quanNum.$quanSmallNum $quanType";
-                                              });
-                                            },
-                                            children: numList,
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 2,
-                                          child:
-                                          CupertinoPicker(
-                                            itemExtent: 24.0,
-                                            onSelectedItemChanged: (value) {
-                                              setState(() {
-                                                quanSmallNum = nums[value];
-                                                quanNumController.text = "$quanNum.$quanSmallNum";
-                                                quanNumAndTypeController.text = "$quanNum.$quanSmallNum $quanType";
-                                              });
-                                            },
-                                            children: numList,
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 3,
-                                          child:
-                                          CupertinoPicker(
-                                            itemExtent: 24.0,
-                                            onSelectedItemChanged: (value) {
-                                              setState(() {
-                                                quanTypeController.text = quanTypes[value];
-                                                quanType = quanTypes[value];
-                                                quanNumAndTypeController.text = "$quanNum.$quanSmallNum $quanType";
-                                              });
-                                            },
-                                            children: quanTypeList,
-                                          ),
-                                        )
-                                      ],
-                                    )
-                                );
-                              }
-                          );
-                        },
-                        controller: quanNumAndTypeController,
-                      ),
-                      heightSpacer(5),
-                      TextField(
-                        decoration: const InputDecoration(
-                          prefixIcon: Icon(
-                            Icons.calendar_today,
-                          ),
-                          hintText: 'Buy date'
-                        ),
-                        onTap: () {
-                          FocusScope.of(context).requestFocus(FocusNode());
-                          showCupertinoModalPopup(
-                              context: context,
-                              builder: (context) {
-                                return Container(
-                                    height: 200,
-                                    color: Colors.white,
-                                    child: Row(
-                                      children: [
-                                        Expanded(child:
-                                        Container(
-                                          height: MediaQuery.of(context).copyWith().size.height * 0.25,
-                                          color: Colors.white,
-                                          child: CupertinoDatePicker(
-                                            mode: CupertinoDatePickerMode.date,
-                                            onDateTimeChanged: (value) {
-
-                                              if (value != selectedDate) {
-                                                setState(() {
-                                                  selectedDate = value;
-                                                  int year = selectedDate.year;
-                                                  int month = selectedDate.month;
-                                                  int day = selectedDate.day;
-                                                  int timestamp = selectedDate.millisecondsSinceEpoch;
-                                                  print("timestamp$timestamp");
-                                                  expireTimeStamp = timestamp;
-                                                  food[3] = expireTimeStamp;
-                                                  expireTimeController.text = "$year-$month-$day";
-                                                  // Navigator.pop(context)
-                                                  //記錄下用戶選擇的時間 ------> 存入數據庫
-                                                }
-                                                );
-                                              }
-                                            },
-
-                                            initialDateTime: DateTime.now(),
-                                            minimumYear: 2000,
-                                            maximumYear: 2025,
-                                          ),
-
-                                        )
-                                        )
-                                      ],
-                                    )
-                                );
-                              }
-                          );
-                        },
-                        controller: expireTimeController,
-                      ),
-                      heightSpacer(5),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          const Text('Expiration date',),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              //需要添加只能選擇一個的判斷
-                              _buildButtonColumn1(1),
-                              _buildButtonColumn1(4),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              _buildButtonColumn1(7),
-                              _buildButtonColumn1(14),
-                            ],
-                          ),
-                        ],
-                      ),
+                autofocus: true,
+                controller: nameController,
+                onSubmitted: (value) {},
+              ),
+              heightSpacer(5),
+              TextField(
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.food_bank),
+                  hintText: 'Food type',
+                ),
+                onTap: () {
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  showCupertinoModalPopup(
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                            height: 200,
+                            color: Colors.white,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: CupertinoPicker(
+                                    itemExtent: 24.0,
+                                    onSelectedItemChanged: (value) {
+                                      setState(() {
+                                        categoryController.text =
+                                            category[value];
+                                      });
+                                    },
+                                    children: categortyList,
+                                  ),
+                                )
+                              ],
+                            ));
+                      });
+                },
+                controller: categoryController,
+              ),
+              heightSpacer(5),
+              TextField(
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(
+                    Icons.shopping_bag,
+                  ),
+                  hintText: 'Amount',
+                ),
+                onTap: () {
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  showCupertinoModalPopup(
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                            height: 200,
+                            color: Colors.white,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: CupertinoPicker(
+                                    itemExtent: 24.0,
+                                    onSelectedItemChanged: (value) {
+                                      setState(() {
+                                        quanNum = nums[value];
+                                        quanNumController.text =
+                                            "$quanNum.$quanSmallNum";
+                                        quanNumAndTypeController.text =
+                                            "$quanNum.$quanSmallNum $quanType";
+                                      });
+                                    },
+                                    children: numList,
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: CupertinoPicker(
+                                    itemExtent: 24.0,
+                                    onSelectedItemChanged: (value) {
+                                      setState(() {
+                                        quanSmallNum = nums[value];
+                                        quanNumController.text =
+                                            "$quanNum.$quanSmallNum";
+                                        quanNumAndTypeController.text =
+                                            "$quanNum.$quanSmallNum $quanType";
+                                      });
+                                    },
+                                    children: numList,
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: CupertinoPicker(
+                                    itemExtent: 24.0,
+                                    onSelectedItemChanged: (value) {
+                                      setState(() {
+                                        quanTypeController.text =
+                                            quanTypes[value];
+                                        quanType = quanTypes[value];
+                                        quanNumAndTypeController.text =
+                                            "$quanNum.$quanSmallNum $quanType";
+                                      });
+                                    },
+                                    children: quanTypeList,
+                                  ),
+                                )
+                              ],
+                            ));
+                      });
+                },
+                controller: quanNumAndTypeController,
+              ),
+              heightSpacer(5),
+              TextField(
+                decoration: const InputDecoration(
+                    prefixIcon: Icon(
+                      Icons.calendar_today,
+                    ),
+                    hintText: 'Buy date'),
+                onTap: () {
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  showCupertinoModalPopup(
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                            height: 200,
+                            color: Colors.white,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                    child: Container(
+                                  height: MediaQuery.of(context)
+                                          .copyWith()
+                                          .size
+                                          .height *
+                                      0.25,
+                                  color: Colors.white,
+                                  child: CupertinoDatePicker(
+                                    mode: CupertinoDatePickerMode.date,
+                                    onDateTimeChanged: (value) {
+                                      if (value != selectedDate) {
+                                        setState(() {
+                                          selectedDate = value;
+                                          int year = selectedDate.year;
+                                          int month = selectedDate.month;
+                                          int day = selectedDate.day;
+                                          int timestamp = selectedDate
+                                              .millisecondsSinceEpoch;
+                                          print("timestamp$timestamp");
+                                          expireTimeStamp = timestamp;
+                                          food[3] = expireTimeStamp;
+                                          expireTimeController.text =
+                                              "$year-$month-$day";
+                                          // Navigator.pop(context)
+                                          //記錄下用戶選擇的時間 ------> 存入數據庫
+                                        });
+                                      }
+                                    },
+                                    initialDateTime: DateTime.now(),
+                                    minimumYear: 2000,
+                                    maximumYear: 2025,
+                                  ),
+                                ))
+                              ],
+                            ));
+                      });
+                },
+                controller: expireTimeController,
+              ),
+              heightSpacer(5),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  const Text(
+                    'Expiration date',
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      //需要添加只能選擇一個的判斷
+                      _buildButtonColumn1(1),
+                      _buildButtonColumn1(4),
                     ],
                   ),
-                ),
-                floatingActionButton: FloatingActionButton.extended(
-                  onPressed: ()  async{
-                          try{
-                              food[0] = nameController.text;
-                              food[1] = categoryController.text;
-                              food[2] = timeNow;
-                              //food[3] = expireTimeStamp;
-                              food[4] = quanTypeController.text;
-                              food[5] = quanNum;
-                              food[6] = 0.0;
-                              food[7] = 'good';
-                              print(food);
-                              //var quantityNum = int.parse(quanNumController.text);
-                              //接上InputPage裏DateTime時間組件，再轉化成timestamp存進數據庫
-                              //var expiretime = int.parse(expireTimeController.text);
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildButtonColumn1(7),
+                      _buildButtonColumn1(14),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () async {
+            try {
+              food[0] = nameController.text;
+              food[1] = categoryController.text;
+              food[2] = timeNow;
+              //food[3] = expireTimeStamp;
+              food[4] = quanTypeController.text;
+              food[5] = quanNum;
+              food[6] = 0.0;
+              food[7] = 'good';
+              print(food);
+              //var quantityNum = int.parse(quanNumController.text);
+              //接上InputPage裏DateTime時間組件，再轉化成timestamp存進數據庫
+              //var expiretime = int.parse(expireTimeController.text);
 
-                            //food[3]是可以直接傳入數據庫的int timestamp
-                            DateTime expireDays = DateTime.fromMillisecondsSinceEpoch(food[3]);
-                            var remainExpireDays = expireDays.difference(timeNowDate).inDays;
-                            addItemExpi(remainExpireDays);
-                            addItemName(food[0]);
-                            print(food);
+              //food[3]是可以直接傳入數據庫的int timestamp
+              DateTime expireDays =
+                  DateTime.fromMillisecondsSinceEpoch(food[3]);
+              var remainExpireDays = expireDays.difference(timeNowDate).inDays;
+              addItemExpi(remainExpireDays);
+              addItemName(food[0]);
+              print(food);
 
-                            //Calculate the current state of the new food
-                            //well actually i should assume the state of a new food should always be good, unless the user is an idiot
-                            //But i'm going to do the calculation anyway
+              //Calculate the current state of the new food
+              //well actually i should assume the state of a new food should always be good, unless the user is an idiot
+              //But i'm going to do the calculation anyway
 
-                            //insert new data into database
-                            insertDB(food);
-                            print('#################################${dbhelper.queryAll('foods')}#####################');
+              //insert new data into database
+              insertDB(food);
+              print(
+                  '#################################${dbhelper.queryAll('foods')}#####################');
 
-                            //user positive value add 1
-                            //var user1 = dbhelper.queryAll('users');
-                            updateUserValue('positive');
-
-                            } on FormatException{
-                              print('Format Error!');
-                            }
-
-                        // close route
-                        // when push is used, it pushes new item on stack of navigator
-                        // simply pop off stack and it goes back
-                        Navigator.pop(context);
-
-                      },
-                      tooltip: 'Add item',
-                      label: Text('Add item'),
-                      icon: const Icon(Icons.add),
-                    ),
-                  );
+              //user positive value add 1
+              //var user1 = dbhelper.queryAll('users');
+              updateUserValue('positive');
+            } on FormatException {
+              print('Format Error!');
             }
-        )
-    );
+
+            // close route
+            // when push is used, it pushes new item on stack of navigator
+            // simply pop off stack and it goes back
+            Navigator.pop(context);
+          },
+          tooltip: 'Add item',
+          label: Text('Add item'),
+          icon: const Icon(Icons.add),
+        ),
+      );
+    }));
   }
 
   // button list for expiring date (only button)
   OutlinedButton _buildButtonColumn1(int value) {
     return OutlinedButton.icon(
-        onPressed: () {
-          //record new expire time ----> value
-          var later = timeNowDate.add(Duration(days: value));
-          food[3] = later.millisecondsSinceEpoch;
-          int year = later.year;
-          int month = later.month;
-          int day = later.day;
-          expireTimeController.text = "$year-$month-$day";
-        },
-        icon: const Icon(Icons.calendar_today),
-        label: Text("+ $value days"),
-      );
+      onPressed: () {
+        //record new expire time ----> value
+        var later = timeNowDate.add(Duration(days: value));
+        food[3] = later.millisecondsSinceEpoch;
+        int year = later.year;
+        int month = later.month;
+        int day = later.day;
+        expireTimeController.text = "$year-$month-$day";
+      },
+      icon: const Icon(Icons.calendar_today),
+      label: Text("+ $value days"),
+    );
   }
 
-
   /// opens edit item screen
-  void pushEditItemScreen (index) {
-    Navigator.of(context).push(
-        MaterialPageRoute(
-            builder: (context) {
-              return Scaffold(
-                appBar: AppBar(
-                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                  title: const Text('Edit item..'),
-                ),
-
-                body: TextField(
-                  autofocus: true,
-                  decoration: const InputDecoration(
-                      hintText: 'e.g. Eggs',
-                      border: OutlineInputBorder(),
-                  ),
-                  controller: txt,
-                  onSubmitted: (value) {
-                    editItem(index, value);
-                    Navigator.pop(context);
-                    buildList();
-                  },
-                ),
-              );
-            }
-        )
-    );
+  void pushEditItemScreen(index) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: const Text('Edit item..'),
+        ),
+        body: TextField(
+          autofocus: true,
+          decoration: const InputDecoration(
+            hintText: 'e.g. Eggs',
+            border: OutlineInputBorder(),
+          ),
+          controller: txt,
+          onSubmitted: (value) {
+            editItem(index, value);
+            Navigator.pop(context);
+            buildList();
+          },
+        ),
+      );
+    }));
   }
 
   // input textfield
   Widget customizedTextField(controller, hint) {
-      return Padding(
-          padding: const EdgeInsets.only(
-          left: 16, right: 16, top: 4, bottom: 4),
-      child: TextField(
-      onChanged: (String txt) {},
-      style: const TextStyle(
-      fontSize: 20,
-      ),
-      // cursorColor: HotelAppTheme.buildLightTheme().primaryColor,
-        decoration: InputDecoration(
-            contentPadding: const EdgeInsets.all(16),
-            labelText: hint,
-            prefixIcon: const Icon(Icons.food_bank)
-        ),
-        controller: quanTypeController,
-      )
-    );
+    return Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, top: 4, bottom: 4),
+        child: TextField(
+          onChanged: (String txt) {},
+          style: const TextStyle(
+            fontSize: 20,
+          ),
+          // cursorColor: HotelAppTheme.buildLightTheme().primaryColor,
+          decoration: InputDecoration(
+              contentPadding: const EdgeInsets.all(16),
+              labelText: hint,
+              prefixIcon: const Icon(Icons.food_bank)),
+          controller: quanTypeController,
+        ));
   }
 
-  List<dynamic> getFoodItems(List<dynamic> snapshot){
+  List<dynamic> getFoodItems(List<dynamic> snapshot) {
     List<dynamic> converted = convertSnapshot(snapshot);
-    converted.sort((a,b){return a[a.length-1].compareTo(b[a.length-1]);});
+    converted.sort((a, b) {
+      return a[a.length - 1].compareTo(b[a.length - 1]);
+    });
     List<dynamic> res = [];
-    for (var i=0;i<converted[0].length;i++){
-      List<dynamic> item=[];
-      for (var j=0;j<converted.length;j++){
+    for (var i = 0; i < converted[0].length; i++) {
+      List<dynamic> item = [];
+      for (var j = 0; j < converted.length; j++) {
         item.add(converted[j][i]);
       }
       res.add(item);
@@ -1488,11 +1511,11 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
     return res;
   }
 
-  List<dynamic> convertSnapshot(List<dynamic> snapshot){
-    List<dynamic> res=[];
-    for (var i=0;i<snapshot[0].length;i++){
-      List<dynamic> item=[];
-      for (var j=0;j<snapshot.length;j++){
+  List<dynamic> convertSnapshot(List<dynamic> snapshot) {
+    List<dynamic> res = [];
+    for (var i = 0; i < snapshot[0].length; i++) {
+      List<dynamic> item = [];
+      for (var j = 0; j < snapshot.length; j++) {
         item.add(snapshot[j][i]);
       }
       res.add(item);
@@ -1500,9 +1523,9 @@ class _BottomTopScreenState extends State<Inventory> with TickerProviderStateMix
     return res;
   }
 
-  List<Duration> getRemainingExpiringTime(List<DateTime> expiringTime){
-    List<Duration> remainingTime=[];
-    for(var i=0;i<expiringTime.length;i++){
+  List<Duration> getRemainingExpiringTime(List<DateTime> expiringTime) {
+    List<Duration> remainingTime = [];
+    for (var i = 0; i < expiringTime.length; i++) {
       remainingTime.add(expiringTime[i].difference(timeNowDate));
     }
     return remainingTime;
@@ -1521,63 +1544,62 @@ class _LineChart extends StatelessWidget {
   }
 
   LineChartData get sampleData2 => LineChartData(
-    lineTouchData: lineTouchData2,
-    gridData: gridData,
-    titlesData: titlesData2,
-    lineBarsData: lineBarsData2,
-    minX: 0,
-    maxX: 13,
-    maxY: 17,
-    minY: 0,
-  );
+        lineTouchData: lineTouchData2,
+        gridData: gridData,
+        titlesData: titlesData2,
+        lineBarsData: lineBarsData2,
+        minX: 0,
+        maxX: 13,
+        maxY: 17,
+        minY: 0,
+      );
 
   LineTouchData get lineTouchData1 => LineTouchData(
-    handleBuiltInTouches: true,
-    touchTooltipData: LineTouchTooltipData(
-      tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
-    ),
-  );
+        handleBuiltInTouches: true,
+        touchTooltipData: LineTouchTooltipData(
+          tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+        ),
+      );
 
   FlTitlesData get titlesData1 => FlTitlesData(
-    bottomTitles: AxisTitles(
-      sideTitles: bottomTitles,
-    ),
-    rightTitles: const AxisTitles(
-      sideTitles: SideTitles(showTitles: false),
-    ),
-    topTitles: const AxisTitles(
-      sideTitles: SideTitles(showTitles: false),
-    ),
-    leftTitles: AxisTitles(
-      sideTitles: leftTitles(),
-    ),
-  );
-
+        bottomTitles: AxisTitles(
+          sideTitles: bottomTitles,
+        ),
+        rightTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        topTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        leftTitles: AxisTitles(
+          sideTitles: leftTitles(),
+        ),
+      );
 
   LineTouchData get lineTouchData2 => const LineTouchData(
-    enabled: false,
-  );
+        enabled: false,
+      );
 
   FlTitlesData get titlesData2 => FlTitlesData(
-    bottomTitles: AxisTitles(
-      sideTitles: bottomTitles,
-    ),
-    rightTitles: const AxisTitles(
-      sideTitles: SideTitles(showTitles: false),
-    ),
-    topTitles: const AxisTitles(
-      sideTitles: SideTitles(showTitles: false),
-    ),
-    leftTitles: AxisTitles(
-      sideTitles: leftTitles(),
-    ),
-  );
+        bottomTitles: AxisTitles(
+          sideTitles: bottomTitles,
+        ),
+        rightTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        topTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        leftTitles: AxisTitles(
+          sideTitles: leftTitles(),
+        ),
+      );
 
   List<LineChartBarData> get lineBarsData2 => [
-    lineChartBarData2_1,
-    lineChartBarData2_2,
-    lineChartBarData2_3,
-  ];
+        lineChartBarData2_1,
+        lineChartBarData2_2,
+        lineChartBarData2_3,
+      ];
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
@@ -1602,11 +1624,11 @@ class _LineChart extends StatelessWidget {
   }
 
   SideTitles leftTitles() => SideTitles(
-    getTitlesWidget: leftTitleWidgets,
-    showTitles: true,
-    interval: 1,
-    reservedSize: 40,
-  );
+        getTitlesWidget: leftTitleWidgets,
+        showTitles: true,
+        interval: 1,
+        reservedSize: 40,
+      );
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
@@ -1663,81 +1685,81 @@ class _LineChart extends StatelessWidget {
   }
 
   SideTitles get bottomTitles => SideTitles(
-    showTitles: true,
-    reservedSize: 32,
-    interval: 1,
-    getTitlesWidget: bottomTitleWidgets,
-  );
+        showTitles: true,
+        reservedSize: 32,
+        interval: 1,
+        getTitlesWidget: bottomTitleWidgets,
+      );
 
   FlGridData get gridData => const FlGridData(show: false);
 
   LineChartBarData get lineChartBarData2_1 => LineChartBarData(
-    isCurved: true,
-    curveSmoothness: 0,
-    color: Colors.green,
-    barWidth: 1,
-    isStrokeCapRound: true,
-    dotData: const FlDotData(show: false),
-    belowBarData: BarAreaData(show: false),
-    spots: const [
-      FlSpot(1, 1),
-      FlSpot(2, 3),
-      FlSpot(3, 4),
-      FlSpot(4, 2),
-      FlSpot(5, 1.8),
-      FlSpot(6, 4),
-      FlSpot(7, 7),
-      FlSpot(8, 5),
-      FlSpot(9, 3),
-      FlSpot(10, 2),
-      FlSpot(11, 1),
-      FlSpot(12, 2.2),
-    ],
-  );
+        isCurved: true,
+        curveSmoothness: 0,
+        color: Colors.green,
+        barWidth: 1,
+        isStrokeCapRound: true,
+        dotData: const FlDotData(show: false),
+        belowBarData: BarAreaData(show: false),
+        spots: const [
+          FlSpot(1, 1),
+          FlSpot(2, 3),
+          FlSpot(3, 4),
+          FlSpot(4, 2),
+          FlSpot(5, 1.8),
+          FlSpot(6, 4),
+          FlSpot(7, 7),
+          FlSpot(8, 5),
+          FlSpot(9, 3),
+          FlSpot(10, 2),
+          FlSpot(11, 1),
+          FlSpot(12, 2.2),
+        ],
+      );
 
   LineChartBarData get lineChartBarData2_2 => LineChartBarData(
-    isCurved: true,
-    curveSmoothness: 0,
-    color: Colors.blue,
-    barWidth: 1,
-    isStrokeCapRound: true,
-    dotData: const FlDotData(show: false),
-    spots: const [
-      FlSpot(1, 12),
-      FlSpot(2, 11),
-      FlSpot(3, 14),
-      FlSpot(4, 9),
-      FlSpot(5, 11),
-      FlSpot(6, 10),
-      FlSpot(7, 12),
-      FlSpot(8, 13),
-      FlSpot(9, 14),
-      FlSpot(10, 11),
-      FlSpot(11, 10),
-      FlSpot(12, 12),
-    ],
-  );
+        isCurved: true,
+        curveSmoothness: 0,
+        color: Colors.blue,
+        barWidth: 1,
+        isStrokeCapRound: true,
+        dotData: const FlDotData(show: false),
+        spots: const [
+          FlSpot(1, 12),
+          FlSpot(2, 11),
+          FlSpot(3, 14),
+          FlSpot(4, 9),
+          FlSpot(5, 11),
+          FlSpot(6, 10),
+          FlSpot(7, 12),
+          FlSpot(8, 13),
+          FlSpot(9, 14),
+          FlSpot(10, 11),
+          FlSpot(11, 10),
+          FlSpot(12, 12),
+        ],
+      );
 
   LineChartBarData get lineChartBarData2_3 => LineChartBarData(
-    isCurved: true,
-    curveSmoothness: 0,
-    color: Colors.red,
-    barWidth: 1,
-    isStrokeCapRound: true,
-    dotData: const FlDotData(show: false),
-    spots: const [
-      FlSpot(1, 3.8),
-      FlSpot(2, 2),
-      FlSpot(3, 1.9),
-      FlSpot(4, 2),
-      FlSpot(5, 1),
-      FlSpot(6, 5),
-      FlSpot(7, 1),
-      FlSpot(8, 2),
-      FlSpot(9, 4),
-      FlSpot(10, 3.3),
-      FlSpot(11, 2),
-      FlSpot(12, 4),
-    ],
-  );
+        isCurved: true,
+        curveSmoothness: 0,
+        color: Colors.red,
+        barWidth: 1,
+        isStrokeCapRound: true,
+        dotData: const FlDotData(show: false),
+        spots: const [
+          FlSpot(1, 3.8),
+          FlSpot(2, 2),
+          FlSpot(3, 1.9),
+          FlSpot(4, 2),
+          FlSpot(5, 1),
+          FlSpot(6, 5),
+          FlSpot(7, 1),
+          FlSpot(8, 2),
+          FlSpot(9, 4),
+          FlSpot(10, 3.3),
+          FlSpot(11, 2),
+          FlSpot(12, 4),
+        ],
+      );
 }

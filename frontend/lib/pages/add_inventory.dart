@@ -24,9 +24,8 @@ class _InputPageState extends State<AddInventoryPage> {
 
   TextEditingController nameController = TextEditingController();
 
-
   @override
-  void dispose(){
+  void dispose() {
     //Clean up all controllers when the widget is disposed
     nameController.dispose();
 
@@ -34,89 +33,110 @@ class _InputPageState extends State<AddInventoryPage> {
   }
 
   //check the primary state of uservalue should be updated or not; if so, update to the latest
-  Future<void> updatePrimaryState() async{
+  Future<void> updatePrimaryState() async {
     var user1 = await dbhelper.queryAll('users');
     int value = user1[0].positive - user1[0].negative;
     String primaryState;
 
-    if (value < 2){
-      primaryState='initialization';
+    if (value < 2) {
+      primaryState = 'initialization';
       await dbhelper.updateUserPrimary(primaryState);
     }
-    if (value <= 6){
+    if (value <= 6) {
       //judge the primary state
-      primaryState='encounter';
+      primaryState = 'encounter';
       await dbhelper.updateUserPrimary(primaryState);
     }
-    if(value > 6 && value <= 14){
-      primaryState='mate';
+    if (value > 6 && value <= 14) {
+      primaryState = 'mate';
       await dbhelper.updateUserPrimary(primaryState);
     }
-    if(value > 14 && value <= 30){
-      primaryState='nest';
+    if (value > 14 && value <= 30) {
+      primaryState = 'nest';
       await dbhelper.updateUserPrimary(primaryState);
     }
-    if(value > 30 && value <= 46){
-      primaryState='hatch';
+    if (value > 30 && value <= 46) {
+      primaryState = 'hatch';
       await dbhelper.updateUserPrimary(primaryState);
     }
-    if(value > 46 && value <= 78){
-      primaryState='learn';
+    if (value > 46 && value <= 78) {
+      primaryState = 'learn';
       await dbhelper.updateUserPrimary(primaryState);
-    }
-    else if(value > 78 && value <= 82){
-      primaryState='leavehome';
+    } else if (value > 78 && value <= 82) {
+      primaryState = 'leavehome';
       await dbhelper.updateUserPrimary(primaryState);
-    }
-    else if(value > 82 && value <= 91){
-      primaryState='snow owl';
+    } else if (value > 82 && value <= 91) {
+      primaryState = 'snow owl';
       await dbhelper.updateUserPrimary(primaryState);
-    }
-    else if(value > 91 && value <= 100){
-      primaryState='tawny owl';
+    } else if (value > 91 && value <= 100) {
+      primaryState = 'tawny owl';
     }
   }
 
   //edit the state to 'consumed' and consumestate to 1, and user positive data adds 1
   //the arugument should be 'positive'(which means positive + 1) or 'negative'(which means negative + 1)
-  Future<void> updateUserValue(String state) async{
+  Future<void> updateUserValue(String state) async {
     var user1 = await dbhelper.queryAll('users');
     //int value = user1[0]['positive'] - user1[0]['negative'];
     print(user1);
 
-
-    if(state == 'positive'){
+    if (state == 'positive') {
       //judge the primary state
-      var uservalue = UserValue(name: user1[0].name, negative: user1[0].negative, positive: user1[0].positive + 1, primarystate: user1[0].primarystate, secondarystate: 'satisfied', secondaryevent: "single", thirdstate: "move", species: "folca", childrennum: 0, fatherstate: "single", motherstate: "single", time: timeNow);
+      var uservalue = UserValue(
+          name: user1[0].name,
+          negative: user1[0].negative,
+          positive: user1[0].positive + 1,
+          primarystate: user1[0].primarystate,
+          secondarystate: 'satisfied',
+          secondaryevent: "single",
+          thirdstate: "move",
+          species: "folca",
+          childrennum: 0,
+          fatherstate: "single",
+          motherstate: "single",
+          time: timeNow);
       await dbhelper.updateUser(uservalue);
       await updatePrimaryState();
       print(await dbhelper.queryAll("users"));
-
-    }
-    else{
-      var uservalue = UserValue(name: user1[0].name, negative: user1[0].negative + 1, positive: user1[0].positive, primarystate: user1[0].primarystate, secondarystate: 'satisfied', secondaryevent: "single", thirdstate: "move", species: "folca", childrennum: 0, fatherstate: "single", motherstate: "single", time: timeNow);
+    } else {
+      var uservalue = UserValue(
+          name: user1[0].name,
+          negative: user1[0].negative + 1,
+          positive: user1[0].positive,
+          primarystate: user1[0].primarystate,
+          secondarystate: 'satisfied',
+          secondaryevent: "single",
+          thirdstate: "move",
+          species: "folca",
+          childrennum: 0,
+          fatherstate: "single",
+          motherstate: "single",
+          time: timeNow);
       await dbhelper.updateUser(uservalue);
       await updatePrimaryState();
     }
-
   }
 
-
-  Future<void> insertDB() async{
-
+  Future<void> insertDB() async {
     //var maxId = await dbhelper.getMaxId();
     //print('##########################MaxID = $maxId###############################');
     //axId = maxId + 1;
-    var newFood = Food(name: food[0], category: food[1], boughttime: food[2], expiretime: food[3], quantitytype: food[4], quantitynum: food[5], consumestate: food[6], state: food[7]);
+    var newFood = Food(
+        name: food[0],
+        category: food[1],
+        boughttime: food[2],
+        expiretime: food[3],
+        quantitytype: food[4],
+        quantitynum: food[5],
+        consumestate: food[6],
+        state: food[7]);
     print(newFood);
 
     await dbhelper.insertFood(newFood);
     print(await dbhelper.queryAll('foods'));
-
   }
-  
-  Future<void> addItemName(value) async {
 
+  Future<void> addItemName(value) async {
     List<String> items = await dbhelper.getAllUncosumedFoodStringValues('name');
     //items = await getItemName();
     //print(items);
@@ -127,13 +147,11 @@ class _InputPageState extends State<AddInventoryPage> {
   }
 
   Future<void> addItemExpi(value) async {
-
-    List<int> expires = await dbhelper.getAllUncosumedFoodIntValues('expiretime');
+    List<int> expires =
+        await dbhelper.getAllUncosumedFoodIntValues('expiretime');
     print(expires);
 
-
     setState(() {
-
       expires.add(value);
     });
   }
@@ -174,11 +192,13 @@ class _InputPageState extends State<AddInventoryPage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             _buildButtonColumn2(context, color, 'No date'),
-            DataPicker(getdatePicker: (value) {
-              setState(() {
-                food[3] = value;
-              });
-            },)
+            DataPicker(
+              getdatePicker: (value) {
+                setState(() {
+                  food[3] = value;
+                });
+              },
+            )
             //food[3] = DataPicker().expiredate,
           ],
         ),
@@ -246,28 +266,25 @@ class _InputPageState extends State<AddInventoryPage> {
                           color: Colors.white,
                           child: Row(
                             children: [
-                              Expanded(child:
-                              CupertinoPicker(
-                                itemExtent: 32.0,
-                                onSelectedItemChanged: (value) {
-                                  setState(() {
-                                  });
-                                },
-                                children: <Widget>[
-                                  Image.asset(
-                                    "assets/category/egg.png",
-                                    width: 30,
-                                    height: 30,
-                                  ),
-                                  const Text("asdaw")
-                                ],
-                              ),
+                              Expanded(
+                                child: CupertinoPicker(
+                                  itemExtent: 32.0,
+                                  onSelectedItemChanged: (value) {
+                                    setState(() {});
+                                  },
+                                  children: <Widget>[
+                                    Image.asset(
+                                      "assets/category/egg.png",
+                                      width: 30,
+                                      height: 30,
+                                    ),
+                                    const Text("asdaw")
+                                  ],
+                                ),
                               )
                             ],
-                          )
-                      );
-                    }
-                );
+                          ));
+                    });
               },
               autofocus: false,
               textAlign: TextAlign.center,
@@ -288,7 +305,7 @@ class _InputPageState extends State<AddInventoryPage> {
           onPressed: () async {
             // Respond to button press  -----> write in database
             //convert string to int
-            try{
+            try {
               //用戶不需要輸入購買時間，直接默認為用戶第一次添加事物的當前時間
               // var boughttime = timeNow;
               //food[1] = Category
@@ -307,7 +324,8 @@ class _InputPageState extends State<AddInventoryPage> {
               //var expiretime = int.parse(expireTimeController.text);
 
               //food[3]是可以直接傳入數據庫的int timestamp
-              DateTime ExpireDays = DateTime.fromMillisecondsSinceEpoch(food[3]);
+              DateTime ExpireDays =
+                  DateTime.fromMillisecondsSinceEpoch(food[3]);
               var remainExpireDays = ExpireDays.difference(timeNowDate).inDays;
               addItemExpi(remainExpireDays);
               addItemName(food[0]);
@@ -327,14 +345,13 @@ class _InputPageState extends State<AddInventoryPage> {
               updateUserValue('positive');
               var user1 = await dbhelper.queryAll('users');
               print('#########${user1[0].primarystate}#############');
-              print(user1[0].positive-user1[0].negative);
+              print(user1[0].positive - user1[0].negative);
               print("===========================");
               // String check = checkIfPrimaryStateChanged(user1[0].positive-user1[0].negative);
               // if (check!='None'){
               //   showAchievementDialog(check);
               // }
-
-            } on FormatException{
+            } on FormatException {
               print('Format Error!');
             }
 
@@ -342,7 +359,6 @@ class _InputPageState extends State<AddInventoryPage> {
             // when push is used, it pushes new item on stack of navigator
             // simply pop off stack and it goes back
             Navigator.pop(context);
-
           },
           icon: const Icon(Icons.add),
           label: const Text('EXTENDED'),
@@ -368,18 +384,19 @@ class _InputPageState extends State<AddInventoryPage> {
                     borderRadius: BorderRadius.circular(18.0),
                     side: const BorderSide(color: Colors.white)))));
   }
+
   //quantity num + quantity type
   ElevatedButton _buildButtonColumn2(
       BuildContext context, Color color, String lable) {
     return ElevatedButton.icon(
         onPressed: () => showDialog<String>(
-          context: context,
-          builder: (BuildContext context) => AlertDialog(
-            title: const Text('Quantity'),
-            content: QuantityNumber(),
-            //food[1] = BodyWidget().category;
-          ),
-        ),
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                title: const Text('Quantity'),
+                content: QuantityNumber(),
+                //food[1] = BodyWidget().category;
+              ),
+            ),
         icon: const Icon(Icons.calendar_today, size: 18),
         label: Text(lable),
         style: ButtonStyle(
@@ -389,30 +406,24 @@ class _InputPageState extends State<AddInventoryPage> {
                     side: const BorderSide(color: Colors.white)))));
   }
 
-
 // category
 
-  ElevatedButton _buildButtonColumn3(
-      BuildContext context, Color color) {
+  ElevatedButton _buildButtonColumn3(BuildContext context, Color color) {
     return ElevatedButton.icon(
-
         onPressed: () => showDialog<String>(
-          context: context,
-          builder: (BuildContext context) => AlertDialog(
-            title: const Text('Category List'),
-            content: BodyWidget(),
-
-          ),
-        ),
-
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                title: const Text('Category List'),
+                content: BodyWidget(),
+              ),
+            ),
         icon: const Icon(Icons.calendar_today, size: 18),
         label: const Text('category'),
         style: ButtonStyle(
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20.0),
-                    side: const BorderSide(color: Colors.white))))
-    );
+                    side: const BorderSide(color: Colors.white)))));
   }
 
 // String checkIfPrimaryStateChanged(int value){
@@ -490,107 +501,98 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text('Add Item'),
-        actions: [],
-      ),
-      body: Container(
-          padding: EdgeInsets.all(10),
-          child: Form(
-            child: Column(
-            children: [
-              TextFormField(
-                controller: _itemNameController,
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Item Name'
-                ),
-              ),
-              const SizedBox(height: 10),
-              Row(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: Text('Add Item'),
+          actions: [],
+        ),
+        body: Container(
+            padding: EdgeInsets.all(10),
+            child: Form(
+              child: Column(
                 children: [
-                  Expanded(
-                      child: TextFormField(
+                  TextFormField(
+                    controller: _itemNameController,
+                    decoration: const InputDecoration(
+                        border: OutlineInputBorder(), hintText: 'Item Name'),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                          child: TextFormField(
                         controller: _itemBuyDateController,
                         decoration: const InputDecoration(
                             border: OutlineInputBorder(),
-                            hintText: 'Item Buy Date'
-                        ),
-                      )
-                  ),
-                  const SizedBox(width: 10),
-                  Container(
-                    height: 50,
-                    width: 50,
-                    child: AspectRatio(
-                        aspectRatio: 1.0,
-                        child: Container(
+                            hintText: 'Item Buy Date'),
+                      )),
+                      const SizedBox(width: 10),
+                      Container(
+                          height: 50,
                           width: 50,
-                          child: TextButton(
-                            onPressed: () {},
-                            child: const Icon(Icons.calendar_today),
-                          ),
-                        )
-                    )
-                  )
+                          child: AspectRatio(
+                              aspectRatio: 1.0,
+                              child: Container(
+                                width: 50,
+                                child: TextButton(
+                                  onPressed: () {},
+                                  child: const Icon(Icons.calendar_today),
+                                ),
+                              )))
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  FilledButton(
+                      onPressed: () {},
+                      child: const FractionallySizedBox(
+                        widthFactor: 1,
+                        child: Text(
+                          'Submit',
+                          textAlign: TextAlign.center,
+                        ),
+                      )),
+                  TextField(
+                    onTap: () {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      showCupertinoModalPopup(
+                          context: context,
+                          builder: (context) {
+                            return Container(
+                                height: 200,
+                                color: Colors.white,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: CupertinoPicker(
+                                        itemExtent: 32.0,
+                                        onSelectedItemChanged: (value) {
+                                          setState(() {});
+                                        },
+                                        children: <Widget>[
+                                          Image.asset(
+                                            "assets/category/egg.png",
+                                            width: 30,
+                                            height: 30,
+                                          ),
+                                          const Text("asdaw")
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ));
+                          });
+                    },
+                    autofocus: false,
+                    textAlign: TextAlign.center,
+                    decoration: const InputDecoration(
+                      hintText: 'e.g. Eggs',
+                      hintStyle: TextStyle(fontWeight: FontWeight.w300),
+                      border: UnderlineInputBorder(),
+                    ),
+                    controller: _itemCategoryController,
+                  ),
                 ],
               ),
-              const SizedBox(height: 10),
-              FilledButton(
-                  onPressed: () {},
-                  child: const FractionallySizedBox(
-                    widthFactor: 1,
-                    child: Text('Submit', textAlign: TextAlign.center,),
-                  )
-              ),
-              TextField(
-                onTap: () {
-                  FocusScope.of(context).requestFocus(FocusNode());
-                  showCupertinoModalPopup(
-                      context: context,
-                      builder: (context) {
-                        return Container(
-                            height: 200,
-                            color: Colors.white,
-                            child: Row(
-                              children: [
-                                Expanded(child:
-                                CupertinoPicker(
-                                  itemExtent: 32.0,
-                                  onSelectedItemChanged: (value) {
-                                    setState(() {
-                                    });
-                                  },
-                                  children: <Widget>[
-                                    Image.asset(
-                                      "assets/category/egg.png",
-                                      width: 30,
-                                      height: 30,
-                                    ),
-                                    const Text("asdaw")
-                                  ],
-                                ),
-                                )
-                              ],
-                            )
-                        );
-                      }
-                  );
-                },
-                autofocus: false,
-                textAlign: TextAlign.center,
-                decoration: const InputDecoration(
-                  hintText: 'e.g. Eggs',
-                  hintStyle: TextStyle(fontWeight: FontWeight.w300),
-                  border: UnderlineInputBorder(),
-                ),
-                controller: _itemCategoryController,
-              ),
-            ],
-          ),
-        )
-      )
-    );
+            )));
   }
 }

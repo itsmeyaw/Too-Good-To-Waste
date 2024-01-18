@@ -16,20 +16,22 @@ class _MyAccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(stream: FirebaseAuth.instance.authStateChanges(), builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.active) {
-              User? user = snapshot.data;
-              if (user == null) {
-                return AccountLoginPage();
-              } else {
-                return AccountSettingPage(user: user);
-              }
+    return StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.active) {
+            User? user = snapshot.data;
+            if (user == null) {
+              return AccountLoginPage();
             } else {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-      }
-    });
+              return AccountSettingPage(user: user);
+            }
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        });
   }
 }
 
@@ -48,45 +50,55 @@ class AccountLoginPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          const Text('Login to your account', textAlign: TextAlign.start,),
-          const SizedBox(height: 10,),
+          const Text(
+            'Login to your account',
+            textAlign: TextAlign.start,
+          ),
+          const SizedBox(
+            height: 10,
+          ),
           TextFormField(
             controller: _emailController,
             decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'E-mail'
-            ),
+                border: OutlineInputBorder(), hintText: 'E-mail'),
           ),
-          const SizedBox(height: 10,),
+          const SizedBox(
+            height: 10,
+          ),
           TextFormField(
             controller: _passwordController,
             obscureText: true,
             decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Password'
-            ),
+                border: OutlineInputBorder(), hintText: 'Password'),
           ),
-          const SizedBox(height: 10,),
+          const SizedBox(
+            height: 10,
+          ),
           FilledButton(
               onPressed: () async {
                 try {
-                  await FirebaseAuth.instance.signInWithEmailAndPassword(email: _emailController.text, password: _passwordController.text);
+                  await FirebaseAuth.instance.signInWithEmailAndPassword(
+                      email: _emailController.text,
+                      password: _passwordController.text);
                 } on FirebaseAuthException catch (e) {
                   logger.e(e);
                 }
               },
-              child: const Text('Login')
+              child: const Text('Login')),
+          const SizedBox(
+            height: 10,
           ),
-          const SizedBox(height: 10,),
           TextButton(
               onPressed: () async {
-              try {
-                await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _emailController.text, password: _passwordController.text);
-              } on FirebaseAuthException catch (e) {
-                logger.e(e);
-              }
-            },
-          child: const Text('Sign Up'))
+                try {
+                  await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                      email: _emailController.text,
+                      password: _passwordController.text);
+                } on FirebaseAuthException catch (e) {
+                  logger.e(e);
+                }
+              },
+              child: const Text('Sign Up'))
         ],
       ),
     );
@@ -96,10 +108,7 @@ class AccountLoginPage extends StatelessWidget {
 class AccountSettingPage extends StatelessWidget {
   final User user;
 
-  const AccountSettingPage({
-    super.key,
-    required this.user
-  });
+  const AccountSettingPage({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -131,51 +140,66 @@ class AccountSettingPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                 height: MediaQuery.of(context).size.height,
-                child: ListView(
-                        children: [
-                        const SizedBox(height: 10,),
-                        const Text('Name'),
-                        RichText(
-                            text: TextSpan(
-                              text: 'Empty',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            )
-                        ),
-                        const SizedBox(height: 10,),
-                        const Text('E-Mail'),
-                        Text('${user.email}', style: Theme.of(context).textTheme.bodyLarge,),
-                        const SizedBox(height: 20,),
-                      ]
-                    ),
+                child: ListView(children: [
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Text('Name'),
+                  RichText(
+                      text: TextSpan(
+                    text: 'Empty',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  )),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Text('E-Mail'),
+                  Text(
+                    '${user.email}',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                ]),
               ),
               Container(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                 height: MediaQuery.of(context).size.height,
-                child: ListView(
-                    children: [
-                      const SizedBox(height: 10,),
-                      const Text('GoodPoints'),
-                      Text('120', style: Theme.of(context).textTheme.bodyLarge,),
-                      const SizedBox(height: 10,),
-                      const Text('Carbon Emission Reduced'),
-                      Text('2 kg', style: Theme.of(context).textTheme.bodyLarge,),
-                      const SizedBox(height: 20,),
-                    ]
-                ),
+                child: ListView(children: [
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Text('GoodPoints'),
+                  Text(
+                    '120',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Text('Carbon Emission Reduced'),
+                  Text(
+                    '2 kg',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                ]),
               ),
               Container(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                 height: MediaQuery.of(context).size.height,
-                child: ListView(
-                    children: const [
-                      SizedBox(height: 10,),
-                      Text('You have no active post currently'),
-                    ]
-                ),
+                child: ListView(children: const [
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text('You have no active post currently'),
+                ]),
               )
             ],
           ),
-      )
-    );
+        ));
   }
 }

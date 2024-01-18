@@ -11,9 +11,6 @@ class GeoPointConverter extends JsonConverter<GeoPoint, Map<String, dynamic>> {
 
   @override
   Map<String, dynamic> toJson(obj) {
-    return {
-      'latitude': obj.latitude,
-      'longitude': obj.longitude
-    };
+    return {'latitude': obj.latitude, 'longitude': obj.longitude};
   }
 }
