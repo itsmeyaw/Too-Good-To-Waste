@@ -13,14 +13,11 @@ class UserName {
 
   UserName.fromJson(Map<String, Object?> json)
       : this(
-    first: json['first']! as String,
-    last: json['last']! as String,
-  );
+          first: json['first']! as String,
+          last: json['last']! as String,
+        );
 
   Map<String, Object?> toJson() {
-    return {
-      'first': first,
-      'last': last
-    };
+    return {'first': first, 'last': last};
   }
 }

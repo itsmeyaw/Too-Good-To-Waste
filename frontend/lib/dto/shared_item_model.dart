@@ -30,7 +30,8 @@ class SharedItem {
       required this.category,
       required this.user});
 
-  factory SharedItem.fromJson(Map<String, dynamic> json) => _$SharedItemFromJson(json);
+  factory SharedItem.fromJson(Map<String, dynamic> json) =>
+      _$SharedItemFromJson(json);
 
   Map<String, dynamic> toJson() => _$SharedItemToJson(this);
 }

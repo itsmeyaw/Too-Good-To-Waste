@@ -21,7 +21,8 @@ class UserItem {
       required this.amount,
       required this.expiry});
 
-  factory UserItem.fromJson(Map<String, dynamic> json) => _$UserItemFromJson(json);
+  factory UserItem.fromJson(Map<String, dynamic> json) =>
+      _$UserItemFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserItemToJson(this);
 }

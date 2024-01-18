@@ -17,7 +17,6 @@ class UserItemExpiry {
   Map<String, dynamic> toJson() => _$UserItemExpiryToJson(this);
 }
 
-
 enum UserItemExpirySource {
   AI,
   Manual;

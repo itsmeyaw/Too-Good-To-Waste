@@ -44,7 +44,8 @@ class UserAddress {
     required this.zipCode,
   });
 
-  factory UserAddress.fromJson(Map<String, Object?> json) => _$UserAddressFromJson(json);
+  factory UserAddress.fromJson(Map<String, Object?> json) =>
+      _$UserAddressFromJson(json);
 
   Map<String, Object?> toJson() => _$UserAddressToJson(this);
 }

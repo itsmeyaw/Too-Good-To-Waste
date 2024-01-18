@@ -17,7 +17,8 @@ class Chatroom {
       required this.receiver,
       required this.messages});
 
-  factory Chatroom.fromJson(Map<String, dynamic> json) => _$ChatroomFromJson(json);
+  factory Chatroom.fromJson(Map<String, dynamic> json) =>
+      _$ChatroomFromJson(json);
 
   Map<String, dynamic> toJson() => _$ChatroomToJson(this);
 }
