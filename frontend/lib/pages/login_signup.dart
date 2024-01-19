@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -76,10 +79,12 @@ class _LoginSignUpState extends State<LoginSignUpPage> {
               child: Column(
                 children: [
                   Expanded(
+                      child: FractionallySizedBox(
+                    widthFactor: 1,
                     child: selectedPage == 0
                         ? const LoginPage()
                         : const SignUpPage(),
-                  ),
+                  )),
                   SizedBox(
                       height: 50,
                       child: Center(
@@ -199,7 +204,8 @@ class _LoginPageState extends State<LoginPage> {
               // On success login
               logger.d('Successfully logged in with ${user.toString()}');
             }).catchError((error) {
-              logger.e('Error with object $error');
+              logger.e('Cannot sign in with username and password',
+                  error: error);
               String errorMessage = 'Unknown error occurred ${error.code}';
               if (error.message != null) {
                 errorMessage = '${error.message}';
@@ -239,42 +245,52 @@ enum SignUpState {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  SignUpState signUpState = SignUpState.information;
+  final StreamController<SignUpState> signUpState = StreamController();
+  final Logger logger = Logger();
 
   @override
   void initState() {
     super.initState();
     // Read all values if exists
     secureStorage.read(key: _SIGN_UP_STATE_KEY).then((persistedSignUpState) {
-      setState(() {
-        signUpState = persistedSignUpState != null
-            ? SignUpState.values.byName(persistedSignUpState)
-            : SignUpState.information;
-      });
+      signUpState.add(persistedSignUpState != null
+          ? SignUpState.values.byName(persistedSignUpState)
+          : SignUpState.information);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (signUpState == SignUpState.information) {
-      return const SignUpInformationPage();
-    } else {
-      return const VerifyPhonePage();
-    }
+    return StreamBuilder(
+        stream: signUpState.stream,
+        builder: (context, snapshot) {
+          logger.d('Showing sign up phase: ${snapshot.data}');
+          if (snapshot.data == SignUpState.information) {
+            return SignUpInformationPage(
+              signUpState: signUpState,
+            );
+          } else if (snapshot.data != null) {
+            return const VerifyPhonePage();
+          } else {
+            return const CircularProgressIndicator();
+          }
+        });
   }
 }
 
 class SignUpInformationPage extends StatefulWidget {
-  const SignUpInformationPage({super.key});
+  final StreamController<SignUpState> signUpState;
+
+  const SignUpInformationPage({super.key, required this.signUpState});
 
   @override
-  State<SignUpInformationPage> createState() => _SignUpInformationState();
+  State<SignUpInformationPage> createState() =>
+      _SignUpInformationState(signUpState: signUpState);
 }
 
 class _SignUpInformationState extends State<SignUpInformationPage> {
   var logger = Logger();
   bool _isPasswordObscured = true;
-  SignUpState signUpState = SignUpState.information;
   String? _firstNameErrorMessage;
   String? _lastNameErrorMessage;
   String? _phoneNumErrorMessage;
@@ -283,18 +299,12 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
   String? _zipCodeErrorMessage;
   String? _cityErrorMessage;
   String? _countryErrorMessage;
+  final StreamController<SignUpState> signUpState;
 
-  final requiredValidator = ValidationBuilder().required().build();
+  _SignUpInformationState({required this.signUpState});
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  final _requiredValidator = ValidationBuilder().required().build();
+  final _phoneValidator = ValidationBuilder().required().phone().build();
 
   void _cleanSignUpData() {}
 
@@ -302,6 +312,14 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
       const AndroidOptions(encryptedSharedPreferences: true);
 
   IOSOptions _getIOSOptions() => const IOSOptions();
+
+  void _putIntoStorage(String key, String value) async {
+    await secureStorage.write(
+        key: key,
+        value: value,
+        iOptions: _getIOSOptions(),
+        aOptions: _getAndroidOptions());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -331,9 +349,9 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
         ),
         TextField(
           onChanged: (input) {
-            secureStorage.write(key: _FIRST_NAME_KEY, value: input);
+            _putIntoStorage(_FIRST_NAME_KEY, input);
             setState(() {
-              _firstNameErrorMessage = requiredValidator(input);
+              _firstNameErrorMessage = _requiredValidator(input);
             });
           },
           decoration: InputDecoration(
@@ -346,9 +364,9 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
         ),
         TextField(
           onChanged: (input) {
-            secureStorage.write(key: _LAST_NAME_KEY, value: input);
+            _putIntoStorage(_LAST_NAME_KEY, input);
             setState(() {
-              _lastNameErrorMessage = requiredValidator(input);
+              _lastNameErrorMessage = _requiredValidator(input);
             });
           },
           decoration: InputDecoration(
@@ -361,12 +379,13 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
         ),
         TextField(
           onChanged: (input) {
-            secureStorage.write(key: _PHONE_NUM_KEY, value: input);
+            _putIntoStorage(_PHONE_NUM_KEY, input);
             setState(() {
-              _phoneNumErrorMessage = requiredValidator(input);
+              _phoneNumErrorMessage = _phoneValidator(input);
             });
           },
           decoration: InputDecoration(
+              helperText: 'Please include country code',
               border: const OutlineInputBorder(),
               labelText: 'Phone Number',
               errorText: _phoneNumErrorMessage),
@@ -376,9 +395,9 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
         ),
         TextField(
           onChanged: (input) {
-            secureStorage.write(key: _PASSWORD_KEY, value: input);
+            _putIntoStorage(_PASSWORD_KEY, input);
             setState(() {
-              _passwordErrorMessage = requiredValidator(input);
+              _passwordErrorMessage = _requiredValidator(input);
             });
           },
           obscureText: _isPasswordObscured,
@@ -411,9 +430,9 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
         ),
         TextField(
           onChanged: (input) {
-            secureStorage.write(key: _ADDRESS_LINE_1_KEY, value: input);
+            _putIntoStorage(_ADDRESS_LINE_1_KEY, input);
             setState(() {
-              _addressLine1ErrorMessage = requiredValidator(input);
+              _addressLine1ErrorMessage = _requiredValidator(input);
             });
           },
           decoration: InputDecoration(
@@ -426,7 +445,7 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
         ),
         TextField(
           onChanged: (input) {
-            secureStorage.write(key: _ADDRESS_LINE_2_KEY, value: input);
+            _putIntoStorage(_ADDRESS_LINE_2_KEY, input);
           },
           decoration: const InputDecoration(
               border: OutlineInputBorder(), labelText: 'Address Line 2'),
@@ -436,9 +455,9 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
         ),
         TextField(
           onChanged: (input) {
-            secureStorage.write(key: _ZIP_CODE_KEY, value: input);
+            _putIntoStorage(_ZIP_CODE_KEY, input);
             setState(() {
-              _zipCodeErrorMessage = requiredValidator(input);
+              _zipCodeErrorMessage = _requiredValidator(input);
             });
           },
           decoration: InputDecoration(
@@ -451,9 +470,9 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
         ),
         TextField(
           onChanged: (input) {
-            secureStorage.write(key: _CITY_KEY, value: input);
+            _putIntoStorage(_CITY_KEY, input);
             setState(() {
-              _cityErrorMessage = requiredValidator(input);
+              _cityErrorMessage = _requiredValidator(input);
             });
           },
           decoration: InputDecoration(
@@ -466,9 +485,9 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
         ),
         TextField(
           onChanged: (input) {
-            secureStorage.write(key: _COUNTRY_KEY, value: input);
+            _putIntoStorage(_COUNTRY_KEY, input);
             setState(() {
-              _countryErrorMessage = requiredValidator(input);
+              _countryErrorMessage = _requiredValidator(input);
             });
           },
           decoration: InputDecoration(
@@ -484,6 +503,12 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
               child: FilledButton(
             onPressed: () {
               logger.d('Pressed sign up button');
+              setState(() {
+                secureStorage.write(
+                    key: _SIGN_UP_STATE_KEY,
+                    value: SignUpState.phoneVerification.name);
+              });
+              signUpState.add(SignUpState.phoneVerification);
             },
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -509,9 +534,139 @@ class VerifyPhonePage extends StatefulWidget {
   State<VerifyPhonePage> createState() => _VerifyPhoneState();
 }
 
+enum PhoneVerificationStatus {
+  init,
+  codeSent,
+  verificationCompleted,
+  verificationFailed,
+  timeout
+}
+
 class _VerifyPhoneState extends State<VerifyPhonePage> {
+  String _verificationId = '';
+  String? _phoneNumber;
+  int? _resendToken;
+  PhoneVerificationStatus _verificationStatus = PhoneVerificationStatus.init;
+  TextEditingController _userCodeController = TextEditingController();
+  PhoneAuthCredential? _cred;
+  final Logger logger = Logger();
+
+  AndroidOptions _getAndroidOptions() =>
+      const AndroidOptions(encryptedSharedPreferences: true);
+
+  IOSOptions _getIOSOptions() => const IOSOptions();
+
+  Future<String?> getPhoneNumber() async {
+    String? phoneNumber = await secureStorage.read(
+        key: _PHONE_NUM_KEY,
+        aOptions: _getAndroidOptions(),
+        iOptions: _getIOSOptions());
+
+    setState(() {
+      _phoneNumber = phoneNumber;
+    });
+
+    logger.d('Got phone number $phoneNumber');
+    return phoneNumber;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Populate the phone number
+    getPhoneNumber().then((phoneNumber) {
+      if (phoneNumber != null) {
+        FirebaseAuth.instance.verifyPhoneNumber(
+            phoneNumber: phoneNumber,
+            verificationCompleted: (PhoneAuthCredential cred) async {
+              logger.d('Logged in user with credential ${cred.toString()}');
+              setState(() {
+                _verificationStatus =
+                    PhoneVerificationStatus.verificationCompleted;
+                _cred = cred;
+              });
+              await FirebaseAuth.instance.signInWithCredential(cred);
+            },
+            verificationFailed: (FirebaseAuthException e) {
+              logger.e('Error on sending verification message', error: e);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('${e.message}'),
+                showCloseIcon: true,
+                closeIconColor: Theme.of(context).colorScheme.inversePrimary,
+              ));
+              setState(() {
+                _verificationStatus =
+                    PhoneVerificationStatus.verificationFailed;
+              });
+            },
+            codeSent: (String verificationId, int? resendToken) async {
+              _verificationId = verificationId;
+              _resendToken = resendToken;
+              setState(() {
+                _verificationStatus = PhoneVerificationStatus.codeSent;
+              });
+            },
+            codeAutoRetrievalTimeout: (String verificationId) {
+              setState(() {
+                _verificationStatus = PhoneVerificationStatus.timeout;
+                _verificationId = verificationId;
+              });
+            });
+      } else {
+        logger.w('Phone number is a null!');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Phone Verification',
+          style: Theme.of(context).textTheme.displaySmall?.copyWith(
+              fontWeight: FontWeight.w900,
+              color: Theme.of(context).primaryColor),
+        ),
+        Text(
+            'Let us do a small check. Please enter the code we have sent to $_phoneNumber'),
+        const SizedBox(
+          height: 30,
+        ),
+        TextField(
+            controller: _userCodeController,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Code',
+            )),
+        const SizedBox(
+          height: 30,
+        ),
+        Row(children: [
+          IntrinsicWidth(
+              child: FilledButton(
+            onPressed: () {
+              PhoneAuthCredential cred = PhoneAuthProvider.credential(
+                  verificationId: _verificationId,
+                  smsCode: _userCodeController.value.text);
+              FirebaseAuth.instance.signInWithCredential(cred);
+            },
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text('Verify'),
+                SizedBox(
+                  width: 10,
+                ),
+                Icon(Icons.arrow_right_alt)
+              ],
+            ),
+          ))
+        ])
+      ],
+    );
   }
 }
