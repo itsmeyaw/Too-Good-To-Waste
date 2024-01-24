@@ -167,26 +167,26 @@ class _FrameState extends State<Frame> {
 
   Future<void> insertItem() async {
     //Insert a new Food butter
-    var butter = Food(
-        name: 'butter',
-        category: 'Milk Product',
-        boughttime: timeNow,
-        expiretime: 1649969762604,
-        quantitytype: 'piece',
-        quantitynum: 3,
-        consumestate: 0.50,
-        state: 'good');
-    await dbHelper.insertFood(butter);
-    var egg = Food(
-        name: 'eggs',
-        category: 'Egg',
-        boughttime: timeNow,
-        expiretime: 1697969762604,
-        quantitytype: 'num',
-        quantitynum: 4,
-        consumestate: 0,
-        state: 'good');
-    await dbHelper.insertFood(egg);
+    // var butter = Food(
+    //     name: 'butter',
+    //     category: 'Milk Product',
+    //     boughttime: timeNow,
+    //     expiretime: 1649969762604,
+    //     quantitytype: 'piece',
+    //     quantitynum: 3,
+    //     consumestate: 0.50,
+    //     state: 'good');
+    // await dbHelper.insertFood(butter);
+    // var egg = Food(
+    //     name: 'eggs',
+    //     category: 'Egg',
+    //     boughttime: timeNow,
+    //     expiretime: 1697969762604,
+    //     quantitytype: 'num',
+    //     quantitynum: 4,
+    //     consumestate: 0,
+    //     state: 'good');
+    // await dbHelper.insertFood(egg);
 
     //Insert a new UserValue instance
     var user1 = UserValue(
@@ -236,6 +236,13 @@ class _FrameState extends State<Frame> {
             onDestinationSelected: (int index) {
               setState(() {
                 currentPage = index;
+                const oneDay = Duration(hours: 24);
+                insertItem();
+                Timer.periodic(oneDay, (Timer timer) {
+                  autocheckWaste();
+                  //pop up  a propmt
+                  print("Repeat task every day");  // This statement will be printed after every one second
+                }); 
               });
             },
             selectedIndex: currentPage,
