@@ -54,6 +54,7 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   mockito: ^5.4.4
   fake_cloud_firestore: ^2.4.8
+  matrix2d: ^1.0.4
 
 dev_dependencies:
   flutter_test:

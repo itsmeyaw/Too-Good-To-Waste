@@ -11,6 +11,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'dart:async';
+import 'package:matrix2d/matrix2d.dart';
 
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -52,7 +53,6 @@ class _BottomTopScreenState extends State<Inventory>
     categoryController.dispose();
     super.dispose();
   }
-
   //FocusNode focusNode1 = FocusNode();
   //FocusNode focusNode2 = FocusNode();
   //FocusScopeNode? focusScopeNode;
@@ -70,7 +70,7 @@ class _BottomTopScreenState extends State<Inventory>
 
   String foodName = '';
   bool showSuggestList = false;
-  List<String> items = [];
+  List<Food> items = [];
   List<String> itemsWaste = [];
   //List<String> items = ['eggs','milk','butter];
 
@@ -120,35 +120,6 @@ class _BottomTopScreenState extends State<Inventory>
     if (secondaryState == "true") {
       await dbhelper.updateUserSecondary("false");
     }
-  }
-
-  Future<void> insertItem() async {
-    //Insert a new Food butter
-    var butter = Food(
-        name: 'butter',
-        category: 'cheese',
-        boughttime: 154893,
-        expiretime: 156432,
-        quantitytype: 'Piece',
-        quantitynum: 3,
-        consumestate: 0.50,
-        state: 'good');
-    await dbhelper.insertFood(butter);
-    var egg = Food(
-        name: 'eggs',
-        category: 'Egg',
-        boughttime: 134554,
-        expiretime: 1654757,
-        quantitytype: 'Number',
-        quantitynum: 4,
-        consumestate: 0,
-        state: 'good');
-    await dbhelper.insertFood(egg);
-
-    //await dbhelper.testDB();
-
-    //print('###################################third##################################');
-    //print(await dbhelper.queryAll("foods"));
   }
 
   Future<void> insertDB(List food) async {
@@ -256,7 +227,7 @@ class _BottomTopScreenState extends State<Inventory>
   }
 
   Future<void> editItem(index, value) async {
-    items = await getItemName();
+    // items = await getItemName();
     setState(() async {
       items[index] = value;
     });
@@ -399,6 +370,7 @@ class _BottomTopScreenState extends State<Inventory>
     print(response.body);
   }
 
+ // Mock data for testing Image Uploading function
   Future<void> insertDBbyKey(String name, int number) async {
     // var maxId = await dbhelper.getMaxId();
     //print('##########################MaxID = $maxId###############################');
@@ -473,90 +445,7 @@ class _BottomTopScreenState extends State<Inventory>
                     hintText: "Search"),
               ),
               Expanded(
-                  child: FutureBuilder(
-                      future: Future.wait([
-                        getItemName(),
-                        getItemExpiringTime(),
-                        getItemQuanNum(),
-                        getItemQuanType(),
-                        getItemCategory(),
-                        getItemBoughtTime(),
-                      ]),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<List<dynamic>> snapshot) {
-                        if (!snapshot.hasData) {
-                          return const Text('Loading...'); // still loading
-                        }
-                        // alternatively use snapshot.connectionState != ConnectionState.done
-                        if (snapshot.hasError)
-                          return const Text('Something went wrong.');
-                        List<String> items = snapshot.requireData[0];
-                        print(
-                            '#################$items#########################');
-                        if (items.isEmpty) {
-                          return const Center(
-                            child: Text(
-                              "Nothing yet...",
-                              style: TextStyle(
-                                fontSize: 20,
-                              ),
-                            ),
-                          );
-                        }
-                        //sort by remaining expiring time
-                        snapshot.requireData.add(
-                            getRemainingExpiringTime(snapshot.requireData[1]));
-                        List<dynamic> foodItems =
-                            getFoodItems(snapshot.requireData);
-
-                        // snapshot.requireData.add(value);
-                        items = List<String>.from(foodItems[0]);
-                        print(
-                            '###################################$items#################################');
-                        final List<DateTime> expires =
-                            List<DateTime>.from(foodItems[1]);
-                        final List<int> num = List<int>.from(foodItems[2]);
-                        final List<String> type =
-                            List<String>.from(foodItems[3]);
-                        final List<String> categoryies =
-                            List<String>.from(foodItems[4]);
-                        final List<DateTime> boughtTime =
-                            List<DateTime>.from(foodItems[5]);
-                        final List<Duration> remainingTime =
-                            List<Duration>.from(foodItems[6]);
-                        return ListTileTheme(
-                            contentPadding: const EdgeInsets.all(15),
-                            textColor: Colors.black54,
-                            style: ListTileStyle.list,
-                            dense: true,
-                            child: ListView.builder(
-                                itemCount: items.length,
-                                itemBuilder: (context, index) {
-                                  var item = items[index];
-                                  //how to show the quantity tyoe and quantity number?
-
-                                  //var expires = getItemExpiringTime();
-                                  //how to show the listsby sequence of expire time?
-                                  var remainDays = remainingTime[index].inDays;
-                                  var progressPercentage = remainDays /
-                                      (expires[index]
-                                          .difference(boughtTime[index])
-                                          .inDays);
-                                  var foodNum = num[index];
-                                  var foodType = type[index];
-
-                                  var category = categoryies[index];
-
-                                  return buildItem(
-                                      item,
-                                      remainDays,
-                                      foodNum,
-                                      foodType,
-                                      index,
-                                      category,
-                                      progressPercentage);
-                                }));
-                      })),
+                  child: buildList()),
             ],
           ),
           Container(
@@ -612,7 +501,7 @@ class _BottomTopScreenState extends State<Inventory>
                         const SizedBox(
                           height: 20,
                         ),
-                        Text('Period: Jan 2023 - Des 2023'),
+                        Text('Period: Jan 2024 - Dec 2024'),
                         const SizedBox(
                           height: 10,
                         ),
@@ -647,7 +536,7 @@ class _BottomTopScreenState extends State<Inventory>
                 child: AnimatedTextKit(
                   animatedTexts: [
                     TypewriterAnimatedText(
-                      'No wasted now, keep it!',
+                      'Nothing expired yet, keep it on!',
                       textStyle: const TextStyle(
                         fontSize: 32.0,
                         fontWeight: FontWeight.bold,
@@ -853,12 +742,7 @@ class _BottomTopScreenState extends State<Inventory>
     //items = await getItemName();
     return FutureBuilder(
         future: Future.wait([
-          getItemName(),
-          getItemExpiringTime(),
-          getItemQuanNum(),
-          getItemQuanType(),
-          getItemCategory(),
-          getItemBoughtTime(),
+          getAllItems('foods')
         ]),
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
           if (!snapshot.hasData) {
@@ -866,7 +750,8 @@ class _BottomTopScreenState extends State<Inventory>
           }
           // alternatively use snapshot.connectionState != ConnectionState.done
           if (snapshot.hasError) return const Text('Something went wrong.');
-          List<String> items = snapshot.requireData[0];
+          items = snapshot.requireData[0].cast<Food>();
+          items = items.where((i) => i.consumestate < 1).toList();
           if (items.isEmpty) {
             return const Center(
               child: Text(
@@ -877,20 +762,7 @@ class _BottomTopScreenState extends State<Inventory>
               ),
             );
           }
-          //sort by remaining expiring time
-          snapshot.requireData
-              .add(getRemainingExpiringTime(snapshot.requireData[1]));
-          List<dynamic> foodItems = getFoodItems(snapshot.requireData);
-
-          // snapshot.requireData.add(value);
-          items = List<String>.from(foodItems[0]);
-          final List<DateTime> expires = List<DateTime>.from(foodItems[1]);
-          final List<int> num = List<int>.from(foodItems[2]);
-          final List<String> type = List<String>.from(foodItems[3]);
-          final List<String> categoryies = List<String>.from(foodItems[4]);
-          final List<DateTime> boughtTime = List<DateTime>.from(foodItems[5]);
-          final List<Duration> remainingTime =
-              List<Duration>.from(foodItems[6]);
+          print('[][]]][][]'+items.toString());
           return ListTileTheme(
               contentPadding: const EdgeInsets.all(15),
               textColor: Colors.black54,
@@ -904,15 +776,18 @@ class _BottomTopScreenState extends State<Inventory>
 
                     //var expires = getItemExpiringTime();
                     //how to show the listsby sequence of expire time?
-                    var remainDays = remainingTime[index].inDays;
-                    var progressPercentage = remainDays /
-                        (expires[index].difference(boughtTime[index]).inDays);
-                    var foodNum = num[index];
-                    var foodType = type[index];
+                    var remainDays = DateTime.fromMillisecondsSinceEpoch(item.expiretime).difference(DateTime.now()).inDays;
+                    var progressPercentage = 1.0 - (remainDays / DateTime.fromMillisecondsSinceEpoch(item.expiretime).difference(DateTime.fromMillisecondsSinceEpoch(item.boughttime)).inDays);
+                    progressPercentage = progressPercentage > 1.0 ? 1.0 : progressPercentage;
+                    print(remainDays);
+                    print(progressPercentage);
+                    print(DateTime.fromMillisecondsSinceEpoch(item.expiretime));
+                    var foodNum = item.quantitynum;
+                    var foodType = item.quantitytype;
 
-                    var category = categoryies[index];
+                    var category = item.category;
 
-                    return buildItem(item, remainDays, foodNum, foodType, index,
+                    return buildItem(item.name, remainDays, foodNum, foodType, index,
                         category, progressPercentage);
                   }));
         });
@@ -927,15 +802,22 @@ class _BottomTopScreenState extends State<Inventory>
     } else {
       categoryIconImagePath = GlobalCateIconMap[category];
     }
-    if (progressPercentage > 0 && progressPercentage < 49) {
+    if (progressPercentage > 0.0 && progressPercentage < 0.49) {
       progressColor = Colors.green;
-    } else if (progressPercentage >= 49 && progressPercentage < 66) {
+    } else if (progressPercentage >= 0.49 && progressPercentage < 0.66) {
       progressColor = Colors.yellow;
-    } else if (progressPercentage >= 49 && progressPercentage < 66) {
+    } else if (progressPercentage >= 0.66 && progressPercentage < 1.0) {
       progressColor = Colors.red;
     } else {
       progressColor = Colors.black;
     }
+    updateFoodDB(text, index, attribute) async {
+          await updateFoodState(text, attribute);
+          await updateUserValue(attribute == "consumed" ? 'positive' : 'negative');
+          items.removeAt(index);
+          print(items);
+          print(await getAllItems('foods'));
+        }
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(
@@ -952,11 +834,7 @@ class _BottomTopScreenState extends State<Inventory>
 
           // A pane can dismiss the Slidable.
           dismissible: DismissiblePane(onDismissed: () {
-            setState(() async {
-              await updateFoodState(text, 'wasted');
-              await updateUserValue('negative');
-              items.removeAt(index);
-            });
+            updateFoodDB(text, index, 'wasted');
           }),
 
           // All actions are defined in the children parameter.
@@ -964,21 +842,18 @@ class _BottomTopScreenState extends State<Inventory>
             // A SlidableAction can have an icon and/or a label.
             SlidableAction(
               onPressed: (BuildContext context) async {
-                await updateFoodState(text, 'wasted');
-                await updateUserValue('negative');
-                //items.removeAt(index);
+
+                updateFoodDB(text, index, 'wasted');
                 // ignore: list_remove_unrelated_type
                 //items is supposed to be [] right?
-                items.remove(text);
+                //items.remove(text);
                 //await Provider.of<BottomTopScreen>(context, listen: false).remove(items[0]);
-
-                //print(await getAllItems('foods'));
                 // print('#########${user1[0].primarystate}#############');
               },
               backgroundColor: const Color(0xFFFE4A49),
               foregroundColor: Colors.white,
               icon: Icons.delete,
-              label: 'Wasted',
+              label: 'Waste',
             ),
           ],
         ),
@@ -987,28 +862,19 @@ class _BottomTopScreenState extends State<Inventory>
         endActionPane: ActionPane(
           motion: const ScrollMotion(),
           dismissible: DismissiblePane(onDismissed: () {
-            setState(() async {
-              await updateFoodState(text, 'consumed');
-              await updateUserValue('positive');
-              items.removeAt(index);
-            });
+            updateFoodDB(text, index, 'consumed');
           }),
           children: [
             SlidableAction(
               // An action can be bigger than the others.
               flex: 2,
               onPressed: (BuildContext context) async {
-                await updateFoodState(text, 'consumed');
-                await updateUserValue('positive');
-                //print(await getAllItems('foods'));
-                //items.removeAt(0);
-                items.remove(text);
-                //buildList();
+                updateFoodDB(text, index, 'consumed');
               },
-              backgroundColor: progressColor,
+              backgroundColor: Colors.green,
               foregroundColor: Colors.white,
               icon: Icons.archive,
-              label: 'Comsumed',
+              label: 'Consume',
             ),
           ],
         ),
@@ -1041,8 +907,7 @@ class _BottomTopScreenState extends State<Inventory>
                         backgroundColor:
                             const Color.fromRGBO(209, 224, 224, 0.2),
                         value: progressPercentage,
-                        valueColor: AlwaysStoppedAnimation(
-                            expire > 3 ? Colors.green : Colors.red)),
+                        valueColor: AlwaysStoppedAnimation(progressColor)),
                   )),
               Expanded(
                 flex: 4,
@@ -1495,38 +1360,10 @@ class _BottomTopScreenState extends State<Inventory>
         ));
   }
 
-  List<dynamic> getFoodItems(List<dynamic> snapshot) {
-    List<dynamic> converted = convertSnapshot(snapshot);
-    converted.sort((a, b) {
-      return a[a.length - 1].compareTo(b[a.length - 1]);
-    });
-    List<dynamic> res = [];
-    for (var i = 0; i < converted[0].length; i++) {
-      List<dynamic> item = [];
-      for (var j = 0; j < converted.length; j++) {
-        item.add(converted[j][i]);
-      }
-      res.add(item);
-    }
-    return res;
-  }
-
-  List<dynamic> convertSnapshot(List<dynamic> snapshot) {
-    List<dynamic> res = [];
-    for (var i = 0; i < snapshot[0].length; i++) {
-      List<dynamic> item = [];
-      for (var j = 0; j < snapshot.length; j++) {
-        item.add(snapshot[j][i]);
-      }
-      res.add(item);
-    }
-    return res;
-  }
-
   List<Duration> getRemainingExpiringTime(List<DateTime> expiringTime) {
     List<Duration> remainingTime = [];
     for (var i = 0; i < expiringTime.length; i++) {
-      remainingTime.add(expiringTime[i].difference(timeNowDate));
+      remainingTime.add(expiringTime[i].difference(DateTime.now()));
     }
     return remainingTime;
   }
