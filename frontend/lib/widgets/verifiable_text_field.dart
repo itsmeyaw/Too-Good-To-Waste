@@ -36,48 +36,33 @@ class _VerifiableTextFieldState extends State<VerifiableTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return Focus(
-      onFocusChange: (value) {
-        _hasBeenFocused = value || _hasBeenFocused;
+    return TextFormField(
+      obscureText: _isObscured,
+      onChanged: (input) {
+        setState(() {
+          field.controller.text = input;
+        });
+        if (field.onChanged != null) {
+          field.onChanged!(input);
+        }
       },
-      child: TextField(
-        obscureText: _isObscured,
-        onChanged: (input) {
-          setState(() {
-            field.controller.text = input;
-          });
-
-          if (field.onChanged != null) {
-            field.onChanged!(input);
-          }
-        },
-        onTapOutside: (_) {
-          setState(() {
-            _isTappedOutside = true;
-          });
-          logger.d('${field.labelText}/tappedOutside is $_isTappedOutside}');
-        },
-        controller: field.controller,
-        decoration: InputDecoration(
-          helperText: field.helperText,
-          border: const OutlineInputBorder(),
-          labelText: field.labelText,
-          errorText:
-              _hasBeenFocused && field.validator != null
-                  ? field.validator!(field.controller.value.text)
-                  : null,
-          suffixIcon: field.canBeHidden
-              ? IconButton(
-                  icon: _isObscured
-                      ? const Icon(Icons.visibility)
-                      : const Icon(Icons.visibility_off),
-                  onPressed: () {
-                    setState(() {
-                      _isObscured = !_isObscured;
-                    });
-                  })
-              : null,
-        ),
+      controller: field.controller,
+      validator: field.validator,
+      decoration: InputDecoration(
+        helperText: field.helperText,
+        border: const OutlineInputBorder(),
+        labelText: field.labelText,
+        suffixIcon: field.canBeHidden
+            ? IconButton(
+                icon: _isObscured
+                    ? const Icon(Icons.visibility)
+                    : const Icon(Icons.visibility_off),
+                onPressed: () {
+                  setState(() {
+                    _isObscured = !_isObscured;
+                  });
+                })
+            : null,
       ),
     );
   }

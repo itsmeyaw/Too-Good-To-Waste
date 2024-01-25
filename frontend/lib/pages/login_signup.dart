@@ -117,6 +117,8 @@ class _LoginPageState extends State<LoginPage> {
   final _emailValidator = ValidationBuilder().required().email().build();
   final _passwordValidator = ValidationBuilder().required().build();
 
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
@@ -133,105 +135,107 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Login',
-          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-              fontWeight: FontWeight.w900,
-              color: Theme.of(context).primaryColor),
-        ),
-        const Text('Welcome back, food warrior!'),
-        const SizedBox(
-          height: 30,
-        ),
-        TextField(
-          onChanged: (input) {
-            setState(() {
-              _emailErrorMessage = _emailValidator(input);
-            });
-          },
-          controller: _emailController,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            labelText: 'E-Mail Address',
-            errorText: _emailErrorMessage,
-          ),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        TextField(
-          onChanged: (input) {
-            setState(() {
-              _passwordErrorMessage = _passwordValidator(input);
-            });
-          },
-          controller: _passwordController,
-          obscureText: _isPasswordObscured,
-          decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              labelText: 'Password',
-              errorText: _passwordErrorMessage,
-              suffixIcon: IconButton(
-                icon: _isPasswordObscured
-                    ? const Icon(Icons.visibility)
-                    : const Icon(Icons.visibility_off),
-                onPressed: () {
-                  setState(() {
-                    _isPasswordObscured = !_isPasswordObscured;
-                  });
-                },
-              )),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        IntrinsicWidth(
-            child: FilledButton(
-          onPressed: () {
-            if (_emailErrorMessage != null) {
-              return;
-            }
-            if (_passwordErrorMessage != null) {
-              return;
-            }
-
-            FirebaseAuth.instance
-                .signInWithEmailAndPassword(
-                    email: _emailController.value.text,
-                    password: _passwordController.value.text)
-                .then((user) {
-              // On success login
-              logger.d('Successfully logged in with ${user.toString()}');
-            }).catchError((error) {
-              logger.e('Cannot sign in with username and password',
-                  error: error);
-              String errorMessage = 'Unknown error occurred ${error.code}';
-              if (error.message != null) {
-                errorMessage = '${error.message}';
-              }
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(errorMessage),
-                showCloseIcon: true,
-                closeIconColor: Theme.of(context).colorScheme.inversePrimary,
-              ));
-            });
-          },
-          child: const Row(
-            children: [
-              Text('Log In'),
-              SizedBox(
-                width: 10,
+    return Form(
+        key: _formKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Login',
+              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: Theme.of(context).primaryColor),
+            ),
+            const Text('Welcome back, food warrior!'),
+            const SizedBox(
+              height: 30,
+            ),
+            TextFormField(
+              onChanged: (input) {
+                setState(() {
+                  _emailErrorMessage = _emailValidator(input);
+                });
+              },
+              controller: _emailController,
+              validator: _emailValidator,
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                labelText: 'E-Mail Address',
+                errorText: _emailErrorMessage,
               ),
-              Icon(Icons.arrow_right_alt)
-            ],
-          ),
-        ))
-      ],
-    );
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            TextFormField(
+              onChanged: (input) {
+                setState(() {
+                  _passwordErrorMessage = _passwordValidator(input);
+                });
+              },
+              controller: _passwordController,
+              obscureText: _isPasswordObscured,
+              validator: _passwordValidator,
+              decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: 'Password',
+                  errorText: _passwordErrorMessage,
+                  suffixIcon: IconButton(
+                    icon: _isPasswordObscured
+                        ? const Icon(Icons.visibility)
+                        : const Icon(Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordObscured = !_isPasswordObscured;
+                      });
+                    },
+                  )),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            IntrinsicWidth(
+                child: FilledButton(
+              onPressed: () {
+                if (!_formKey.currentState!.validate()) {
+                  return;
+                }
+
+                FirebaseAuth.instance
+                    .signInWithEmailAndPassword(
+                        email: _emailController.value.text,
+                        password: _passwordController.value.text)
+                    .then((user) {
+                  // On success login
+                  logger.d('Successfully logged in with ${user.toString()}');
+                }).catchError((error) {
+                  logger.e('Cannot sign in with username and password',
+                      error: error);
+                  String errorMessage = 'Unknown error occurred ${error.code}';
+                  if (error.message != null) {
+                    errorMessage = '${error.message}';
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(errorMessage),
+                    showCloseIcon: true,
+                    closeIconColor:
+                        Theme.of(context).colorScheme.inversePrimary,
+                  ));
+                });
+              },
+              child: const Row(
+                children: [
+                  Text('Log In'),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Icon(Icons.arrow_right_alt)
+                ],
+              ),
+            ))
+          ],
+        ));
   }
 }
 
@@ -305,6 +309,8 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _countryController = TextEditingController();
 
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   final StreamController<SignUpState> signUpState;
 
   _SignUpInformationState({required this.signUpState});
@@ -337,217 +343,225 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        const SizedBox(
-          height: 30,
-        ),
-        Text(
-          'Sign Up',
-          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-              fontWeight: FontWeight.w900,
-              color: Theme.of(context).primaryColor),
-        ),
-        const Text('Ready to be a food warrior?'),
-        const SizedBox(
-          height: 30,
-        ),
-        Text(
-          'Personal Information',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w900,
-              color: Theme.of(context).primaryColor),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        VerifiableTextField(
-          onChanged: (input) {
-            _putIntoStorage(_FIRST_NAME_KEY, input);
-          },
-          labelText: 'First Name',
-          controller: _firstNameController,
-          validator: _requiredValidator,
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        VerifiableTextField(
-          onChanged: (input) {
-            _putIntoStorage(_LAST_NAME_KEY, input);
-          },
-          labelText: 'Last Name',
-          controller: _lastNameController,
-          validator: _requiredValidator,
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        VerifiableTextField(
-          onChanged: (input) {
-            _putIntoStorage(_LAST_NAME_KEY, input);
-          },
-          labelText: 'E-mail Address',
-          controller: _emailController,
-          validator: _emailValidator,
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        VerifiableTextField(
-          onChanged: (input) {
-            _putIntoStorage(_PHONE_NUM_KEY, input);
-          },
-          labelText: 'Phone Number',
-          validator: _phoneValidator,
-          controller: _phoneController,
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        VerifiableTextField(
-          onChanged: (input) {
-            _putIntoStorage(_PASSWORD_KEY, input);
-          },
-          canBeHidden: true,
-          labelText: 'Password',
-          validator: _passwordValidator,
-          controller: _passwordController,
-        ),
-        const SizedBox(
-          height: 30,
-        ),
-        Text(
-          'Address',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w900,
-              color: Theme.of(context).primaryColor),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        VerifiableTextField(
-          onChanged: (input) {
-            _putIntoStorage(_ADDRESS_LINE_1_KEY, input);
-            setState(() {
-              _addressLine1Controller.text = input;
-            });
-          },
-          labelText: 'Address Line 1',
-          validator: _requiredValidator,
-          controller: _addressLine1Controller,
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        VerifiableTextField(
-          onChanged: (input) {
-            _putIntoStorage(_ADDRESS_LINE_2_KEY, input);
-          },
-          labelText: 'Address Line 2',
-          controller: _addressLine2Controller,
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        VerifiableTextField(
-          onChanged: (input) {
-            _putIntoStorage(_ZIP_CODE_KEY, input);
-          },
-          labelText: 'Zip Code',
-          controller: _zipCodeController,
-          validator: _requiredValidator,
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        VerifiableTextField(
-          onChanged: (input) {
-            _putIntoStorage(_CITY_KEY, input);
-          },
-          labelText: 'City',
-          controller: _cityController,
-          validator: _requiredValidator,
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        VerifiableTextField(
-          onChanged: (input) {
-            _putIntoStorage(_COUNTRY_KEY, input);
-          },
-          labelText: 'Country',
-          controller: _countryController,
-          validator: _requiredValidator,
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        Row(children: [
-          IntrinsicWidth(
-              child: FilledButton(
-            onPressed: () {
-              logger.d('Pressed sign up button');
+    return Form(
+      key: _formKey,
+      child: ListView(
+        children: [
+          const SizedBox(
+            height: 30,
+          ),
+          Text(
+            'Sign Up',
+            style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: Theme.of(context).primaryColor),
+          ),
+          const Text('Ready to be a food warrior?'),
+          const SizedBox(
+            height: 30,
+          ),
+          Text(
+            'Personal Information',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: Theme.of(context).primaryColor),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          VerifiableTextField(
+            onChanged: (input) {
+              _putIntoStorage(_FIRST_NAME_KEY, input);
+            },
+            labelText: 'First Name',
+            controller: _firstNameController,
+            validator: _requiredValidator,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          VerifiableTextField(
+            onChanged: (input) {
+              _putIntoStorage(_LAST_NAME_KEY, input);
+            },
+            labelText: 'Last Name',
+            controller: _lastNameController,
+            validator: _requiredValidator,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          VerifiableTextField(
+            onChanged: (input) {
+              _putIntoStorage(_LAST_NAME_KEY, input);
+            },
+            labelText: 'E-mail Address',
+            controller: _emailController,
+            validator: _emailValidator,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          VerifiableTextField(
+            onChanged: (input) {
+              _putIntoStorage(_PHONE_NUM_KEY, input);
+            },
+            labelText: 'Phone Number',
+            validator: _phoneValidator,
+            controller: _phoneController,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          VerifiableTextField(
+            onChanged: (input) {
+              _putIntoStorage(_PASSWORD_KEY, input);
+            },
+            canBeHidden: true,
+            labelText: 'Password',
+            validator: _passwordValidator,
+            controller: _passwordController,
+          ),
+          const SizedBox(
+            height: 30,
+          ),
+          Text(
+            'Address',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: Theme.of(context).primaryColor),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          VerifiableTextField(
+            onChanged: (input) {
+              _putIntoStorage(_ADDRESS_LINE_1_KEY, input);
               setState(() {
-                FirebaseAuth.instance
-                    .createUserWithEmailAndPassword(
-                  email: _emailController.value.text,
-                  password: _passwordController.value.text,
-                )
-                    .then((cred) {
-                  logger.d('Created user with credential $cred');
-
-                  if (cred.user == null) {
-                    throw Exception('User UID is null');
-                  }
-
-                  dto_user.User user = dto_user.User(
-                      name: UserName(
-                          first: _firstNameController.value.text,
-                          last: _lastNameController.value.text),
-                      rating: 0,
-                      phoneNumber: _phoneController.value.text,
-                      address: dto_user.UserAddress(
-                          line1: _addressLine1Controller.value.text,
-                          line2: _addressLine2Controller.value.text,
-                          zipCode: _zipCodeController.value.text,
-                          city: _cityController.value.text,
-                          country: _countryController.value.text),
-                      allergies: [],
-                      chatroomIds: [],
-                      goodPoints: 0,
-                      reducedCarbonKg: 0.0);
-
-                  return FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(cred.user!.uid)
-                      .set(user.toJson());
-                }).then((_) {
-                  logger.d(
-                      'Successfully created user in database with uid: ${FirebaseAuth.instance.currentUser?.uid}');
-                }).catchError((e) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('${e.message}'),
-                    showCloseIcon: true,
-                    closeIconColor:
-                        Theme.of(context).colorScheme.inversePrimary,
-                  ));
-                });
+                _addressLine1Controller.text = input;
               });
             },
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text('Sign Up'),
-                SizedBox(
-                  width: 10,
-                ),
-                Icon(Icons.arrow_right_alt)
-              ],
-            ),
-          ))
-        ])
-      ],
+            labelText: 'Address Line 1',
+            validator: _requiredValidator,
+            controller: _addressLine1Controller,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          VerifiableTextField(
+            onChanged: (input) {
+              _putIntoStorage(_ADDRESS_LINE_2_KEY, input);
+            },
+            labelText: 'Address Line 2',
+            controller: _addressLine2Controller,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          VerifiableTextField(
+            onChanged: (input) {
+              _putIntoStorage(_ZIP_CODE_KEY, input);
+            },
+            labelText: 'Zip Code',
+            controller: _zipCodeController,
+            validator: _requiredValidator,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          VerifiableTextField(
+            onChanged: (input) {
+              _putIntoStorage(_CITY_KEY, input);
+            },
+            labelText: 'City',
+            controller: _cityController,
+            validator: _requiredValidator,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          VerifiableTextField(
+            onChanged: (input) {
+              _putIntoStorage(_COUNTRY_KEY, input);
+            },
+            labelText: 'Country',
+            controller: _countryController,
+            validator: _requiredValidator,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Row(children: [
+            IntrinsicWidth(
+                child: FilledButton(
+              onPressed: () {
+                logger.d('Pressed sign up button');
+                setState(() {
+
+                  if (!_formKey.currentState!.validate()) {
+                    return;
+                  }
+
+                  FirebaseAuth.instance
+                      .createUserWithEmailAndPassword(
+                    email: _emailController.value.text,
+                    password: _passwordController.value.text,
+                  )
+                      .then((cred) {
+                    logger.d('Created user with credential $cred');
+
+                    if (cred.user == null) {
+                      throw Exception('User UID is null');
+                    }
+
+                    dto_user.User user = dto_user.User(
+                        name: UserName(
+                            first: _firstNameController.value.text,
+                            last: _lastNameController.value.text),
+                        rating: 0,
+                        phoneNumber: _phoneController.value.text,
+                        address: dto_user.UserAddress(
+                            line1: _addressLine1Controller.value.text,
+                            line2: _addressLine2Controller.value.text,
+                            zipCode: _zipCodeController.value.text,
+                            city: _cityController.value.text,
+                            country: _countryController.value.text),
+                        allergies: [],
+                        chatroomIds: [],
+                        goodPoints: 0,
+                        reducedCarbonKg: 0.0);
+
+                    return FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(cred.user!.uid)
+                        .set(user.toJson());
+                  }).then((_) {
+                    logger.d(
+                        'Successfully created user in database with uid: ${FirebaseAuth.instance.currentUser?.uid}');
+                  }).catchError((e) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('${e.message}'),
+                      showCloseIcon: true,
+                      closeIconColor:
+                          Theme.of(context).colorScheme.inversePrimary,
+                    ));
+                  });
+                });
+              },
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text('Sign Up'),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Icon(Icons.arrow_right_alt)
+                ],
+              ),
+            ))
+          ])
+        ],
+      ),
     );
   }
 }
