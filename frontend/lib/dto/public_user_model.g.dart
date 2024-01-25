@@ -13,6 +13,6 @@ PublicUser _$PublicUserFromJson(Map<String, dynamic> json) => PublicUser(
 
 Map<String, dynamic> _$PublicUserToJson(PublicUser instance) =>
     <String, dynamic>{
-      'name': instance.name,
+      'name': instance.name.toJson(),
       'rating': instance.rating,
     };

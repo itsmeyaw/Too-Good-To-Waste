@@ -7,18 +7,24 @@ import './user_name_model.dart';
 part 'user_model.g.dart';
 
 @immutable
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class User extends PublicUser {
   final UserAddress address;
+  final String phoneNumber;
   final List<String> allergies;
   final List<String> chatroomIds;
+  final int goodPoints;
+  final double reducedCarbonKg;
 
   const User({
     required super.name,
     required super.rating,
+    required this.phoneNumber,
     required this.address,
     required this.allergies,
     required this.chatroomIds,
+    required this.goodPoints,
+    required this.reducedCarbonKg,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);

@@ -1,12 +1,15 @@
 import 'dart:async';
-import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
+import 'package:tooGoodToWaste/dto/user_name_model.dart';
+import 'package:tooGoodToWaste/widgets/verifiable_text_field.dart';
 
 // Constants
 const String _SIGN_UP_STATE_KEY = 'SIGN_UP_STEP';
@@ -291,20 +294,31 @@ class SignUpInformationPage extends StatefulWidget {
 class _SignUpInformationState extends State<SignUpInformationPage> {
   var logger = Logger();
   bool _isPasswordObscured = true;
-  String? _firstNameErrorMessage;
-  String? _lastNameErrorMessage;
-  String? _phoneNumErrorMessage;
-  String? _passwordErrorMessage;
-  String? _addressLine1ErrorMessage;
-  String? _zipCodeErrorMessage;
-  String? _cityErrorMessage;
-  String? _countryErrorMessage;
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _addressLine1Controller = TextEditingController();
+  final TextEditingController _addressLine2Controller = TextEditingController();
+  final TextEditingController _zipCodeController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _countryController = TextEditingController();
+
   final StreamController<SignUpState> signUpState;
 
   _SignUpInformationState({required this.signUpState});
 
   final _requiredValidator = ValidationBuilder().required().build();
   final _phoneValidator = ValidationBuilder().required().phone().build();
+  final _emailValidator = ValidationBuilder().required().email().build();
+  final _passwordValidator =
+      ValidationBuilder().required().minLength(8).build();
+
+  bool allInputsAreValid() {
+    return _requiredValidator(_firstNameController.value.text) == null &&
+        _requiredValidator(_lastNameController.value.text) == null;
+  }
 
   void _cleanSignUpData() {}
 
@@ -347,74 +361,58 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
         const SizedBox(
           height: 20,
         ),
-        TextField(
+        VerifiableTextField(
           onChanged: (input) {
             _putIntoStorage(_FIRST_NAME_KEY, input);
-            setState(() {
-              _firstNameErrorMessage = _requiredValidator(input);
-            });
           },
-          decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              labelText: 'First Name',
-              errorText: _firstNameErrorMessage),
+          labelText: 'First Name',
+          controller: _firstNameController,
+          validator: _requiredValidator,
         ),
         const SizedBox(
           height: 20,
         ),
-        TextField(
+        VerifiableTextField(
           onChanged: (input) {
             _putIntoStorage(_LAST_NAME_KEY, input);
-            setState(() {
-              _lastNameErrorMessage = _requiredValidator(input);
-            });
           },
-          decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              labelText: 'Last Name',
-              errorText: _lastNameErrorMessage),
+          labelText: 'Last Name',
+          controller: _lastNameController,
+          validator: _requiredValidator,
         ),
         const SizedBox(
           height: 20,
         ),
-        TextField(
+        VerifiableTextField(
+          onChanged: (input) {
+            _putIntoStorage(_LAST_NAME_KEY, input);
+          },
+          labelText: 'E-mail Address',
+          controller: _emailController,
+          validator: _emailValidator,
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        VerifiableTextField(
           onChanged: (input) {
             _putIntoStorage(_PHONE_NUM_KEY, input);
-            setState(() {
-              _phoneNumErrorMessage = _phoneValidator(input);
-            });
           },
-          decoration: InputDecoration(
-              helperText: 'Please include country code',
-              border: const OutlineInputBorder(),
-              labelText: 'Phone Number',
-              errorText: _phoneNumErrorMessage),
+          labelText: 'Phone Number',
+          validator: _phoneValidator,
+          controller: _phoneController,
         ),
         const SizedBox(
           height: 20,
         ),
-        TextField(
+        VerifiableTextField(
           onChanged: (input) {
             _putIntoStorage(_PASSWORD_KEY, input);
-            setState(() {
-              _passwordErrorMessage = _requiredValidator(input);
-            });
           },
-          obscureText: _isPasswordObscured,
-          decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              labelText: 'Password',
-              errorText: _passwordErrorMessage,
-              suffixIcon: IconButton(
-                icon: _isPasswordObscured
-                    ? const Icon(Icons.visibility)
-                    : const Icon(Icons.visibility_off),
-                onPressed: () {
-                  setState(() {
-                    _isPasswordObscured = !_isPasswordObscured;
-                  });
-                },
-              )),
+          canBeHidden: true,
+          labelText: 'Password',
+          validator: _passwordValidator,
+          controller: _passwordController,
         ),
         const SizedBox(
           height: 30,
@@ -428,72 +426,59 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
         const SizedBox(
           height: 20,
         ),
-        TextField(
+        VerifiableTextField(
           onChanged: (input) {
             _putIntoStorage(_ADDRESS_LINE_1_KEY, input);
             setState(() {
-              _addressLine1ErrorMessage = _requiredValidator(input);
+              _addressLine1Controller.text = input;
             });
           },
-          decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              labelText: 'Address Line 1',
-              errorText: _addressLine1ErrorMessage),
+          labelText: 'Address Line 1',
+          validator: _requiredValidator,
+          controller: _addressLine1Controller,
         ),
         const SizedBox(
           height: 20,
         ),
-        TextField(
+        VerifiableTextField(
           onChanged: (input) {
             _putIntoStorage(_ADDRESS_LINE_2_KEY, input);
           },
-          decoration: const InputDecoration(
-              border: OutlineInputBorder(), labelText: 'Address Line 2'),
+          labelText: 'Address Line 2',
+          controller: _addressLine2Controller,
         ),
         const SizedBox(
           height: 20,
         ),
-        TextField(
+        VerifiableTextField(
           onChanged: (input) {
             _putIntoStorage(_ZIP_CODE_KEY, input);
-            setState(() {
-              _zipCodeErrorMessage = _requiredValidator(input);
-            });
           },
-          decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              labelText: 'Zip Code',
-              errorText: _zipCodeErrorMessage),
+          labelText: 'Zip Code',
+          controller: _zipCodeController,
+          validator: _requiredValidator,
         ),
         const SizedBox(
           height: 20,
         ),
-        TextField(
+        VerifiableTextField(
           onChanged: (input) {
             _putIntoStorage(_CITY_KEY, input);
-            setState(() {
-              _cityErrorMessage = _requiredValidator(input);
-            });
           },
-          decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              labelText: 'City',
-              errorText: _cityErrorMessage),
+          labelText: 'City',
+          controller: _cityController,
+          validator: _requiredValidator,
         ),
         const SizedBox(
           height: 20,
         ),
-        TextField(
+        VerifiableTextField(
           onChanged: (input) {
             _putIntoStorage(_COUNTRY_KEY, input);
-            setState(() {
-              _countryErrorMessage = _requiredValidator(input);
-            });
           },
-          decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              labelText: 'Country',
-              errorText: _countryErrorMessage),
+          labelText: 'Country',
+          controller: _countryController,
+          validator: _requiredValidator,
         ),
         const SizedBox(
           height: 20,
@@ -504,11 +489,51 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
             onPressed: () {
               logger.d('Pressed sign up button');
               setState(() {
-                secureStorage.write(
-                    key: _SIGN_UP_STATE_KEY,
-                    value: SignUpState.phoneVerification.name);
+                FirebaseAuth.instance
+                    .createUserWithEmailAndPassword(
+                  email: _emailController.value.text,
+                  password: _passwordController.value.text,
+                )
+                    .then((cred) {
+                  logger.d('Created user with credential $cred');
+
+                  if (cred.user == null) {
+                    throw Exception('User UID is null');
+                  }
+
+                  dto_user.User user = dto_user.User(
+                      name: UserName(
+                          first: _firstNameController.value.text,
+                          last: _lastNameController.value.text),
+                      rating: 0,
+                      phoneNumber: _phoneController.value.text,
+                      address: dto_user.UserAddress(
+                          line1: _addressLine1Controller.value.text,
+                          line2: _addressLine2Controller.value.text,
+                          zipCode: _zipCodeController.value.text,
+                          city: _cityController.value.text,
+                          country: _countryController.value.text),
+                      allergies: [],
+                      chatroomIds: [],
+                      goodPoints: 0,
+                      reducedCarbonKg: 0.0);
+
+                  return FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(cred.user!.uid)
+                      .set(user.toJson());
+                }).then((_) {
+                  logger.d(
+                      'Successfully created user in database with uid: ${FirebaseAuth.instance.currentUser?.uid}');
+                }).catchError((e) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('${e.message}'),
+                    showCloseIcon: true,
+                    closeIconColor:
+                        Theme.of(context).colorScheme.inversePrimary,
+                  ));
+                });
               });
-              signUpState.add(SignUpState.phoneVerification);
             },
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.start,

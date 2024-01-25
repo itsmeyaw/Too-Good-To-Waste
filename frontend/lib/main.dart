@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:logger/logger.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:tooGoodToWaste/Pages/home.dart';
 import 'package:tooGoodToWaste/firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +34,7 @@ class TooGoodToWaste extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: HomePage(),
+      home: const HomePage(),
     );
   }
 }
@@ -45,24 +47,34 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final Logger logger = Logger();
+
   // Checks whether we are logged in or not
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.active) {
-            User? user = snapshot.data;
-            if (true) {
-              return const LoginSignUpPage();
-            } else {
-              return MyApp();
-            }
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+        stream: FirebaseAuth.instance.userChanges(),
+        builder: (userChangeContext, userChangeSnapshot) {
+          return StreamBuilder(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (authChangeContext, authChangeSnapshot) {
+                if (authChangeSnapshot.connectionState == ConnectionState.active) {
+                  User? user = authChangeSnapshot.data;
+
+                  user ??= userChangeSnapshot.data;
+
+                  logger.d('State of the login is $user');
+                  if (user == null) {
+                    return const LoginSignUpPage();
+                  } else {
+                    return MyApp();
+                  }
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              });
         });
   }
 }
