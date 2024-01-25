@@ -107,10 +107,10 @@ class Post extends StatelessWidget {
         style: ButtonStyle(
           overlayColor: MaterialStatePropertyAll(
               Theme.of(context).colorScheme.background),
-          textStyle: MaterialStatePropertyAll(TextStyle(
+          textStyle: const MaterialStatePropertyAll(TextStyle(
             color: Colors.black,
           )),
-          padding: MaterialStatePropertyAll(EdgeInsets.zero),
+          padding: const MaterialStatePropertyAll(EdgeInsets.zero),
         ),
         child: FractionallySizedBox(
           widthFactor: 1.0,

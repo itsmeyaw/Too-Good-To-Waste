@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/gestures.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
@@ -11,97 +13,16 @@ class AccountPage extends StatefulWidget {
 }
 
 class _MyAccountPageState extends State<AccountPage> {
-  User? user;
+  User? currentUser = FirebaseAuth.instance.currentUser;
   Logger logger = Logger();
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.active) {
-            User? user = snapshot.data;
-            if (user == null) {
-              return AccountLoginPage();
-            } else {
-              return AccountSettingPage(user: user);
-            }
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        });
-  }
-}
-
-class AccountLoginPage extends StatelessWidget {
-  final Logger logger = Logger();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  AccountLoginPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          const Text(
-            'Login to your account',
-            textAlign: TextAlign.start,
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          TextFormField(
-            controller: _emailController,
-            decoration: const InputDecoration(
-                border: OutlineInputBorder(), hintText: 'E-mail'),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          TextFormField(
-            controller: _passwordController,
-            obscureText: true,
-            decoration: const InputDecoration(
-                border: OutlineInputBorder(), hintText: 'Password'),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          FilledButton(
-              onPressed: () async {
-                try {
-                  await FirebaseAuth.instance.signInWithEmailAndPassword(
-                      email: _emailController.text,
-                      password: _passwordController.text);
-                } on FirebaseAuthException catch (e) {
-                  logger.e(e);
-                }
-              },
-              child: const Text('Login')),
-          const SizedBox(
-            height: 10,
-          ),
-          TextButton(
-              onPressed: () async {
-                try {
-                  await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                      email: _emailController.text,
-                      password: _passwordController.text);
-                } on FirebaseAuthException catch (e) {
-                  logger.e(e);
-                }
-              },
-              child: const Text('Sign Up'))
-        ],
-      ),
-    );
+    if (currentUser == null) {
+      throw Exception('User is null but accessing account page');
+    } else {
+      return AccountSettingPage(user: currentUser!);
+    }
   }
 }
 
@@ -110,96 +31,221 @@ class AccountSettingPage extends StatelessWidget {
 
   const AccountSettingPage({super.key, required this.user});
 
+  Future<dto_user.User> getUserFromDatabase(String uid) async {
+    Logger logger = Logger();
+
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get()
+        .then((DocumentSnapshot doc) {
+      logger.d('Got data ${doc.data()}');
+      return dto_user.User.fromJson(doc.data() as Map<String, dynamic>);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-            toolbarHeight: 0,
-            bottom: const TabBar(
-              tabs: [
-                Tab(
-                  icon: Icon(Icons.person_outline),
-                  text: 'Pers. Info',
+    return FutureBuilder(
+        future: getUserFromDatabase(user.uid),
+        builder: (BuildContext context, AsyncSnapshot<dto_user.User> dtoUser) {
+          if (!dtoUser.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          dto_user.User userData = dtoUser.data!;
+
+          return DefaultTabController(
+              length: 3,
+              child: Scaffold(
+                appBar: AppBar(
+                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                  toolbarHeight: 0,
+                  bottom: const TabBar(
+                    tabs: [
+                      Tab(
+                        icon: Icon(Icons.person_outline),
+                        text: 'Pers. Info',
+                      ),
+                      Tab(
+                        icon: Icon(Icons.chat_bubble),
+                        text: 'Messages',
+                      ),
+                      Tab(
+                        icon: Icon(Icons.notifications_active_outlined),
+                        text: 'Active Posts',
+                      )
+                    ],
+                  ),
                 ),
-                Tab(
-                  icon: Icon(Icons.stars_outlined),
-                  text: 'Achievements',
+                body: TabBarView(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      height: MediaQuery.of(context).size.height,
+                      child: ListView(children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          'User Information',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text('Name'),
+                        RichText(
+                            text: TextSpan(
+                          text: '${userData.name.first} ${userData.name.last}',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        )),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text('E-Mail'),
+                        Text(
+                          '${user.email}',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text('Phone Number'),
+                        RichText(
+                            text: TextSpan(
+                          text: userData.phoneNumber,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        )),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Text(
+                          'Address',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text('Address Line 1'),
+                        Text(
+                          userData.address.line1,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text('Address Line 2'),
+                        Text(
+                          userData.address.line2,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text('City'),
+                        Text(
+                          userData.address.city,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text('Zip Code'),
+                        Text(
+                          userData.address.zipCode,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text('Country'),
+                        Text(
+                          userData.address.country,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Text(
+                          'Additional Information',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text('Allergies'),
+                        Text(
+                          userData.allergies.isEmpty ? 'No allergies listed' : userData.allergies.join(', '),
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Text(
+                          'Achievements',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text('GoodPoints'),
+                        Text(
+                          '${userData.goodPoints}',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text('Carbon Emission Reduced'),
+                        Text(
+                          '${userData.reducedCarbonKg} kg',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          children: [
+                            IntrinsicWidth(
+                                child: FilledButton(
+                                    onPressed: () {
+                                      FirebaseAuth.instance.signOut();
+                                    },
+                                    child: const Text('Sign Out')))
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                      ]),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      height: MediaQuery.of(context).size.height,
+                      child: ListView(children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+
+                        const SizedBox(
+                          height: 20,
+                        ),
+                      ]),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      height: MediaQuery.of(context).size.height,
+                      child: ListView(children: const [
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text('You have no active post currently'),
+                      ]),
+                    )
+                  ],
                 ),
-                Tab(
-                  icon: Icon(Icons.notifications_active_outlined),
-                  text: 'Active Posts',
-                )
-              ],
-            ),
-          ),
-          body: TabBarView(
-            children: [
-              Container(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                height: MediaQuery.of(context).size.height,
-                child: ListView(children: [
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Text('Name'),
-                  RichText(
-                      text: TextSpan(
-                    text: 'Empty',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  )),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Text('E-Mail'),
-                  Text(
-                    '${user.email}',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                ]),
-              ),
-              Container(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                height: MediaQuery.of(context).size.height,
-                child: ListView(children: [
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Text('GoodPoints'),
-                  Text(
-                    '120',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Text('Carbon Emission Reduced'),
-                  Text(
-                    '2 kg',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                ]),
-              ),
-              Container(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                height: MediaQuery.of(context).size.height,
-                child: ListView(children: const [
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text('You have no active post currently'),
-                ]),
-              )
-            ],
-          ),
-        ));
+              ));
+        });
   }
 }
