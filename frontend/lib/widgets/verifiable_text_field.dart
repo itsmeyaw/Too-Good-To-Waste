@@ -27,8 +27,6 @@ class VerifiableTextField extends StatefulWidget {
 class _VerifiableTextFieldState extends State<VerifiableTextField> {
   final Logger logger = Logger();
   final VerifiableTextField field;
-  bool _hasBeenFocused = false;
-  bool _isTappedOutside = false;
 
   late bool _isObscured = field.canBeHidden;
 
