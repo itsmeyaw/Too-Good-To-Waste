@@ -68,7 +68,7 @@ class AccountSettingPage extends StatelessWidget {
                         text: 'Pers. Info',
                       ),
                       Tab(
-                        icon: Icon(Icons.chat_bubble),
+                        icon: Icon(Icons.chat_bubble_outline),
                         text: 'Messages',
                       ),
                       Tab(
