@@ -524,7 +524,7 @@ class _AddInventoryPageState extends State<AddInventoryPage> {
                         controller: _itemBuyDateController,
                         decoration: const InputDecoration(
                             border: OutlineInputBorder(),
-                            hintText: 'Item Buy Date'),
+                            hintText: 'Item Expiration Date'),
                       )),
                       const SizedBox(width: 10),
                       Container(

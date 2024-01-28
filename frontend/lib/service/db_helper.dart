@@ -643,7 +643,7 @@ class Food {
   int boughttime;
   int expiretime;
   String quantitytype;
-  int quantitynum;
+  double quantitynum;
   String state;
   double consumestate;
 

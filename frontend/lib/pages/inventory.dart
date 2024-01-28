@@ -11,7 +11,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'dart:async';
-import 'package:matrix2d/matrix2d.dart';
+
 
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -58,7 +58,7 @@ class _BottomTopScreenState extends State<Inventory>
   //FocusScopeNode? focusScopeNode;
 
   Map<String, String> GlobalCateIconMap = {
-    "seafood": "assets/category/seafood.png",
+    "Sea Food": "assets/category/seafood.png",
     "Meat": "assets/category/meat.png",
     "Milk": "assets/category/milk.png",
     "Milk Product": "assets/category/cheese.png",
@@ -385,7 +385,7 @@ class _BottomTopScreenState extends State<Inventory>
         boughttime: timeNow,
         expiretime: expireDate,
         quantitytype: 'bag',
-        quantitynum: number,
+        quantitynum: 0.0,
         consumestate: 0.0,
         state: 'good');
 
@@ -762,7 +762,6 @@ class _BottomTopScreenState extends State<Inventory>
               ),
             );
           }
-          print('[][]]][][]'+items.toString());
           return ListTileTheme(
               contentPadding: const EdgeInsets.all(15),
               textColor: Colors.black54,
@@ -793,7 +792,7 @@ class _BottomTopScreenState extends State<Inventory>
         });
   }
 
-  Widget buildItem(String text, int expire, int foodNum, String foodType,
+  Widget buildItem(String text, int expire, double foodNum, String foodType,
       int index, String category, double progressPercentage) {
     String? categoryIconImagePath;
     Color progressColor;
@@ -1025,6 +1024,8 @@ class _BottomTopScreenState extends State<Inventory>
       "Egg",
       "Others"
     ];
+    categoryController.text = 'Vegetable';
+    quanTypeController.text = 'g';
     List<Widget> categortyList =
         List<Widget>.generate(8, (index) => Text(category[index]));
     final quanTypes = ["g", "kg", "piece", "bag", "bottle", "num"];
@@ -1038,9 +1039,22 @@ class _BottomTopScreenState extends State<Inventory>
     DateTime selectedDate = DateTime.now();
     int expireTimeStamp = 0;
     Color textFieldColor = const Color.fromRGBO(178, 207, 135, 0.8);
+
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
       return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            nameController.clear();
+            categoryController.clear();
+            quanNumController.clear();
+            quanTypeController.clear();
+            expireTimeController.clear();
+            quanNumAndTypeController.clear();
+            Navigator.of(context).pop(false);
+          }
+        ),
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: const Text('Add an Item'),
         ),
@@ -1169,7 +1183,7 @@ class _BottomTopScreenState extends State<Inventory>
                     prefixIcon: Icon(
                       Icons.calendar_today,
                     ),
-                    hintText: 'Buy date'),
+                    hintText: 'Expiration date'),
                 onTap: () {
                   FocusScope.of(context).requestFocus(FocusNode());
                   showCupertinoModalPopup(
@@ -1255,7 +1269,7 @@ class _BottomTopScreenState extends State<Inventory>
               food[2] = timeNow;
               //food[3] = expireTimeStamp;
               food[4] = quanTypeController.text;
-              food[5] = quanNum;
+              food[5] = double.parse(quanNumController.text);
               food[6] = 0.0;
               food[7] = 'good';
               print(food);
@@ -1286,10 +1300,16 @@ class _BottomTopScreenState extends State<Inventory>
             } on FormatException {
               print('Format Error!');
             }
-
+          
             // close route
             // when push is used, it pushes new item on stack of navigator
             // simply pop off stack and it goes back
+            nameController.clear();
+            categoryController.clear();
+            quanNumController.clear();
+            quanTypeController.clear();
+            expireTimeController.clear();
+            quanNumAndTypeController.clear();
             Navigator.pop(context);
           },
           tooltip: 'Add item',
