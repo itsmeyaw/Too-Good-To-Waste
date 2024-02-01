@@ -14,18 +14,22 @@ class SharedItemService {
 
   SharedItemService.withCustomFirestore({required this.db});
 
-  Iterable<SharedItem> _convertDocRefToSharedItem(DocumentReference<Map<String, dynamic>> )
+  Iterable<SharedItem> _convertDocRefToSharedItem(List<DocumentSnapshot<Object?>> geoRef) {
+    final
+  }
 
   Stream<List<SharedItem>> getSharedItemWithinRadius(
-      GeoPoint userLocation, double radiusInKm, String type) {
+      GeoPoint userLocation, double radiusInKm, String category) {
     GeoFirePoint center = geo.point(
         latitude: userLocation.latitude, longitude: userLocation.longitude);
 
-    var ref = db.collection(COLLECTION);
+    var ref = db.collection(COLLECTION).where('category', isEqualTo: category);
 
     return geo
         .collection(collectionRef: ref)
-        .within(center: center, radius: radiusInKm, field: 'location')
-        ;
+        .withinAsSingleStreamSubscription(center: center, radius: radiusInKm, field: 'location')
+        .expand((docRefList) {
+
+    });
   }
 }

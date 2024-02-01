@@ -13,6 +13,7 @@ class UserItem {
   final String category;
   final UserItemAmount amount;
   final UserItemExpiry expiry;
+  // TODO: Add state here
 
   const UserItem(
       {required this.name,
