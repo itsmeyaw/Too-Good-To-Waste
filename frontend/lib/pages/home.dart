@@ -1,63 +1,96 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:tooGoodToWaste/dto/user_model.dart';
+import 'package:logger/logger.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
+import 'package:tooGoodToWaste/service/user_service.dart';
 import '../Pages/post_page.dart';
+import '../dto/user_model.dart';
+import '../service/shared_items_service.dart';
+
+Logger logger = Logger();
 
 // The social places timeline
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({super.key});
 
   @override
+  State<StatefulWidget> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  @override
   Widget build(BuildContext context) {
+    if (FirebaseAuth.instance.currentUser == null) {
+      throw StateError("Trying to access user page without authentication");
+    }
+
+    final UserService userService = UserService();
+    final User firebaseUser = FirebaseAuth.instance.currentUser!;
+
     var users = [];
 
     var postData = [];
 
-    return Container(
-      padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-      child: Column(
-        children: [
-          const FractionallySizedBox(
-            widthFactor: 1.0,
-            child: SizedBox(
-              height: 200,
-              child: Card(
-                child: Text(
-                    'Here shall be map showing locations of available items'),
-              ),
+    return FutureBuilder(
+        future: userService.getUserData(firebaseUser.uid),
+        builder: (BuildContext context, AsyncSnapshot<TGTWUser> userDataSnapshot) {
+          if (userDataSnapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (userDataSnapshot.hasError) {
+            return Center(child: Text('Error: ${userDataSnapshot.error}'),);
+          }
+
+          final TGTWUser user = userDataSnapshot.requireData;
+
+          return Container(
+            padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+            child: Column(
+              children: [
+                const FractionallySizedBox(
+                  widthFactor: 1.0,
+                  child: SizedBox(
+                    height: 200,
+                    child: Card(
+                      child: Text(
+                          'Here shall be map showing locations of available items'),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                const SearchBar(),
+                const SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Results',
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    )
+                  ],
+                ),
+                Expanded(
+                    child: ListView.separated(
+                  itemCount: postData.length,
+                  itemBuilder: (_, index) {
+                    return Post(
+                      postData: postData[index],
+                    );
+                  },
+                  separatorBuilder: (_, index) {
+                    return const Divider();
+                  },
+                ))
+              ],
             ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          const SearchBar(),
-          const SizedBox(
-            height: 20,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                'Results',
-                style: Theme.of(context).textTheme.headlineMedium,
-              )
-            ],
-          ),
-          Expanded(
-              child: ListView.separated(
-            itemCount: postData.length,
-            itemBuilder: (_, index) {
-              return Post(
-                postData: postData[index],
-              );
-            },
-            separatorBuilder: (_, index) {
-              return const Divider();
-            },
-          ))
-        ],
-      ),
-    );
+          );
+        });
   }
 }
 
@@ -128,7 +161,7 @@ class Post extends StatelessWidget {
                     style: const TextStyle(color: Colors.black),
                   ),
                   Text(
-                    'Distance: ${postData.location}',
+                    'Distance: {TODO}',
                     style: const TextStyle(color: Colors.black),
                   )
                 ],
