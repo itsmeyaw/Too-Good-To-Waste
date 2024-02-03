@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tooGoodToWaste/dto/user_item_amount_model.dart';
 import '../dto/shared_item_model.dart';
+import '../service/shared_items_service.dart';
 
 class PostPage extends StatelessWidget {
   final SharedItem postData;
@@ -11,6 +15,9 @@ class PostPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+
+
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -42,15 +49,14 @@ class PostPage extends StatelessWidget {
                 Text(
                     'Amount: ${postData.amount.nominal} ${postData.amount.unit}',
                     style: Theme.of(context).textTheme.headlineSmall),
-                Text(
-                    'Person: ${postData.user.name.first} ${postData.user.name.last} (${postData.user.rating} stars)'),
+                // TODO: Insert User name here
                 const Spacer(),
                 FilledButton(
                     onPressed: () {},
                     child: FractionallySizedBox(
                       widthFactor: 1,
                       child: Text(
-                        'Chat with ${postData.user.name}',
+                        'Chat with ', // TODO: Insert user name here
                         textAlign: TextAlign.center,
                       ),
                     ))
