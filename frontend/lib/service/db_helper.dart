@@ -372,7 +372,7 @@ class DBHelper {
     //Query table for all the foods.
 
     final List<Map<String, dynamic>> maps = await dbHelper.query('foods',
-        columns: [value], where: 'consumestate < 1');
+        columns: [value], where: 'consumestate < 1.0');
 
     //Convert the List<Map<String, dynamic> into a List<String>
     var foodsint = List<int>.generate(maps.length, (i) => maps[i][value]);
@@ -485,7 +485,7 @@ class DBHelper {
 
     await dbHelper.rawUpdate(
         'UPDATE foods SET quantitynum = ?, consumestate = ?, state = ? WHERE name = ?',
-        [0, 1.0, status, name]);
+        [0.0, 1.0, status, name]);
     print('###############update##################');
   }
 
@@ -558,7 +558,7 @@ class DBHelper {
         boughttime: 154893,
         expiretime: 156432,
         quantitytype: 'pieces',
-        quantitynum: 3,
+        quantitynum: 3.0,
         consumestate: 0.50,
         state: 'good');
     var egg = Food(
@@ -567,7 +567,7 @@ class DBHelper {
         boughttime: 134554,
         expiretime: 1654757,
         quantitytype: 'number',
-        quantitynum: 4,
+        quantitynum: 4.0,
         consumestate: 0,
         state: 'good');
     dbhelper.insertFood(butter);

@@ -76,7 +76,7 @@ class _BottomTopScreenState extends State<Inventory>
 
   //Create Databse Object
   DBHelper dbhelper = DBHelper();
-  List food = ['name', '', -1, -1, '', -1, -1.0, ''];
+  List food = ['name', '', -1, -1, '', -1.0, -1.0, ''];
 
   //check the primary state of uservalue should be updated or not; if so, update to the latest
   Future<void> updateStates() async {
@@ -147,7 +147,7 @@ class _BottomTopScreenState extends State<Inventory>
     //get all foods name as a list of string
     List<dynamic> items = await dbhelper.queryAll(dbname);
     //print('##################################first######################################');
-    //print(items);
+    print(items);
 
     return items;
   }
