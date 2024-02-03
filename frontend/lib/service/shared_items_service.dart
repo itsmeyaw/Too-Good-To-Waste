@@ -12,24 +12,56 @@ class SharedItemService {
   final GeoFlutterFire geo = GeoFlutterFire();
   FirebaseFirestore db = FirebaseFirestore.instance;
 
+  SharedItemService();
+
   SharedItemService.withCustomFirestore({required this.db});
 
-  Iterable<SharedItem> _convertDocRefToSharedItem(List<DocumentSnapshot<Object?>> geoRef) {
-    final
-  }
-
-  Stream<List<SharedItem>> getSharedItemWithinRadius(
-      GeoPoint userLocation, double radiusInKm, String category) {
-    GeoFirePoint center = geo.point(
+  Future<bool> postSharedItem(
+      GeoPoint userLocation, SharedItem sharedItem) async {
+    // TODO: Check whether an item with the same ref is already exists, if yes then false
+    var collection = db.collection(COLLECTION);
+    var location = geo.point(
         latitude: userLocation.latitude, longitude: userLocation.longitude);
-
-    var ref = db.collection(COLLECTION).where('category', isEqualTo: category);
+    sharedItem.location = location.data;
 
     return geo
-        .collection(collectionRef: ref)
-        .withinAsSingleStreamSubscription(center: center, radius: radiusInKm, field: 'location')
-        .expand((docRefList) {
-
+        .collection(collectionRef: collection)
+        .add(sharedItem.toJson())
+        .then((value) {
+      logger.d("Successfully added shared item $value");
+      return true;
+    }).catchError((error) {
+      logger.e("Got error when adding item $error");
+      return false;
     });
+  }
+
+  Iterable<SharedItem> _createSharedItemList(
+      List<DocumentSnapshot<Object?>> docList) sync* {
+    for (var obj in docList) {
+      if (obj.exists) {
+        yield SharedItem.fromJson(obj.data() as Map<String, dynamic>);
+      }
+    }
+  }
+
+  Stream<SharedItem> getSharedItemsWithinRadius(
+      {required GeoPoint userLocation,
+      required double radiusInKm,
+      required String userId,
+      String? category}) {
+    var collection = db.collection(COLLECTION);
+    if (category != null) {
+      collection.where("category", isEqualTo: category);
+    }
+
+    return geo
+        .collection(collectionRef: collection)
+        .within(
+            center: GeoFirePoint(userLocation.latitude, userLocation.longitude),
+            radius: radiusInKm,
+            field: "location",
+            strictMode: true)
+        .expand((docList) => _createSharedItemList(docList));
   }
 }
