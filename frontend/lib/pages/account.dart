@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
+import 'package:tooGoodToWaste/dto/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:tooGoodToWaste/service/user_service.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -31,29 +32,22 @@ class AccountSettingPage extends StatelessWidget {
 
   const AccountSettingPage({super.key, required this.user});
 
-  Future<dto_user.User> getUserFromDatabase(String uid) async {
-    Logger logger = Logger();
-
-    return FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .get()
-        .then((DocumentSnapshot doc) {
-      logger.d('Got data ${doc.data()}');
-      return dto_user.User.fromJson(doc.data() as Map<String, dynamic>);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final UserService userService = UserService();
+
     return FutureBuilder(
-        future: getUserFromDatabase(user.uid),
-        builder: (BuildContext context, AsyncSnapshot<dto_user.User> dtoUser) {
-          if (!dtoUser.hasData) {
+        future: userService.getUserData(user.uid),
+        builder: (BuildContext context, AsyncSnapshot<TGTWUser> userDataSnapshot) {
+          if (userDataSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          dto_user.User userData = dtoUser.data!;
+          if (userDataSnapshot.hasError) {
+            return Center(child: Text('Error: ${userDataSnapshot.error}'),);
+          }
+
+          TGTWUser userData = userDataSnapshot.requireData;
 
           return DefaultTabController(
               length: 3,

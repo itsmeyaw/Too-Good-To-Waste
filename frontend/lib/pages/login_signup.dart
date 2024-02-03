@@ -514,7 +514,7 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
                       throw Exception('User UID is null');
                     }
 
-                    dto_user.User user = dto_user.User(
+                    dto_user.TGTWUser user = dto_user.TGTWUser(
                         name: UserName(
                             first: _firstNameController.value.text,
                             last: _lastNameController.value.text),

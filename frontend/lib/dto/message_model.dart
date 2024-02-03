@@ -9,8 +9,8 @@ part 'message_model.g.dart';
 @JsonSerializable()
 class Message {
   final String message;
-  final User initiator;
-  final User receiver;
+  final TGTWUser initiator;
+  final TGTWUser receiver;
   final DateTime timestamp;
 
   const Message({

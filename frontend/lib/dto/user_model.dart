@@ -8,7 +8,7 @@ part 'user_model.g.dart';
 
 @immutable
 @JsonSerializable(explicitToJson: true)
-class User extends PublicUser {
+class TGTWUser extends PublicUser {
   final UserAddress address;
   final String phoneNumber;
   final List<String> allergies;
@@ -16,7 +16,7 @@ class User extends PublicUser {
   final int goodPoints;
   final double reducedCarbonKg;
 
-  const User({
+  const TGTWUser({
     required super.name,
     required super.rating,
     required this.phoneNumber,
@@ -27,7 +27,7 @@ class User extends PublicUser {
     required this.reducedCarbonKg,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  factory TGTWUser.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$UserToJson(this);
