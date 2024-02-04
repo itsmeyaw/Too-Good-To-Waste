@@ -31,7 +31,7 @@ class DBHelper {
         'CREATE TABLE users(name TEXT PRIMARY KEY, positive INTEGER, negative INTEGER, primarystate TEXT, secondarystate TEXT, secondaryevent TEXT, thirdstate TEXT, state TEXT, species TEXT, childrennum INTEGER, fatherstate TEXT, motherstate TEXT, time INTEGER)',
       );
       await db.execute(
-          'CREATE TABLE foods(name TEXT PRIMARY KEY, category TEXT, boughttime INTEGER, expiretime INTEGER, quantitytype TEXT, quantitynum INTEGER, state TEXT, consumestate REAL)');
+          'CREATE TABLE foods(name TEXT PRIMARY KEY, category TEXT, boughttime INTEGER, expiretime INTEGER, quantitytype TEXT, quantitynum REAL, state TEXT, consumestate REAL)');
     });
   }
 
@@ -124,10 +124,10 @@ class DBHelper {
           category: maps[i]['category'],
           boughttime: maps[i]['boughttime'],
           expiretime: maps[i]['expiretime'],
-          quantitynum: maps[i]['quantitynum'],
           quantitytype: maps[i]['quantitytype'],
-          state: maps[i]['state'],
+          quantitynum: maps[i]['quantitynum'],
           consumestate: maps[i]['consumestate'],
+          state: maps[i]['state'],
         );
       });
     } else if (object == "users") {
@@ -323,6 +323,7 @@ class DBHelper {
   }
 
   //Define method that retrieves all the foods from food table
+  //value = 
   Future<List<String>> getAllUncosumedFoodStringValues(String value) async {
     //Get a reference to the database.
     Database dbHelper = await db;
@@ -363,6 +364,36 @@ class DBHelper {
     print('########################3$maps########################');
 
     return maps;
+  }
+
+  //Define method that retrieves all the foods from food table
+  Future<List<double>> getAllUncosumedFoodDoubleValues(String value) async {
+    //Get a reference to the database.
+    Database dbHelper = await db;
+    //Query table for all the foods.
+
+    final List<Map<String, dynamic>> maps = await dbHelper.query('foods',
+        columns: [value], where: 'consumestate < 1.0');
+
+    //Convert the List<Map<String, dynamic> into a List<String>
+    var foodsdouble = List<double>.generate(maps.length, (i) => maps[i][value]);
+
+    return foodsdouble;
+  }
+
+  //Define method that retrieves all the foods with certain state from food table
+  Future<List<double>> getAllGoodFoodDoubleValues(String value, String state) async {
+    //Get a reference to the database.
+    Database dbHelper = await db;
+    //Query table for all the foods.
+
+    final List<Map<String, dynamic>> maps = await dbHelper.query('foods',
+        columns: [value], where: '"state" = ?', whereArgs: [state]);
+
+    //Convert the List<Map<String, dynamic> into a List<String>
+    var foodsdouble = List<double>.generate(maps.length, (i) => maps[i][value]);
+
+    return foodsdouble;
   }
 
   //Define method that retrieves all the foods from food table

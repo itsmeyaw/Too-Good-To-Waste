@@ -76,7 +76,8 @@ class _BottomTopScreenState extends State<Inventory>
 
   //Create Databse Object
   DBHelper dbhelper = DBHelper();
-  List food = ['name', '', -1, -1, '', -1.0, -1.0, ''];
+  Food food = Food(name: 'name', category: '', boughttime: -1, expiretime: -1, quantitytype: '', quantitynum: 0.0, consumestate: 0.0, state: 'good');
+  //List food = ['name', '', -1, -1, '', -1.0, -1.0, ''];
 
   //check the primary state of uservalue should be updated or not; if so, update to the latest
   Future<void> updateStates() async {
@@ -122,23 +123,23 @@ class _BottomTopScreenState extends State<Inventory>
     }
   }
 
-  Future<void> insertDB(List food) async {
+  Future<void> insertDB(Food food) async {
     //var maxId = await dbhelper.getMaxId();
     //print('##########################MaxID = $maxId###############################');
     //maxId = maxId + 1;
-    var newFood = Food(
-        name: food[0],
-        category: food[1],
-        boughttime: food[2],
-        expiretime: food[3],
-        quantitytype: food[4],
-        quantitynum: food[5],
-        consumestate: food[6],
-        state: food[7]);
-    print(newFood);
+    // var newFood = Food(
+    //     name: food[0],
+    //     category: food[1],
+    //     boughttime: food[2],
+    //     expiretime: food[3],
+    //     quantitytype: food[4],
+    //     quantitynum: food[5],
+    //     consumestate: food[6],
+    //     state: food[7]);
+    
 
-    await dbhelper.insertFood(newFood);
-    print(await dbhelper.queryAll('foods'));
+    await dbhelper.insertFood(food);
+    // print(await dbhelper.queryAll('foods'));
   }
 
   Future<List<dynamic>> getAllItems(String dbname) async {
@@ -175,9 +176,10 @@ class _BottomTopScreenState extends State<Inventory>
     return category;
   }
 
-  Future<List<int>> getItemQuanNum() async {
+  //
+  Future<List<double>> getItemQuanNum() async {
     //get all foods quantity number as a list of integers
-    List<int> num = await dbhelper.getAllUncosumedFoodIntValues('quantitynum');
+    List<double> num = await dbhelper.getAllUncosumedFoodDoubleValues('quantitynum');
 
     return num;
   }
@@ -599,10 +601,10 @@ class _BottomTopScreenState extends State<Inventory>
     return WasteName;
   }
 
-  Future<List<int>> getWasteItemInt(String value) async {
+  Future<List<double>> getWasteItemDouble(String value) async {
     List<Map<String, dynamic>> items = await dbhelper.getAllWastedFoodList();
-    List<int> WasteName =
-        List<int>.generate(items.length, (i) => items[i][value]);
+    List<double> WasteName =
+        List<double>.generate(items.length, (i) => items[i][value]);
     return WasteName;
   }
 
@@ -611,7 +613,7 @@ class _BottomTopScreenState extends State<Inventory>
         future: Future.wait([
           getWasteItemString('name'),
           //getWasteItemInt('expiretime'),
-          getWasteItemInt('quantitynum'),
+          getWasteItemDouble('quantitynum'),
           getWasteItemString('quantitytype'),
           getWasteItemString('category'),
           //getWasteItemInt('boughttime'),
@@ -637,7 +639,7 @@ class _BottomTopScreenState extends State<Inventory>
           //List<dynamic> foodItems = getFoodItems(snapshot.requireData);
 
           //final List<DateTime> expires = List<DateTime>.from(foodItems[1]);
-          List<int> num = snapshot.requireData[1];
+          List<double> num = snapshot.requireData[1];
           List<String> type = snapshot.requireData[2];
           List<String> categoryies = snapshot.requireData[3];
           print(
@@ -674,7 +676,7 @@ class _BottomTopScreenState extends State<Inventory>
         });
   }
 
-  Widget buildWasteItem(String item, int num, String type, String category) {
+  Widget buildWasteItem(String item, double num, String type, String category) {
     String? categoryIconImagePath;
 
     if (GlobalCateIconMap[category] == null) {
@@ -810,6 +812,7 @@ class _BottomTopScreenState extends State<Inventory>
     } else {
       progressColor = Colors.black;
     }
+    //test = food name, 
     updateFoodDB(text, index, attribute) async {
           await updateFoodState(text, attribute);
           await updateUserValue(attribute == "consumed" ? 'positive' : 'negative');
@@ -946,7 +949,7 @@ class _BottomTopScreenState extends State<Inventory>
 
   void pushItemDetailScreen(int index, String text) async {
     String quantype = await dbhelper.getOneFoodValue(text, 'quantitytype');
-    int quannum = await dbhelper.getOneFoodIntValue(text, 'quantitynum');
+    double quannum = await dbhelper.getOneFoodDoubleValue(text, 'quantitynum');
     int expitime = await dbhelper.getOneFoodIntValue(text, 'expiretime');
     var expireDate = DateTime.fromMillisecondsSinceEpoch(expitime);
     var remainDays = expireDate.difference(timeNowDate).inDays;
@@ -1215,7 +1218,7 @@ class _BottomTopScreenState extends State<Inventory>
                                               .millisecondsSinceEpoch;
                                           print("timestamp$timestamp");
                                           expireTimeStamp = timestamp;
-                                          food[3] = expireTimeStamp;
+                                          food.expiretime = expireTimeStamp;
                                           expireTimeController.text =
                                               "$year-$month-$day";
                                           // Navigator.pop(context)
@@ -1264,14 +1267,14 @@ class _BottomTopScreenState extends State<Inventory>
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () async {
             try {
-              food[0] = nameController.text;
-              food[1] = categoryController.text;
-              food[2] = timeNow;
+              food.name = nameController.text;
+              food.category = categoryController.text;
+              food.boughttime = timeNow;
               //food[3] = expireTimeStamp;
-              food[4] = quanTypeController.text;
-              food[5] = double.parse(quanNumController.text);
-              food[6] = 0.0;
-              food[7] = 'good';
+              food.quantitytype = quanTypeController.text;
+              food.quantitynum = double.parse(quanNumController.text);
+              food.consumestate = 0.0;
+              food.state = 'good';
               print(food);
               //var quantityNum = int.parse(quanNumController.text);
               //接上InputPage裏DateTime時間組件，再轉化成timestamp存進數據庫
@@ -1279,10 +1282,10 @@ class _BottomTopScreenState extends State<Inventory>
 
               //food[3]是可以直接傳入數據庫的int timestamp
               DateTime expireDays =
-                  DateTime.fromMillisecondsSinceEpoch(food[3]);
+                  DateTime.fromMillisecondsSinceEpoch(food.expiretime);
               var remainExpireDays = expireDays.difference(timeNowDate).inDays;
               addItemExpi(remainExpireDays);
-              addItemName(food[0]);
+              addItemName(food.name);
               print(food);
 
               //Calculate the current state of the new food
@@ -1326,7 +1329,7 @@ class _BottomTopScreenState extends State<Inventory>
       onPressed: () {
         //record new expire time ----> value
         var later = timeNowDate.add(Duration(days: value));
-        food[3] = later.millisecondsSinceEpoch;
+        food.expiretime = later.millisecondsSinceEpoch;
         int year = later.year;
         int month = later.month;
         int day = later.day;
