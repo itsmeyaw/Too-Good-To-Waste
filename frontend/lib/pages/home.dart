@@ -3,9 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:logger/logger.dart';
+import 'package:tooGoodToWaste/dto/item_allergies_enum.dart';
+import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
 import 'package:tooGoodToWaste/service/user_location_service.dart';
 import 'package:tooGoodToWaste/service/user_service.dart';
+import 'package:tooGoodToWaste/widgets/allergies_picker.dart';
+import 'package:tooGoodToWaste/widgets/category_picker.dart';
 import '../Pages/post_page.dart';
 import '../dto/user_model.dart';
 import '../service/shared_items_service.dart';
@@ -98,11 +102,9 @@ class _InnerHomeState extends State<InnerHomeWidget> {
   final SharedItemService sharedItemService = SharedItemService();
   final String userId = FirebaseAuth.instance.currentUser!.uid;
 
-  _InnerHomeState();
-
   double radius = 1;
-  String? category;
-  List<String> allergies = [];
+  ItemCategory? category;
+  List<ItemAllergy> allergies = [];
 
   Future<void> _showRangeDialog() async {
     final double? selectedRadius = await showDialog<double>(
@@ -112,6 +114,30 @@ class _InnerHomeState extends State<InnerHomeWidget> {
     if (selectedRadius != null) {
       setState(() {
         radius = selectedRadius;
+      });
+    }
+  }
+
+  Future<void> _showCategoryDialog() async {
+    final ItemCategory? selectedCategory = await showDialog<ItemCategory>(
+        context: context,
+        builder: (context) => CategoryPicker(initialCategory: category));
+
+    if (selectedCategory != null) {
+      setState(() {
+        category = selectedCategory;
+      });
+    }
+  }
+
+  Future<void> _showAllergyDialog() async {
+    final List<ItemAllergy>? selectedAllergies = await showDialog<List<ItemAllergy>>(
+        context: context,
+        builder: (context) => AllergiesPicker(initialAllergies: allergies));
+
+    if (selectedAllergies != null) {
+      setState(() {
+        allergies = selectedAllergies;
       });
     }
   }
@@ -140,25 +166,25 @@ class _InnerHomeState extends State<InnerHomeWidget> {
             child: Row(
               children: <Widget>[
                 ActionChip(
-                  onPressed: () {},
+                  onPressed: _showCategoryDialog,
                   avatar: const Icon(Icons.tune, size: 16),
                   label: category != null
-                      ? Text('Category: $category')
-                      : const Text('Category: any'),
+                      ? Text('Category: ${category!.name}')
+                      : const Text('Category: Any'),
                 ),
                 const SizedBox(
                   width: 10,
                 ),
                 ActionChip(
                   onPressed: _showRangeDialog,
-                  avatar: Icon(Icons.location_pin, size: 16),
+                  avatar: const Icon(Icons.location_pin, size: 16),
                   label: Text('Range (${radius.round().toString()} km)'),
                 ),
                 const SizedBox(
                   width: 10,
                 ),
                 ActionChip(
-                    onPressed: () {},
+                    onPressed: _showAllergyDialog,
                     avatar: const Icon(Icons.warning),
                     label: Text('Allergies (${allergies.length})'))
               ],
@@ -243,12 +269,16 @@ class _RadiusPickerState extends State<RadiusPicker> {
       )),
       actions: [
         TextButton(
+            onPressed: () => Navigator.pop(context, null),
+            child: const Text('Cancel')),
+        TextButton(
             onPressed: () => Navigator.pop(context, _range),
             child: const Text('OK'))
       ],
     );
   }
 }
+
 
 class SearchBar extends StatelessWidget {
   const SearchBar({super.key});
