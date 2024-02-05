@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import '../dto/user_item_model.dart';
 
 class DBHelper {
   static final DBHelper _instance = DBHelper.internal();
@@ -60,7 +61,7 @@ class DBHelper {
   */
 
   //Define the function that inserts food into the 'foods' table
-  Future<void> insertFood(Food food) async {
+  Future<void> insertFood(UserItem food) async {
     //Get a refenrence to the database
 
     Database dbHelper = await db;
@@ -118,7 +119,7 @@ class DBHelper {
       //Convert the List<Map<String, dynamic> into a List<Food>
 
       return List.generate(maps.length, (i) {
-        return Food(
+        return UserItem(
           //id: maps[i]['id'],
           name: maps[i]['name'],
           category: maps[i]['category'],
@@ -167,7 +168,7 @@ class DBHelper {
 
       //shoud be only one row, how to simplfy the code?
       return List.generate(maps.length, (i) {
-        return Food(
+        return UserItem(
           //id: maps[0]['id'],
           name: maps[0]['name'],
           category: maps[0]['category'],
@@ -297,7 +298,7 @@ class DBHelper {
     return maxID;
   }
 
-  Future<List<Food>> queryByCategory(String category) async {
+  Future<List<UserItem>> queryByCategory(String category) async {
     //Get the refernce to the database
     Database dbHelper = await db;
 
@@ -308,7 +309,7 @@ class DBHelper {
     //Convert the List<Map<String, dynamic> into a List
 
     return List.generate(maps.length, (i) {
-      return Food(
+      return UserItem(
         //id: maps[i]['id'],
         name: maps[i]['name'],
         category: maps[i]['category'],
@@ -426,7 +427,7 @@ class DBHelper {
     return foodsint;
   }
 
-  Future<List<Food>> queryAllUnconsumedFood() async {
+  Future<List<UserItem>> queryAllUnconsumedFood() async {
     //Get the refernce to the database
     Database dbHelper = await db;
 
@@ -437,7 +438,7 @@ class DBHelper {
     //Convert the List<Map<String, dynamic> into a List
 
     return List.generate(maps.length, (i) {
-      return Food(
+      return UserItem(
         //id: maps[i]['id'],
         name: maps[i]['name'],
         category: maps[i]['category'],
@@ -451,7 +452,7 @@ class DBHelper {
     });
   }
 
-  Future<List<Food>> queryAllGoodFood(String state) async {
+  Future<List<UserItem>> queryAllGoodFood(String state) async {
     //Get the refernce to the database
     Database dbHelper = await db;
 
@@ -462,7 +463,7 @@ class DBHelper {
     //Convert the List<Map<String, dynamic> into a List
 
     return List.generate(maps.length, (i) {
-      return Food(
+      return UserItem(
         //id: maps[i]['id'],
         name: maps[i]['name'],
         category: maps[i]['category'],
@@ -477,7 +478,7 @@ class DBHelper {
   }
 
   //Define method that updates food data
-  Future<void> updateFood(Food food) async {
+  Future<void> updateFood(UserItem food) async {
     //Get the reference to the database
     Database dbHelper = await db;
     //update the food data
@@ -583,7 +584,7 @@ class DBHelper {
     DBHelper dbhelper = DBHelper();
 
     //Insert a new Food butter
-    var butter = Food(
+    var butter = UserItem(
         name: 'milk',
         category: 'MilkProduct',
         boughttime: 154893,
@@ -592,7 +593,7 @@ class DBHelper {
         quantitynum: 3.0,
         consumestate: 0.50,
         state: 'good');
-    var egg = Food(
+    var egg = UserItem(
         name: 'beaf',
         category: 'Meat',
         boughttime: 134554,
@@ -667,66 +668,54 @@ class DBHelper {
   }
 }
 
-class Food {
-  //int id;
-  String name;
-  String category;
-  int boughttime;
-  int expiretime;
-  String quantitytype;
-  double quantitynum;
-  String state;
-  double consumestate;
+// class Food {
+//   //int id;
+//   String name;
+//   String category;
+//   int boughttime;
+//   int expiretime;
+//   String quantitytype;
+//   int quantitynum;
+//   String state;
+//   double consumestate;
 
-  Food(
-      {
-      //required this.id,
-      required this.name,
-      required this.category,
-      required this.boughttime,
-      required this.expiretime,
-      required this.quantitytype,
-      required this.quantitynum,
-      required this.consumestate,
-      required this.state});
+// Food(
+//   {
+//     //required this.id,
+//     required this.name,
+//     required this.category,
+//     required this.boughttime,
+//     required this.expiretime,
+//     required this.quantitytype,
+//     required this.quantitynum,
+//     required this.consumestate,
+//     required this.state
+//   }
+// );
 
-  /*
-  Food.fromMap(Map map){
-    id = map[id];
-    name = map[name];
-    category = map[category];
-    boughttime = map[boughttime];
-    expiretime = map[expiretime];
-    quantitytype = map[quantitytype];
-    quantitynum = map[quantitynum];
-    state = map[state];
-    consumestate = map[consumestate];
-  }
-  */
+//   //Convert a Food into a Map. The keys must correspond to the names
+//   //of the columns in the databse.
+//   Map<String, dynamic> toMap() {
+//     return {
+//       //'id': id,
+//       'name': name,
+//       'category': category,
+//       'boughttime': boughttime,
+//       'expiretime': expiretime,
+//       'quantitytype': quantitytype,
+//       'quantitynum': quantitynum,
+//       'state': state,
+//       'consumestate': consumestate,
+//     };
+//   }
 
-  //Convert a Food into a Map. The keys must correspond to the names
-  //of the columns in the databse.
-  Map<String, dynamic> toMap() {
-    return {
-      //'id': id,
-      'name': name,
-      'category': category,
-      'boughttime': boughttime,
-      'expiretime': expiretime,
-      'quantitytype': quantitytype,
-      'quantitynum': quantitynum,
-      'state': state,
-      'consumestate': consumestate,
-    };
-  }
-
-  //Implement toString tomake it easier to see information about
-  //each food when using the print statement
-  @override
-  String toString() {
-    return 'Food{name: $name, category: $category, boughttime: $boughttime, expiretime: $expiretime, quantitytype: $quantitytype, quantitynum: $quantitynum, state: $state, consumestate: $consumestate}';
-  }
-}
+//   //Implement toString tomake it easier to see information about
+//   //each food when using the print statement
+//   @override
+//   String toString() {
+//     return 'Food{name: $name, category: $category, boughttime: $boughttime, expiretime: $expiretime, quantitytype: $quantitytype, quantitynum: $quantitynum, state: $state, consumestate: $consumestate}';
+//   }
+// }
 
 class UserValue {
   final String name;
@@ -780,6 +769,6 @@ class UserValue {
   //each food when using the print statement
   @override
   String toString() {
-    return 'Food{name: $name, positive: $positive, negative: $negative, primarystate: $primarystate, secondarystate: $secondarystate, secondaryevent: $secondaryevent, thirdstate: $thirdstate, species: $species, childrennum: $childrennum, fatherstate: $fatherstate, motherstate: $motherstate, time: $time}';
+    return 'User{name: $name, positive: $positive, negative: $negative, primarystate: $primarystate, secondarystate: $secondarystate, secondaryevent: $secondaryevent, thirdstate: $thirdstate, species: $species, childrennum: $childrennum, fatherstate: $fatherstate, motherstate: $motherstate, time: $time}';
   }
 }

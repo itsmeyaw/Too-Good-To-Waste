@@ -6,6 +6,8 @@ import '../widgets/date_picker.dart';
 import '../widgets/dialog.dart';
 import '../widgets/quantity_dialog.dart';
 
+import 'package:tooGoodToWaste/dto/user_item_model.dart';
+
 class AddInventoryPage extends StatefulWidget {
   const AddInventoryPage({super.key});
 
@@ -121,7 +123,7 @@ class _InputPageState extends State<AddInventoryPage> {
     //var maxId = await dbhelper.getMaxId();
     //print('##########################MaxID = $maxId###############################');
     //axId = maxId + 1;
-    var newFood = Food(
+    var newFood = UserItem(
         name: food[0],
         category: food[1],
         boughttime: food[2],

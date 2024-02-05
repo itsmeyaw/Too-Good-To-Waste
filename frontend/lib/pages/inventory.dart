@@ -17,6 +17,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
+import 'itemDetail.dart';
+import '../dto/user_item_detail_model.dart';
+import '../dto/user_item_model.dart';
 
 class Inventory extends StatefulWidget {
   const Inventory({super.key});
@@ -70,13 +73,13 @@ class _BottomTopScreenState extends State<Inventory>
 
   String foodName = '';
   bool showSuggestList = false;
-  List<Food> items = [];
+  List<UserItem> items = [];
   List<String> itemsWaste = [];
   //List<String> items = ['eggs','milk','butter];
 
   //Create Databse Object
   DBHelper dbhelper = DBHelper();
-  Food food = Food(name: 'name', category: '', boughttime: -1, expiretime: -1, quantitytype: '', quantitynum: 0.0, consumestate: 0.0, state: 'good');
+  UserItem food = UserItem(name: 'name', category: '', boughttime: -1, expiretime: -1, quantitytype: '', quantitynum: 0.0, consumestate: 0.0, state: 'good');
   //List food = ['name', '', -1, -1, '', -1.0, -1.0, ''];
 
   //check the primary state of uservalue should be updated or not; if so, update to the latest
@@ -123,20 +126,40 @@ class _BottomTopScreenState extends State<Inventory>
     }
   }
 
-  Future<void> insertDB(Food food) async {
+  //mock data
+  Future<void> insertItem() async {
+    //Insert a new Food butter
+    var butter = UserItem(
+        name: 'butter',
+        category: 'cheese',
+        boughttime: 154893,
+        expiretime: 156432,
+        quantitytype: 'Piece',
+        quantitynum: 3,
+        consumestate: 0.50,
+        state: 'good');
+    await dbhelper.insertFood(butter);
+    var egg = UserItem(
+        name: 'eggs',
+        category: 'Egg',
+        boughttime: 134554,
+        expiretime: 1654757,
+        quantitytype: 'Number',
+        quantitynum: 4,
+        consumestate: 0,
+        state: 'good');
+    await dbhelper.insertFood(egg);
+
+    //await dbhelper.testDB();
+
+    //print('###################################third##################################');
+    //print(await dbhelper.queryAll("foods"));
+  }
+
+  Future<void> insertDB(UserItem food) async {
     //var maxId = await dbhelper.getMaxId();
     //print('##########################MaxID = $maxId###############################');
     //maxId = maxId + 1;
-    // var newFood = Food(
-    //     name: food[0],
-    //     category: food[1],
-    //     boughttime: food[2],
-    //     expiretime: food[3],
-    //     quantitytype: food[4],
-    //     quantitynum: food[5],
-    //     consumestate: food[6],
-    //     state: food[7]);
-    
 
     await dbhelper.insertFood(food);
     // print(await dbhelper.queryAll('foods'));
@@ -381,7 +404,7 @@ class _BottomTopScreenState extends State<Inventory>
     var expireDate =
         timeNowDate.add(const Duration(days: 7)).millisecondsSinceEpoch;
     print('#########################$expireDate##################');
-    var newFood = Food(
+    var newFood = UserItem(
         name: name,
         category: 'Meat',
         boughttime: timeNow,
@@ -752,7 +775,7 @@ class _BottomTopScreenState extends State<Inventory>
           }
           // alternatively use snapshot.connectionState != ConnectionState.done
           if (snapshot.hasError) return const Text('Something went wrong.');
-          items = snapshot.requireData[0].cast<Food>();
+          items = snapshot.requireData[0].cast<UserItem>();
           items = items.where((i) => i.consumestate < 1).toList();
           if (items.isEmpty) {
             return const Center(
@@ -958,51 +981,20 @@ class _BottomTopScreenState extends State<Inventory>
     double consumeprogress =
         await dbhelper.getOneFoodDoubleValue(text, 'consumestate');
 
-    Navigator.push(context, MaterialPageRoute<void>(
-      builder: (BuildContext context) {
-        return Scaffold(
-          appBar: AppBar(
-              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-              title: const Text('Item Detail Page')),
-          body: Column(children: <Widget>[
-            TextButton(
-              child: const Text('Edit'),
-              onPressed: () {
-                //var qnum = dbhelper.getOneFoodValue(index, "quantitynum");
-                Navigator.pop(context);
-              },
-            ),
-            //name
-            //quantity number and quantity type
-            Title(
-              color: Colors.blue,
-              title: text,
-              child: Column(
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Text('Storage Now: $quannum $quantype'),
-                      //Text(quantype),
-                    ],
-                  ),
-                  Row(children: <Widget>[Text('Category: $category')]),
-                  Row(children: <Widget>[Text('Expires in: $remainDays')]),
-                ],
-              ),
-              //progress bar of cosume state
-            ),
-            SizedBox(
-              height: 5,
-              child: LinearProgressIndicator(
-                backgroundColor: Colors.grey[200],
-                valueColor: const AlwaysStoppedAnimation(Colors.blue),
-                value: consumeprogress,
-              ),
-            ),
-          ]),
+    var foodDetail = UserItemDetail(
+        name: text,
+        category: category,
+        remainDays: remainDays,
+        quantitytype: quantype,
+        quantitynum: quannum,
+        consumestate: consumeprogress,
         );
-      },
-    ));
+    Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => itemDetailPage(foodDetail: foodDetail),
+          ),
+        );
   }
 
   Widget getTextWidgets(List<String> strings) {

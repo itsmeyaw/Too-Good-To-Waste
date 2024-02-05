@@ -4,6 +4,7 @@ import 'package:tooGoodToWaste/Pages/account.dart';
 import 'package:tooGoodToWaste/pages/inventory.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'dart:async';
+import 'package:tooGoodToWaste/dto/user_item_model.dart';
 
 class Frame extends StatefulWidget {
   const Frame({super.key});
