@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:logger/logger.dart';
 import 'package:tooGoodToWaste/dto/item_allergies_enum.dart';
@@ -131,9 +132,10 @@ class _InnerHomeState extends State<InnerHomeWidget> {
   }
 
   Future<void> _showAllergyDialog() async {
-    final List<ItemAllergy>? selectedAllergies = await showDialog<List<ItemAllergy>>(
-        context: context,
-        builder: (context) => AllergiesPicker(initialAllergies: allergies));
+    final List<ItemAllergy>? selectedAllergies =
+        await showDialog<List<ItemAllergy>>(
+            context: context,
+            builder: (context) => AllergiesPicker(initialAllergies: allergies));
 
     if (selectedAllergies != null) {
       setState(() {
@@ -142,21 +144,33 @@ class _InnerHomeState extends State<InnerHomeWidget> {
     }
   }
 
+  void _onMapCreated(GoogleMapController controller) {
+    logger.d('Created Google Map');
+  }
+
   @override
   Widget build(BuildContext context) {
+    final Stream<SharedItem> sharedItemStream =
+        sharedItemService.getSharedItemsWithinRadius(
+            userLocation: widget.userLocation,
+            radiusInKm: radius,
+            userId: userId);
+
     return Container(
       padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
       child: Column(
         children: [
-          const FractionallySizedBox(
+          FractionallySizedBox(
             widthFactor: 1.0,
             child: SizedBox(
-              height: 200,
-              child: Card(
-                child: Text(
-                    'Here shall be map showing locations of available items'),
-              ),
-            ),
+                height: 200,
+                child: GoogleMap(
+                    onMapCreated: _onMapCreated,
+                    initialCameraPosition: CameraPosition(
+                      target: LatLng(widget.userLocation.latitude,
+                          widget.userLocation.longitude),
+                      zoom: 15.0 - radius / 5,
+                    ))),
           ),
           const SizedBox(
             height: 10,
@@ -203,15 +217,14 @@ class _InnerHomeState extends State<InnerHomeWidget> {
             ],
           ),
           StreamBuilder(
-              stream: sharedItemService.getSharedItemsWithinRadius(
-                  userLocation: widget.userLocation,
-                  radiusInKm: radius,
-                  userId: userId),
+              stream: sharedItemStream,
               builder: (BuildContext sharedItemContext,
                   AsyncSnapshot<SharedItem> sharedItemSnapshot) {
-
-                if (sharedItemSnapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(),);
+                if (sharedItemSnapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
                 }
 
                 return Expanded(
@@ -278,7 +291,6 @@ class _RadiusPickerState extends State<RadiusPicker> {
     );
   }
 }
-
 
 class SearchBar extends StatelessWidget {
   const SearchBar({super.key});
