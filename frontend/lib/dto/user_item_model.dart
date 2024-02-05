@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import './user_item_amount_model.dart';
 import './user_item_expiry_model.dart';
 
-part 'user_item_model.g.dart';
+// part 'user_item_model.g.dart';
 
 @immutable
 @JsonSerializable()
@@ -55,10 +55,10 @@ UserItem(
     return 'UserItem{name: $name, category: $category, boughttime: $boughttime, expiretime: $expiretime, quantitytype: $quantitytype, quantitynum: $quantitynum, state: $state, consumestate: $consumestate}';
   }
 
-  factory UserItem.fromJson(Map<String, dynamic> json) =>
-      _$UserItemFromJson(json);
+  // factory UserItem.fromJson(Map<String, dynamic> json) =>
+  //     _$UserItemFromJson(json);
 
-  Map<String, dynamic> toJson() => _$UserItemToJson(this);
+  // Map<String, dynamic> toJson() => _$UserItemToJson(this);
 }
 
 
