@@ -58,6 +58,7 @@ dependencies:
   geoflutterfire2: ^2.3.15
   geolocator: ^10.1.0
   google_maps_flutter: ^2.5.3
+  synchronized: ^3.1.0+1
 
 dev_dependencies:
   flutter_test:
