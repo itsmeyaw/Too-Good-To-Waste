@@ -18,8 +18,10 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'itemDetail.dart';
+import 'add_inventory.dart';
 import '../dto/user_item_detail_model.dart';
 import '../dto/user_item_model.dart';
+import 'package:tooGoodToWaste/constant/category_icon_map.dart';
 
 class Inventory extends StatefulWidget {
   const Inventory({super.key});
@@ -59,17 +61,6 @@ class _BottomTopScreenState extends State<Inventory>
   //FocusNode focusNode1 = FocusNode();
   //FocusNode focusNode2 = FocusNode();
   //FocusScopeNode? focusScopeNode;
-
-  Map<String, String> GlobalCateIconMap = {
-    "Sea Food": "assets/category/seafood.png",
-    "Meat": "assets/category/meat.png",
-    "Milk": "assets/category/milk.png",
-    "Milk Product": "assets/category/cheese.png",
-    "Fruit": "assets/category/fruits.png",
-    "Egg": "assets/category/egg.png",
-    "Vegetable": "assets/category/vegetable.png",
-    "Others": "assets/category/others.png"
-  };
 
   String foodName = '';
   bool showSuggestList = false;
@@ -989,12 +980,14 @@ class _BottomTopScreenState extends State<Inventory>
         quantitynum: quannum,
         consumestate: consumeprogress,
         );
+
+    //navigate to the item detail page
     Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => itemDetailPage(foodDetail: foodDetail),
-          ),
-        );
+      context,
+      MaterialPageRoute(
+        builder: (context) => itemDetailPage(foodDetail: foodDetail),
+      ),
+    );
   }
 
   Widget getTextWidgets(List<String> strings) {
@@ -1034,6 +1027,13 @@ class _BottomTopScreenState extends State<Inventory>
     DateTime selectedDate = DateTime.now();
     int expireTimeStamp = 0;
     Color textFieldColor = const Color.fromRGBO(178, 207, 135, 0.8);
+
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => const AddInventoryPage(),
+    //   ),
+    // );
 
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
       return Scaffold(
@@ -1311,6 +1311,7 @@ class _BottomTopScreenState extends State<Inventory>
           label: Text('Add item'),
           icon: const Icon(Icons.add),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       );
     }));
   }

@@ -5,6 +5,7 @@ import 'package:tooGoodToWaste/pages/inventory.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'dart:async';
 import 'package:tooGoodToWaste/dto/user_item_model.dart';
+import 'package:tooGoodToWaste/constant/category_icon_map.dart';
 
 class Frame extends StatefulWidget {
   const Frame({super.key});
@@ -27,17 +28,6 @@ class _FrameState extends State<Frame> {
     String imagePath = "assets/category/$category.png";
     return imagePath;
   }
-
-  Map<String, String> GlobalCateIconMap = {
-    "seafood": "assets/category/seafood.png",
-    "Meat": "assets/category/meat.png",
-    "Milk": "assets/category/milk.png",
-    "Milk Product": "assets/category/cheese.png",
-    "Fruit": "assets/category/fruits.png",
-    "Egg": "assets/category/egg.png",
-    "Vegetable": "assets/category/vegetable.png",
-    "Others": "assets/category/others.png"
-  };
 
   //when to call this function? At a certain time evey day.
   Future<void> autocheckWaste() async {
