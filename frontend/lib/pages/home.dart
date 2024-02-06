@@ -11,6 +11,7 @@ import 'package:tooGoodToWaste/service/user_location_service.dart';
 import 'package:tooGoodToWaste/service/user_service.dart';
 import 'package:tooGoodToWaste/widgets/allergies_picker.dart';
 import 'package:tooGoodToWaste/widgets/category_picker.dart';
+import 'package:tooGoodToWaste/widgets/user_location_aware_widget.dart';
 import '../Pages/post_page.dart';
 import '../dto/user_model.dart';
 import '../service/shared_items_service.dart';
@@ -27,66 +28,146 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
+  final SharedItemService sharedItemService = SharedItemService();
+
+  double radius = 1;
+  ItemCategory? category;
+  List<ItemAllergy> allergies = [];
+
+  Future<void> _showRangeDialog() async {
+    final double? selectedRadius = await showDialog<double>(
+        context: context,
+        builder: (context) => RadiusPicker(initialRange: radius));
+
+    if (selectedRadius != null) {
+      setState(() {
+        radius = selectedRadius;
+      });
+    }
+  }
+
+  Future<void> _showCategoryDialog() async {
+    final ItemCategory? selectedCategory = await showDialog<ItemCategory>(
+        context: context,
+        builder: (context) => CategoryPicker(initialCategory: category));
+
+    if (selectedCategory != null) {
+      setState(() {
+        category = selectedCategory;
+      });
+    }
+  }
+
+  Future<void> _showAllergyDialog() async {
+    final List<ItemAllergy>? selectedAllergies =
+        await showDialog<List<ItemAllergy>>(
+            context: context,
+            builder: (context) => AllergiesPicker(initialAllergies: allergies));
+
+    if (selectedAllergies != null) {
+      setState(() {
+        allergies = selectedAllergies;
+      });
+    }
+  }
+
+  void _onMapCreated(GoogleMapController controller) {
+    logger.d('Created Google Map');
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (FirebaseAuth.instance.currentUser == null) {
-      throw StateError("Trying to access user page without authentication");
-    }
-
-    final UserService userService = UserService();
-
-    var users = [];
-    var postData = [];
-
-    return FutureBuilder(
-        future: userService.getUserData(userId),
-        builder:
-            (BuildContext context, AsyncSnapshot<TGTWUser> userDataSnapshot) {
-          if (userDataSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (userDataSnapshot.hasError) {
-            return Center(
-              child: Text('Error: ${userDataSnapshot.error}'),
-            );
-          }
-
-          final TGTWUser user = userDataSnapshot.requireData;
-
-          return FutureBuilder(
-            future: UserLocationService.getUserLocation(),
-            builder: (BuildContext locationContext,
-                AsyncSnapshot<LocationData> locationDataSnapshot) {
-              if (locationDataSnapshot.connectionState ==
-                  ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (locationDataSnapshot.hasError) {
-                return Center(
-                  child: Text('Error: ${locationDataSnapshot.error}'),
-                );
-              }
-
-              final double? longitude =
-                  locationDataSnapshot.requireData.longitude;
-              final double? latitude =
-                  locationDataSnapshot.requireData.latitude;
-              if (longitude == null) {
-                throw Exception('User longitude is null');
-              }
-              if (latitude == null) {
-                throw Exception('User latitude is null');
-              }
-
-              final GeoPoint userLocation = GeoPoint(latitude, longitude);
-
-              return InnerHomeWidget(userLocation: userLocation);
-            },
-          );
-        });
+    return Container(
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+      child: Column(
+        children: [
+          UserLocationAwareWidget(
+            loader: (BuildContext context) =>
+                FractionallySizedBox(
+                  widthFactor: 1.0,
+                  child: SizedBox(
+                    height: 200,
+                    child: Container(
+                      color: Theme.of(context).colorScheme.secondaryContainer,
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  ),
+                ),
+            builder: (BuildContext context, GeoPoint userLocation) =>
+                FractionallySizedBox(
+              widthFactor: 1.0,
+              child: SizedBox(
+                  height: 200,
+                  child: GoogleMap(
+                      onMapCreated: _onMapCreated,
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(
+                            userLocation.latitude, userLocation.longitude),
+                        zoom: 15.0 - radius / 5,
+                      ))),
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: <Widget>[
+                ActionChip(
+                  onPressed: _showCategoryDialog,
+                  avatar: const Icon(Icons.tune, size: 16),
+                  label: category != null
+                      ? Text('Category: ${category!.name}')
+                      : const Text('Category: Any'),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                ActionChip(
+                  onPressed: _showRangeDialog,
+                  avatar: const Icon(Icons.location_pin, size: 16),
+                  label: Text('Range (${radius.round().toString()} km)'),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                ActionChip(
+                    onPressed: _showAllergyDialog,
+                    avatar: const Icon(Icons.warning),
+                    label: Text('Allergies (${allergies.length})'))
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                'Results',
+                style: Theme.of(context).textTheme.headlineMedium,
+              )
+            ],
+          ),
+          UserLocationAwareWidget(
+              builder: (BuildContext context, GeoPoint userLocation) =>
+                  Expanded(
+                      child: ListView.separated(
+                    itemCount: 0,
+                    itemBuilder: (_, index) {
+                      return Placeholder();
+                    },
+                    separatorBuilder: (_, index) {
+                      return const Divider();
+                    },
+                  )))
+        ],
+      ),
+    );
   }
 }
 
