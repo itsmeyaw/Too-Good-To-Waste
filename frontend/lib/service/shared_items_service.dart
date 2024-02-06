@@ -64,6 +64,9 @@ class SharedItemService {
             radius: radiusInKm,
             field: "location",
             strictMode: true)
-        .expand((docList) => _createSharedItemList(docList));
+        .expand((docList) {
+          logger.d('Got results: ${docList.length}');
+          return _createSharedItemList(docList);
+    });
   }
 }
