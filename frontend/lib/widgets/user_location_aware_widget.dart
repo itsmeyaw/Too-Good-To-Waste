@@ -6,8 +6,8 @@ import 'package:tooGoodToWaste/service/user_location_service.dart';
 class UserLocationAwareWidget extends StatefulWidget {
   final Widget Function(BuildContext context, GeoPoint userLocation) builder;
   final Widget Function(BuildContext context)? loader;
-key, required this
-  const UserLocationAwareWidget({super..builder, this.loader});
+
+  const UserLocationAwareWidget({super.key, required this.builder, this.loader});
 
   @override
   State<StatefulWidget> createState() => _UserLocationAwareState();
