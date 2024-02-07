@@ -12,22 +12,23 @@ class SharedItemService {
 
   SharedItemService.withCustomFirestore({required this.db});
 
-  Future<Iterable<SharedItem>> getSharedItems(String userUid) async {
+  Future<Iterable<SharedItem?>> getSharedItem(String userUid) async {
     return await db
-        .collection(COLLECTION)
-        .doc(userUid)
-        .collection(SUB_COLLECTION)
-        .get()
-        .then((querySnapshot) {
-      logger.d('Got ${querySnapshot.size} items, converting to item');
-      return querySnapshot.docs.map((doc) => SharedItem.fromJson(doc.data()));
-    });
-  }
+          .collection(COLLECTION)
+          .doc(userUid)
+          .collection(SUB_COLLECTION)
+          .get()
+          .then((querySnapshot) {
+      logger.d('Got ${querySnapshot.size} shared items, converting to item');
+        return querySnapshot.docs.map((doc) => SharedItem.fromJson(doc.data()));
+      });
+}
+
 
   Future<bool> updateSharedItem(
       String userUid, String itemUid, SharedItem newItemData) async {
     logger.d(
-        'Updating item $itemUid for user $userUid with data ${newItemData.toJson()}');
+        'Updating shared item $itemUid for user $userUid with data ${newItemData.toJson()}');
     return await db
         .collection(COLLECTION)
         .doc(userUid)
@@ -52,27 +53,27 @@ class SharedItemService {
         .doc(itemUid)
         .delete()
         .then((_) {
-      logger.d('Successfully deleted item $itemUid for user $userUid');
+      logger.d('Successfully deleted shared item $itemUid for user $userUid');
       return true;
     }).catchError((err) {
-      logger.e('Got error when deleting item $itemUid for user $userUid with detail: $err');
+      logger.e('Got error when deleting shared item $itemUid for user $userUid with detail: $err');
       return false;
     });
   }
 
   Future<SharedItem?> addSharedItem(String userUid, SharedItem newItemData) async {
-    logger.d('Adding new item for user $userUid');
+    logger.d('Adding new shared item for user $userUid');
     return await db
         .collection(COLLECTION)
-        .doc(userUid)
-        .collection(SUB_COLLECTION)
+        // .doc(userUid)
+        // .collection(SUB_COLLECTION)
         .add(newItemData.toJson())
         .then((docRef) {
-      logger.d('Successfully added item ${docRef.id} for user $userUid');
+      logger.d('Successfully added shared item ${docRef.id} for user $userUid');
       return newItemData;
     }).catchError((err) {
-      logger.e('Got error when adding item for user $userUid with detail: $err');
-      return null;
+      logger.e('Got error when adding shared item for user $userUid with detail: $err');
+      return newItemData;
     });
   }
 }

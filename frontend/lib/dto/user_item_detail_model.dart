@@ -7,23 +7,25 @@ import './user_item_expiry_model.dart';
 @immutable
 @JsonSerializable()
 class UserItemDetail {
-  //int id;
+  // String id;
   String name;
   String category;
   String quantitytype;
   double quantitynum;
   int remainDays;
   double consumestate;
+  String state;
 
 UserItemDetail(
   {
-    //required this.id,
+    // required this.id,
     required this.name,
     required this.category,
     required this.quantitytype,
     required this.quantitynum,
     required this.consumestate,
     required this.remainDays,
+    required this.state
   }
 );
 
@@ -31,13 +33,14 @@ UserItemDetail(
   //of the columns in the databse.
   Map<String, dynamic> toMap() {
     return {
-      //'id': id,
+      // 'id': id,
       'name': name,
       'category': category,
       'quantitytype': quantitytype,
       'quantitynum': quantitynum,
       'remainDays': remainDays,
       'consumestate': consumestate,
+      'state': state,
     };
   }
 
@@ -45,6 +48,6 @@ UserItemDetail(
   //each food when using the print statement
   @override
   String toString() {
-    return 'UserItemDetail{name: $name, category: $category, quantitytype: $quantitytype, quantitynum: $quantitynum, remainDays: $remainDays, consumestate: $consumestate}';
+    return 'UserItemDetail{name: $name, category: $category, quantitytype: $quantitytype, quantitynum: $quantitynum, remainDays: $remainDays, consumestate: $consumestate}, state: $state';
   }
 }

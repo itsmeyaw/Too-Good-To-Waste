@@ -1,8 +1,20 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
 import 'package:tooGoodToWaste/dto/user_item_detail_model.dart';
-import '../dto/user_model.dart';
+import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
 import 'package:tooGoodToWaste/constant/category_icon_map.dart';
+import 'package:tooGoodToWaste/service/shared_item_service.dart';
+import 'package:tooGoodToWaste/pages/account.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tooGoodToWaste/dto/public_user_model.dart';
+import 'package:tooGoodToWaste/service/user_item_service.dart';
+import '../dto/user_name_model.dart';
+import '../dto/user_item_amount_model.dart';
+import '../util/geo_point_converter.dart';
 
 class itemDetailPage extends StatelessWidget {
   const itemDetailPage({super.key, required this.foodDetail});
@@ -20,6 +32,156 @@ class itemDetailPage extends StatelessWidget {
     } else {
       categoryIconImagePath = GlobalCateIconMap[foodDetail.category]!;
     }
+
+    Future<dto_user.User> getUserFromDatabase(String uid) async {
+      Logger logger = Logger();
+
+      return FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get()
+          .then((DocumentSnapshot doc) {
+        logger.d('Got data ${doc.data()}');
+        return dto_user.User.fromJson(doc.data() as Map<String, dynamic>);
+      });
+    }
+
+    //toast contains 'Alert! Your *** has already expired and cannot be shared!'
+  showExpiredDialog(String foodname, String category) {
+    String? categoryIconImagePath;
+
+    if (GlobalCateIconMap[category] == null) {
+      categoryIconImagePath = GlobalCateIconMap["Others"];
+    } else {
+      categoryIconImagePath = GlobalCateIconMap[category];
+    }
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    AlertDialog dialog = AlertDialog(
+      title: const Text("Alert!", textAlign: TextAlign.center),
+      content: Container(
+        width: 3 * width / 5,
+        height: height / 3,
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          children: [
+            Image.asset(categoryIconImagePath!),
+            //Expanded(child: stateIndex>-1? Image.asset(imageList[stateIndex]):Image.asset(imageList[12])),
+            Text('Your $foodname is already expired and cannot be shared!',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold))
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, 'OK'),
+          child: const Text('OK'),
+        ),
+      ],
+    );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return dialog;
+      }
+    );
+  }
+
+  TextEditingController locationController = TextEditingController();
+
+  showLocationDialog(){
+    // BuildContext dialogContext;
+    Dialog dialog = Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: Container(
+        height: 200,
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text('Please enter the location for picking up:'),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10.0),
+              child: TextField(
+                controller: locationController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Location',
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  //Extract Location information
+                  locationController.value.text;
+
+                  // add a new item to Shared_Item_Collection
+                // add the user_id attribute to the shared_item
+                // add the location attribute to the shared_item                
+            
+                SharedItemService sharedItemService = SharedItemService.withCustomFirestore(db: FirebaseFirestore.instance);
+
+                User? currentUser = FirebaseAuth.instance.currentUser;
+                  if (currentUser == null) {
+                    throw Exception('User is null but want to publish item');
+                  } else {
+                    getUserFromDatabase(currentUser.uid).then((dto_user.User userData) {
+                      SharedItem sharedItem = SharedItem(
+                        name: foodDetail.name,
+                        category: foodDetail.category,
+                        amount:  UserItemAmount(
+                          nominal: foodDetail.quantitynum,
+                          unit: foodDetail.quantitytype
+                        ),
+                        buyDate: foodDetail.remainDays,
+                        expiryDate: foodDetail.remainDays,                 
+                        location: GeoPoint(
+                          0.0,
+                          0.0,
+                        ),
+                        user: PublicUser(
+                            name: UserName(
+                              first: userData.name.first,
+                              last: userData.name.last,
+                            ),
+                            rating: userData.rating,
+                          ),
+                          itemRef: '',
+                      );
+                     sharedItemService.addSharedItem(currentUser.uid, sharedItem);
+                      
+                    });
+                  }  
+                  
+                  //TODO: delete the card in Inventory
+                  UserItemService userItemService = UserItemService.withCustomFirestore(db: FirebaseFirestore.instance);
+                  // userItemService.deleteUserItem(currentUser.uid, foodDetail.id);
+
+                  Navigator.of(context, rootNavigator: true).pop();
+                  Navigator.pop(context);
+                },
+                child: Text('Submit'),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // dialogContext = context;
+        return dialog;
+      }
+    );
+  }
+
 
      return Scaffold(
         appBar: AppBar(
@@ -67,11 +229,18 @@ class itemDetailPage extends StatelessWidget {
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () async {
             try {
-              // add a new item to Shared_Item_Collection
-              // add the user_id attribute to the shared_item
-              // add the location attribute to the shared_item
-
-              Navigator.pop(context);
+      
+              //check if the state is still good
+              if(foodDetail.state == 'good'){
+                // add a new item to Shared_Item_Collection
+                // add the user_id attribute to the shared_item
+                // add the location attribute to the shared_item
+                
+                showLocationDialog();
+                // Navigator.pop(context);
+              } else {
+                showExpiredDialog(foodDetail.name, foodDetail.category);
+              }
             } catch (e) {
               print(e);
             }

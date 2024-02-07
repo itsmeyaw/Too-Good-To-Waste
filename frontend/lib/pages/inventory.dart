@@ -1,4 +1,6 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:convert';
 
@@ -6,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:logger/logger.dart';
 import 'package:rive/rive.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
@@ -22,6 +25,9 @@ import 'add_inventory.dart';
 import '../dto/user_item_detail_model.dart';
 import '../dto/user_item_model.dart';
 import 'package:tooGoodToWaste/constant/category_icon_map.dart';
+import 'package:tooGoodToWaste/service/user_item_service.dart';
+
+import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
 
 class Inventory extends StatefulWidget {
   const Inventory({super.key});
@@ -193,7 +199,7 @@ class _BottomTopScreenState extends State<Inventory>
   //
   Future<List<double>> getItemQuanNum() async {
     //get all foods quantity number as a list of integers
-    List<double> num = await dbhelper.getAllUncosumedFoodDoubleValues('quantitynum');
+    List<double> num = await dbhelper.getAllUncosumedFoodDoubleValues('quantity_num');
 
     return num;
   }
@@ -201,7 +207,7 @@ class _BottomTopScreenState extends State<Inventory>
   Future<List<String>> getItemQuanType() async {
     //get all foods quantity number as a list of integers
     List<String> type =
-        await dbhelper.getAllUncosumedFoodStringValues('quantitytype');
+        await dbhelper.getAllUncosumedFoodStringValues('quantity_type');
 
     return type;
   }
@@ -627,8 +633,8 @@ class _BottomTopScreenState extends State<Inventory>
         future: Future.wait([
           getWasteItemString('name'),
           //getWasteItemInt('expiretime'),
-          getWasteItemDouble('quantitynum'),
-          getWasteItemString('quantitytype'),
+          getWasteItemDouble('quantity_num'),
+          getWasteItemString('quantity_type'),
           getWasteItemString('category'),
           //getWasteItemInt('boughttime'),
         ]),
@@ -962,15 +968,16 @@ class _BottomTopScreenState extends State<Inventory>
   }
 
   void pushItemDetailScreen(int index, String text) async {
-    String quantype = await dbhelper.getOneFoodValue(text, 'quantitytype');
-    double quannum = await dbhelper.getOneFoodDoubleValue(text, 'quantitynum');
-    int expitime = await dbhelper.getOneFoodIntValue(text, 'expiretime');
+    String quantype = await dbhelper.getOneFoodValue(text, 'quantity_type');
+    double quannum = await dbhelper.getOneFoodDoubleValue(text, 'quantity_num');
+    int expitime = await dbhelper.getOneFoodIntValue(text, 'expiry_date');
+    String state = await dbhelper.getOneFoodValue(text, 'state');
     var expireDate = DateTime.fromMillisecondsSinceEpoch(expitime);
     var remainDays = expireDate.difference(timeNowDate).inDays;
 
     String category = await dbhelper.getOneFoodValue(text, 'category');
     double consumeprogress =
-        await dbhelper.getOneFoodDoubleValue(text, 'consumestate');
+        await dbhelper.getOneFoodDoubleValue(text, 'consume_state');
 
     var foodDetail = UserItemDetail(
         name: text,
@@ -979,6 +986,7 @@ class _BottomTopScreenState extends State<Inventory>
         quantitytype: quantype,
         quantitynum: quannum,
         consumestate: consumeprogress,
+        state: state
         );
 
     //navigate to the item detail page
@@ -995,6 +1003,19 @@ class _BottomTopScreenState extends State<Inventory>
   }
 
   Widget heightSpacer(double myHeight) => SizedBox(height: myHeight);
+
+   Future<dto_user.User> getUserFromDatabase(String uid) async {
+      Logger logger = Logger();
+
+      return FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get()
+          .then((DocumentSnapshot doc) {
+        logger.d('Got data ${doc.data()}');
+        return dto_user.User.fromJson(doc.data() as Map<String, dynamic>);
+      });
+    }
 
   /// opens add new item screen
   void pushAddItemScreen() {
@@ -1284,8 +1305,18 @@ class _BottomTopScreenState extends State<Inventory>
               //well actually i should assume the state of a new food should always be good, unless the user is an idiot
               //But i'm going to do the calculation anyway
 
-              //insert new data into database
+              //insert new data into local sqlite database
               insertDB(food);
+
+              //insert new data into cloud firebase
+              UserItemService userItemService = UserItemService.withCustomFirestore(db: FirebaseFirestore.instance);
+              User? currentUser = FirebaseAuth.instance.currentUser;
+
+              if (currentUser == null) {
+                throw Exception('You should Login first!');
+              } else {
+                userItemService.addUserItem(currentUser.uid, food);
+              }
               print(
                   '#################################${dbhelper.queryAll('foods')}#####################');
 

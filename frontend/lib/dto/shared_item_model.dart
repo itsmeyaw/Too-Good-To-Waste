@@ -10,10 +10,11 @@ import '../util/geo_point_converter.dart';
 part 'shared_item_model.g.dart';
 
 @immutable
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class SharedItem {
   final UserItemAmount amount;
-  final DateTime buyDate;
+  final int buyDate;
+  final int expiryDate;
   final String itemRef;
   @GeoPointConverter()
   final GeoPoint location;
@@ -24,6 +25,7 @@ class SharedItem {
   const SharedItem(
       {required this.amount,
       required this.buyDate,
+      required this.expiryDate,
       required this.itemRef,
       required this.location,
       required this.name,

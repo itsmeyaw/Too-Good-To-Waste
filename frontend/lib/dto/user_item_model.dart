@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import './user_item_amount_model.dart';
 import './user_item_expiry_model.dart';
 
-// part 'user_item_model.g.dart';
+part 'user_item_model.g.dart';
 
 @immutable
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class UserItem {
   //int id;
   String name;
@@ -39,12 +39,12 @@ UserItem(
       //'id': id,
       'name': name,
       'category': category,
-      'boughttime': boughttime,
-      'expiretime': expiretime,
-      'quantitytype': quantitytype,
-      'quantitynum': quantitynum,
+      'buy_date': boughttime,
+      'expiry_date': expiretime,
+      'quantity_type': quantitytype,
+      'quantity_num': quantitynum,
       'state': state,
-      'consumestate': consumestate,
+      'consume_state': consumestate,
     };
   }
 
@@ -52,13 +52,13 @@ UserItem(
   //each food when using the print statement
   @override
   String toString() {
-    return 'UserItem{name: $name, category: $category, boughttime: $boughttime, expiretime: $expiretime, quantitytype: $quantitytype, quantitynum: $quantitynum, state: $state, consumestate: $consumestate}';
+    return 'UserItem{name: $name, category: $category, buy_date: $boughttime, expiry_date: $expiretime, quantity_type: $quantitytype, quantity_num: $quantitynum, state: $state, consume_state: $consumestate}';
   }
 
-  // factory UserItem.fromJson(Map<String, dynamic> json) =>
-  //     _$UserItemFromJson(json);
+  factory UserItem.fromJson(Map<String, dynamic> json) =>
+      _$UserItemFromJson(json);
 
-  // Map<String, dynamic> toJson() => _$UserItemToJson(this);
+  Map<String, dynamic> toJson() => _$UserItemToJson(this);
 }
 
 

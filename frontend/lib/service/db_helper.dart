@@ -32,7 +32,7 @@ class DBHelper {
         'CREATE TABLE users(name TEXT PRIMARY KEY, positive INTEGER, negative INTEGER, primarystate TEXT, secondarystate TEXT, secondaryevent TEXT, thirdstate TEXT, state TEXT, species TEXT, childrennum INTEGER, fatherstate TEXT, motherstate TEXT, time INTEGER)',
       );
       await db.execute(
-          'CREATE TABLE foods(name TEXT PRIMARY KEY, category TEXT, boughttime INTEGER, expiretime INTEGER, quantitytype TEXT, quantitynum REAL, state TEXT, consumestate REAL)');
+          'CREATE TABLE foods(name TEXT PRIMARY KEY, category TEXT, buy_date INTEGER, expiry_date INTEGER, quantity_type TEXT, quantity_num REAL, state TEXT, consume_state REAL)');
     });
   }
 
@@ -123,11 +123,11 @@ class DBHelper {
           //id: maps[i]['id'],
           name: maps[i]['name'],
           category: maps[i]['category'],
-          boughttime: maps[i]['boughttime'],
-          expiretime: maps[i]['expiretime'],
-          quantitytype: maps[i]['quantitytype'],
-          quantitynum: maps[i]['quantitynum'],
-          consumestate: maps[i]['consumestate'],
+          boughttime: maps[i]['buy_date'],
+          expiretime: maps[i]['expiry_date'],
+          quantitytype: maps[i]['quantity_type'],
+          quantitynum: maps[i]['quantity_num'],
+          consumestate: maps[i]['consume_state'],
           state: maps[i]['state'],
         );
       });
@@ -172,12 +172,12 @@ class DBHelper {
           //id: maps[0]['id'],
           name: maps[0]['name'],
           category: maps[0]['category'],
-          boughttime: maps[0]['boughttime'],
-          expiretime: maps[0]['expiretime'],
-          quantitynum: maps[0]['quantitynum'],
-          quantitytype: maps[0]['quantitytype'],
+          boughttime: maps[0]['buy_date'],
+          expiretime: maps[0]['expiry_date'],
+          quantitynum: maps[0]['quantity_num'],
+          quantitytype: maps[0]['quantity_type'],
           state: maps[0]['state'],
-          consumestate: maps[0]['consumestate'],
+          consumestate: maps[0]['consume_state'],
         );
       });
     } else if (object == "users") {
@@ -313,12 +313,12 @@ class DBHelper {
         //id: maps[i]['id'],
         name: maps[i]['name'],
         category: maps[i]['category'],
-        boughttime: maps[i]['boughttime'],
-        expiretime: maps[i]['expiretime'],
-        quantitynum: maps[i]['quantitynum'],
-        quantitytype: maps[i]['quantitytype'],
+        boughttime: maps[i]['buy_date'],
+        expiretime: maps[i]['expiry_date'],
+        quantitynum: maps[i]['quantity_num'],
+        quantitytype: maps[i]['quantity_type'],
         state: maps[i]['state'],
-        consumestate: maps[i]['consumestate'],
+        consumestate: maps[i]['consume_state'],
       );
     });
   }
@@ -331,7 +331,7 @@ class DBHelper {
     //Query table for all the foods.
 
     final List<Map<String, dynamic>> maps = await dbHelper.query('foods',
-        columns: [value], where: 'consumestate < 1');
+        columns: [value], where: 'consume_state < 1');
 
     //Convert the List<Map<String, dynamic> into a List<String>
     var foodstring = List<String>.generate(maps.length, (i) => maps[i][value]);
@@ -404,7 +404,7 @@ class DBHelper {
     //Query table for all the foods.
 
     final List<Map<String, dynamic>> maps = await dbHelper.query('foods',
-        columns: [value], where: 'consumestate < 1.0');
+        columns: [value], where: 'consume_state < 1.0');
 
     //Convert the List<Map<String, dynamic> into a List<String>
     var foodsint = List<int>.generate(maps.length, (i) => maps[i][value]);
@@ -433,7 +433,7 @@ class DBHelper {
 
     //final List<Map<String, dynamic>> maps = await dbHelper.query('foods',columns: ['name', 'expiretime', 'boughttime', 'quantitynum', 'quantitytype', 'state', 'consumestate'], where: '$category = ?', whereArgs: [category]);
     final List<Map<String, dynamic>> maps = await dbHelper
-        .rawQuery('SELECT * FROM foods WHERE consumestate < ?', [1]);
+        .rawQuery('SELECT * FROM foods WHERE consume_state < ?', [1]);
 
     //Convert the List<Map<String, dynamic> into a List
 
@@ -442,12 +442,12 @@ class DBHelper {
         //id: maps[i]['id'],
         name: maps[i]['name'],
         category: maps[i]['category'],
-        boughttime: maps[i]['boughttime'],
-        expiretime: maps[i]['expiretime'],
-        quantitynum: maps[i]['quantitynum'],
-        quantitytype: maps[i]['quantitytype'],
+        boughttime: maps[i]['buy_date'],
+        expiretime: maps[i]['expiry_date'],
+        quantitynum: maps[i]['quantity_num'],
+        quantitytype: maps[i]['quantity_type'],
         state: maps[i]['state'],
-        consumestate: maps[i]['consumestate'],
+        consumestate: maps[i]['consume_state'],
       );
     });
   }
@@ -467,12 +467,12 @@ class DBHelper {
         //id: maps[i]['id'],
         name: maps[i]['name'],
         category: maps[i]['category'],
-        boughttime: maps[i]['boughttime'],
-        expiretime: maps[i]['expiretime'],
-        quantitynum: maps[i]['quantitynum'],
-        quantitytype: maps[i]['quantitytype'],
+        boughttime: maps[i]['buy_date'],
+        expiretime: maps[i]['expiry_date'],
+        quantitynum: maps[i]['quantity_num'],
+        quantitytype: maps[i]['quantity_type'],
         state: maps[i]['state'],
-        consumestate: maps[i]['consumestate'],
+        consumestate: maps[i]['consume_state'],
       );
     });
   }
@@ -507,7 +507,7 @@ class DBHelper {
     Database dbHelper = await db;
 
     await dbHelper.rawUpdate(
-        'UPDATE foods SET consumestate = ?, state = ? WHERE name = ?',
+        'UPDATE foods SET consume_state = ?, state = ? WHERE name = ?',
         [1.0, 'wasted', name]);
     print('###############update##################');
   }
@@ -516,7 +516,7 @@ class DBHelper {
     Database dbHelper = await db;
 
     await dbHelper.rawUpdate(
-        'UPDATE foods SET quantitynum = ?, consumestate = ?, state = ? WHERE name = ?',
+        'UPDATE foods SET quantity_num = ?, consume_state = ?, state = ? WHERE name = ?',
         [0.0, 1.0, status, name]);
     print('###############update##################');
   }
@@ -622,7 +622,7 @@ class DBHelper {
 
     //Get all foods name
     print(await dbhelper.getAllFoodStringValues('name'));
-    print(await dbhelper.getAllFoodIntValues('expiretime'));
+    print(await dbhelper.getAllFoodIntValues('expiry_date'));
     //print(await dbhelper.getOneFoodName(1));
 
     //Insert a new UserValue instance

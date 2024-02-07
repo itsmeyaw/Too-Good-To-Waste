@@ -8,7 +8,8 @@ part of 'shared_item_model.dart';
 
 SharedItem _$SharedItemFromJson(Map<String, dynamic> json) => SharedItem(
       amount: UserItemAmount.fromJson(json['amount'] as Map<String, dynamic>),
-      buyDate: DateTime.parse(json['buy_date'] as String),
+      buyDate: json['buy_date'] as int,
+      expiryDate: json['expiry_date'] as int,
       itemRef: json['item_ref'] as String,
       location: const GeoPointConverter()
           .fromJson(json['location'] as Map<String, dynamic>),
@@ -19,11 +20,12 @@ SharedItem _$SharedItemFromJson(Map<String, dynamic> json) => SharedItem(
 
 Map<String, dynamic> _$SharedItemToJson(SharedItem instance) =>
     <String, dynamic>{
-      'amount': instance.amount,
-      'buy_date': instance.buyDate.toIso8601String(),
+      'amount': instance.amount.toJson(),
+      'buy_date': instance.buyDate,
+      'expiry_date': instance.expiryDate,
       'item_ref': instance.itemRef,
       'location': const GeoPointConverter().toJson(instance.location),
       'name': instance.name,
       'category': instance.category,
-      'user': instance.user,
+      'user': instance.user.toJson(),
     };
