@@ -17,17 +17,23 @@ class SharedItem {
   final int expiryDate;
   final String itemRef;
   @GeoPointConverter()
-  final GeoPoint location;
+  final GeoPoint geoPoint;
   final String name;
   final String category;
   final PublicUser user;
 
-  const SharedItem(
+  @JsonKey(includeToJson: false, defaultValue: {})
+  Map<String, dynamic> location = {};
+
+  @JsonKey(includeToJson: false, defaultValue: double.infinity)
+  double distance = double.infinity;
+
+  SharedItem(
       {required this.amount,
       required this.buyDate,
       required this.expiryDate,
       required this.itemRef,
-      required this.location,
+      required this.geoPoint,
       required this.name,
       required this.category,
       required this.user});

@@ -6,7 +6,7 @@ part of 'user_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-User _$UserFromJson(Map<String, dynamic> json) => User(
+TGTWUser _$UserFromJson(Map<String, dynamic> json) => TGTWUser(
       name: UserName.fromJson(json['name'] as Map<String, dynamic>),
       rating: (json['rating'] as num).toDouble(),
       phoneNumber: json['phone_number'] as String,
@@ -20,7 +20,7 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       reducedCarbonKg: (json['reduced_carbon_kg'] as num).toDouble(),
     );
 
-Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
+Map<String, dynamic> _$UserToJson(TGTWUser instance) => <String, dynamic>{
       'name': instance.name.toJson(),
       'rating': instance.rating,
       'address': instance.address.toJson(),

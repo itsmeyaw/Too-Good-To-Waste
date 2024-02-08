@@ -11,12 +11,14 @@ SharedItem _$SharedItemFromJson(Map<String, dynamic> json) => SharedItem(
       buyDate: json['buy_date'] as int,
       expiryDate: json['expiry_date'] as int,
       itemRef: json['item_ref'] as String,
-      location: const GeoPointConverter()
-          .fromJson(json['location'] as Map<String, dynamic>),
+      geoPoint: const GeoPointConverter()
+          .fromJson(json['geo_point'] as Map<String, dynamic>),
       name: json['name'] as String,
       category: json['category'] as String,
       user: PublicUser.fromJson(json['user'] as Map<String, dynamic>),
-    );
+    )
+      ..location = json['location'] as Map<String, dynamic>? ?? {}
+      ..distance = (json['distance'] as num?)?.toDouble() ?? double.infinity;
 
 Map<String, dynamic> _$SharedItemToJson(SharedItem instance) =>
     <String, dynamic>{
@@ -24,7 +26,7 @@ Map<String, dynamic> _$SharedItemToJson(SharedItem instance) =>
       'buy_date': instance.buyDate,
       'expiry_date': instance.expiryDate,
       'item_ref': instance.itemRef,
-      'location': const GeoPointConverter().toJson(instance.location),
+      'geo_point': const GeoPointConverter().toJson(instance.geoPoint),
       'name': instance.name,
       'category': instance.category,
       'user': instance.user.toJson(),
