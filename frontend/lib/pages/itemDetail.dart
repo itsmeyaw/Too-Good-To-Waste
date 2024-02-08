@@ -4,7 +4,7 @@ import 'package:logger/logger.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
 import 'package:tooGoodToWaste/dto/user_item_detail_model.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
-import 'package:tooGoodToWaste/constant/category_icon_map.dart';
+import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import 'package:tooGoodToWaste/service/shared_item_service.dart';
 import 'package:tooGoodToWaste/pages/account.dart';
 

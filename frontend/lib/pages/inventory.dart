@@ -11,6 +11,7 @@ import 'package:flutter/rendering.dart';
 import 'package:logger/logger.dart';
 import 'package:rive/rive.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'dart:async';
@@ -25,7 +26,7 @@ import 'itemDetail.dart';
 import 'add_inventory.dart';
 import '../dto/user_item_detail_model.dart';
 import '../dto/user_item_model.dart';
-import 'package:tooGoodToWaste/constant/category_icon_map.dart';
+import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import 'package:tooGoodToWaste/service/user_item_service.dart';
 
 import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
@@ -699,11 +700,6 @@ class _BottomTopScreenState extends State<Inventory>
                   itemCount: itemsWaste.length,
                   itemBuilder: (context, index) {
                     var item = itemsWaste[index];
-                    //how to show the quantity tyoe and quantity number?
-
-                    //var expires = getItemExpiringTime();
-                    //how to show the listsby sequence of expire time?
-                    //var remainDays = remainingTime[index].inDays;
                     //var progressPercentage = remainDays / (expires[index].difference(boughtTime[index]).inDays);
                     var foodNum = num[index];
                     var foodType = type[index];
