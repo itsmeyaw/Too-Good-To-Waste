@@ -8,13 +8,13 @@ void main() {
   final UserItemService sut =
       UserItemService.withCustomFirestore(db: mockFirestore);
 
-  const String USER_COLLECTION = 'users';
-  const String ITEMS_COLLECTION = 'items';
+  const String userCollection = 'users';
+  const String itemsCollection = 'items';
 
 
   group('Get Items', () {
     setUp(() {
-      mockFirestore.collection(USER_COLLECTION);
+      mockFirestore.collection(userCollection);
     });
 
     test('Getting user items normally', () {

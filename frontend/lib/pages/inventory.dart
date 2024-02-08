@@ -7,11 +7,12 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:logger/logger.dart';
 import 'package:rive/rive.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
+import 'package:tooGoodToWaste/dto/item_allergies_enum.dart';
+import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'dart:async';
@@ -19,14 +20,15 @@ import 'dart:async';
 
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:tooGoodToWaste/widgets/allergies_picker.dart';
+import 'package:tooGoodToWaste/widgets/category_picker.dart';
+import 'package:tooGoodToWaste/widgets/date_picker.dart';
 import 'package:tooGoodToWaste/widgets/expandableFab.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'itemDetail.dart';
-import 'add_inventory.dart';
 import '../dto/user_item_detail_model.dart';
 import '../dto/user_item_model.dart';
-import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import 'package:tooGoodToWaste/service/user_item_service.dart';
 
 import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
@@ -54,6 +56,8 @@ class _BottomTopScreenState extends State<Inventory>
   late String imageData;
   DateTime timeNowDate = DateTime.now();
   int timeNow = DateTime.now().millisecondsSinceEpoch;
+  ItemCategory? category;
+  List<ItemAllergy> allergies = [];
 
   @override
   void dispose() {
@@ -461,9 +465,9 @@ class _BottomTopScreenState extends State<Inventory>
         children: [
           Column(
             children: [
-              TextField(
+              const TextField(
                 decoration: InputDecoration(
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.search,
                     ),
                     hintText: "Search"),
@@ -473,7 +477,7 @@ class _BottomTopScreenState extends State<Inventory>
             ],
           ),
           Container(
-              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
               child: ListView(
                 children: [
                   Column(
@@ -490,16 +494,16 @@ class _BottomTopScreenState extends State<Inventory>
                         const SizedBox(
                           height: 5,
                         ),
-                        Text('Month: January'),
+                        const Text('Month: January'),
                         const SizedBox(
                           height: 10,
                         ),
-                        Container(
+                        SizedBox(
                             height: 200,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Container(
+                                SizedBox(
                                   width: 200,
                                   child: PieChart(PieChartData(sections: [
                                     PieChartSectionData(
@@ -525,19 +529,19 @@ class _BottomTopScreenState extends State<Inventory>
                         const SizedBox(
                           height: 20,
                         ),
-                        Text('Period: Jan 2024 - Dec 2024'),
+                        const Text('Period: Jan 2024 - Dec 2024'),
                         const SizedBox(
                           height: 10,
                         ),
-                        Container(
+                        SizedBox(
                             height: 200,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Container(
+                                SizedBox(
                                   width: MediaQuery.of(context).size.width -
                                       20, // 20 is padding left + right
-                                  child: _LineChart(),
+                                  child: const _LineChart(),
                                 )
                               ],
                             )),
@@ -607,34 +611,6 @@ class _BottomTopScreenState extends State<Inventory>
               child: const Icon(Icons.camera_alt),
             )
           ]),
-          // Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-          //   FloatingActionButton(
-          //     tooltip: "Add item",
-          //     onPressed: () {
-          //       // clear out txt buffer before entering new screen
-          //       txt.value = const TextEditingValue();
-          //       //pushAddItemPage();
-          //       pushAddItemScreen();
-          //     },
-          //     child: const Icon(Icons.add),
-          //   ),
-          //   const SizedBox(
-          //     height: 10,
-          //   ),
-          //   FloatingActionButton(
-          //     onPressed: () => pickImage(false),
-          //     heroTag: null,
-          //     child: const Icon(Icons.photo_album),
-          //   ),
-          //   const SizedBox(
-          //     height: 10,
-          //   ),
-          //   FloatingActionButton(
-          //     onPressed: () => pickImage(true),
-          //     heroTag: null,
-          //     child: const Icon(Icons.camera_alt),
-          //   )
-          // ]),
     );
   }
 
@@ -1038,26 +1014,52 @@ class _BottomTopScreenState extends State<Inventory>
       });
     }
 
+    Future<void> _showCategoryDialog() async {
+    final ItemCategory? selectedCategory = await showDialog<ItemCategory>(
+        context: context,
+        builder: (context) => CategoryPicker(initialCategory: category));
+
+    if (selectedCategory != null) {
+      setState(() {
+        category = selectedCategory;
+      });
+    }
+    // return selectedCategory;
+  }
+
+  Future<void> _showAllergyDialog() async {
+    final List<ItemAllergy>? selectedAllergies =
+        await showDialog<List<ItemAllergy>>(
+            context: context,
+            builder: (context) => AllergiesPicker(initialAllergies: allergies));
+
+    if (selectedAllergies != null) {
+      setState(() {
+        allergies = selectedAllergies;
+      });
+    }
+  }
+
   /// opens add new item screen
   void pushAddItemScreen() {
     //String date = dateToday.toString().substring(0, 10);
     Color color = Theme.of(context).primaryColor;
     const double padding = 15;
 
-    final category = [
-      "Vegetable",
-      "Meat",
-      "Fruit",
-      "Milk Product",
-      "Milk",
-      "Sea Food",
-      "Egg",
-      "Others"
-    ];
+    // final category = [
+    //   "Vegetable",
+    //   "Meat",
+    //   "Fruit",
+    //   "Milk Product",
+    //   "Milk",
+    //   "Sea Food",
+    //   "Egg",
+    //   "Others"
+    // ];
     categoryController.text = 'Vegetable';
     quanTypeController.text = 'g';
-    List<Widget> categortyList =
-        List<Widget>.generate(8, (index) => Text(category[index]));
+    // List<Widget> categortyList =
+    //     List<Widget>.generate(8, (index) => Text(category[index]));
     final quanTypes = ["g", "kg", "piece", "bag", "bottle", "num"];
     List<Widget> quanTypeList =
         List<Widget>.generate(6, (index) => Text(quanTypes[index]));
@@ -1070,18 +1072,11 @@ class _BottomTopScreenState extends State<Inventory>
     int expireTimeStamp = 0;
     Color textFieldColor = const Color.fromRGBO(178, 207, 135, 0.8);
 
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => const AddInventoryPage(),
-    //   ),
-    // );
-
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
       return Scaffold(
         appBar: AppBar(
           leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             nameController.clear();
             categoryController.clear();
@@ -1114,32 +1109,16 @@ class _BottomTopScreenState extends State<Inventory>
                   prefixIcon: Icon(Icons.food_bank),
                   hintText: 'Food type',
                 ),
+                // label: category != null
+                //       ? Text('Category: ${category!.name}')
+                //       : const Text('Category: Any'),
                 onTap: () {
                   FocusScope.of(context).requestFocus(FocusNode());
-                  showCupertinoModalPopup(
-                      context: context,
-                      builder: (context) {
-                        return Container(
-                            height: 200,
-                            color: Colors.white,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: CupertinoPicker(
-                                    itemExtent: 24.0,
-                                    onSelectedItemChanged: (value) {
-                                      setState(() {
-                                        categoryController.text =
-                                            category[value];
-                                      });
-                                    },
-                                    children: categortyList,
-                                  ),
-                                )
-                              ],
-                            ));
-                      });
-                },
+                  _showCategoryDialog();
+                  setState(() {
+                    categoryController.text = category!.name;
+                  });
+                },    
                 controller: categoryController,
               ),
               heightSpacer(5),
@@ -1223,6 +1202,24 @@ class _BottomTopScreenState extends State<Inventory>
                     hintText: 'Expiration date'),
                 onTap: () {
                   FocusScope.of(context).requestFocus(FocusNode());
+                    // DataPicker( getdatePicker: (int value) { 
+                    //   // if (value != selectedDate) {
+                    //       setState(() {
+                    //         int year = selectedDate.year;
+                    //         int month = selectedDate.month;
+                    //         int day = selectedDate.day;
+                    //         int timestamp = selectedDate
+                    //             .millisecondsSinceEpoch;
+                    //         print("timestamp$timestamp");
+                    //         expireTimeStamp = timestamp;
+                    //         food.expiretime = expireTimeStamp;
+                    //         expireTimeController.text =
+                    //             "$year-$month-$day";
+                    //         // Navigator.pop(context)
+                    //         //記錄下用戶選擇的時間 ------> 存入數據庫
+                    //       });
+                      
+                    //  },);
                   showCupertinoModalPopup(
                       context: context,
                       builder: (context) {
@@ -1239,7 +1236,9 @@ class _BottomTopScreenState extends State<Inventory>
                                           .height *
                                       0.25,
                                   color: Colors.white,
-                                  child: CupertinoDatePicker(
+                                  child: 
+                                
+                                  CupertinoDatePicker(
                                     mode: CupertinoDatePickerMode.date,
                                     onDateTimeChanged: (value) {
                                       if (value != selectedDate) {
@@ -1360,7 +1359,7 @@ class _BottomTopScreenState extends State<Inventory>
             Navigator.pop(context);
           },
           tooltip: 'Add item',
-          label: Text('Add item'),
+          label: const Text('Add item'),
           icon: const Icon(Icons.add),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -1438,7 +1437,7 @@ class _BottomTopScreenState extends State<Inventory>
 }
 
 class _LineChart extends StatelessWidget {
-  const _LineChart({super.key});
+  const _LineChart();
 
   @override
   Widget build(BuildContext context) {
