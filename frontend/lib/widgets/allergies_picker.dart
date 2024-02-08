@@ -22,12 +22,6 @@ class _AllergiesPickerState extends State<AllergiesPicker> {
   }
 
   @override
-  void deactivate() {
-    super.deactivate();
-    _allergies = [];
-  }
-
-  @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Choose allergies'),

@@ -50,6 +50,8 @@ class SharedItemService {
       required double radiusInKm,
       required String userId,
       String? category}) {
+    logger.d('Start querying for shared item');
+
     var collection = db.collection(COLLECTION);
     if (category != null) {
       collection.where("category", isEqualTo: category);
@@ -62,6 +64,9 @@ class SharedItemService {
             radius: radiusInKm,
             field: "location",
             strictMode: true)
-        .expand((docList) => _createSharedItemList(docList));
+        .expand((docList) {
+          logger.d('Got results: ${docList.length}');
+          return _createSharedItemList(docList);
+    });
   }
 }

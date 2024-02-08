@@ -1,17 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:location/location.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:tooGoodToWaste/dto/item_allergies_enum.dart';
 import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
-import 'package:tooGoodToWaste/service/user_location_service.dart';
-import 'package:tooGoodToWaste/service/user_service.dart';
 import 'package:tooGoodToWaste/widgets/allergies_picker.dart';
 import 'package:tooGoodToWaste/widgets/category_picker.dart';
+import 'package:tooGoodToWaste/widgets/user_location_aware_widget.dart';
 import '../Pages/post_page.dart';
-import '../dto/user_model.dart';
 import '../service/shared_items_service.dart';
 
 Logger logger = Logger();
@@ -26,85 +24,12 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
-
-  @override
-  Widget build(BuildContext context) {
-    if (FirebaseAuth.instance.currentUser == null) {
-      throw StateError("Trying to access user page without authentication");
-    }
-
-    final UserService userService = UserService();
-
-    var users = [];
-    var postData = [];
-
-    return FutureBuilder(
-        future: userService.getUserData(userId),
-        builder:
-            (BuildContext context, AsyncSnapshot<TGTWUser> userDataSnapshot) {
-          if (userDataSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (userDataSnapshot.hasError) {
-            return Center(
-              child: Text('Error: ${userDataSnapshot.error}'),
-            );
-          }
-
-          final TGTWUser user = userDataSnapshot.requireData;
-
-          return FutureBuilder(
-            future: UserLocationService.getUserLocation(),
-            builder: (BuildContext locationContext,
-                AsyncSnapshot<LocationData> locationDataSnapshot) {
-              if (locationDataSnapshot.connectionState ==
-                  ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (locationDataSnapshot.hasError) {
-                return Center(
-                  child: Text('Error: ${locationDataSnapshot.error}'),
-                );
-              }
-
-              final double? longitude =
-                  locationDataSnapshot.requireData.longitude;
-              final double? latitude =
-                  locationDataSnapshot.requireData.latitude;
-              if (longitude == null) {
-                throw Exception('User longitude is null');
-              }
-              if (latitude == null) {
-                throw Exception('User latitude is null');
-              }
-
-              final GeoPoint userLocation = GeoPoint(latitude, longitude);
-
-              return InnerHomeWidget(userLocation: userLocation);
-            },
-          );
-        });
-  }
-}
-
-class InnerHomeWidget extends StatefulWidget {
-  final GeoPoint userLocation;
-
-  const InnerHomeWidget({super.key, required this.userLocation});
-
-  @override
-  State<StatefulWidget> createState() => _InnerHomeState();
-}
-
-class _InnerHomeState extends State<InnerHomeWidget> {
   final SharedItemService sharedItemService = SharedItemService();
-  final String userId = FirebaseAuth.instance.currentUser!.uid;
 
   double radius = 1;
   ItemCategory? category;
   List<ItemAllergy> allergies = [];
+  List<SharedItem> sharedItems = [];
 
   Future<void> _showRangeDialog() async {
     final double? selectedRadius = await showDialog<double>(
@@ -131,9 +56,10 @@ class _InnerHomeState extends State<InnerHomeWidget> {
   }
 
   Future<void> _showAllergyDialog() async {
-    final List<ItemAllergy>? selectedAllergies = await showDialog<List<ItemAllergy>>(
-        context: context,
-        builder: (context) => AllergiesPicker(initialAllergies: allergies));
+    final List<ItemAllergy>? selectedAllergies =
+        await showDialog<List<ItemAllergy>>(
+            context: context,
+            builder: (context) => AllergiesPicker(initialAllergies: allergies));
 
     if (selectedAllergies != null) {
       setState(() {
@@ -142,20 +68,41 @@ class _InnerHomeState extends State<InnerHomeWidget> {
     }
   }
 
+  void _onMapCreated(GoogleMapController controller) {
+    logger.d('Created Google Map');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
       child: Column(
         children: [
-          const FractionallySizedBox(
-            widthFactor: 1.0,
-            child: SizedBox(
-              height: 200,
-              child: Card(
-                child: Text(
-                    'Here shall be map showing locations of available items'),
+          UserLocationAwareWidget(
+            loader: (BuildContext context) => FractionallySizedBox(
+              widthFactor: 1.0,
+              child: SizedBox(
+                height: 200,
+                child: Container(
+                  color: Theme.of(context).colorScheme.secondaryContainer,
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
               ),
+            ),
+            builder: (BuildContext context, GeoPoint userLocation) =>
+                FractionallySizedBox(
+              widthFactor: 1.0,
+              child: SizedBox(
+                  height: 200,
+                  child: GoogleMap(
+                      onMapCreated: _onMapCreated,
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(
+                            userLocation.latitude, userLocation.longitude),
+                        zoom: 15.0 - radius / 5,
+                      ))),
             ),
           ),
           const SizedBox(
@@ -202,29 +149,34 @@ class _InnerHomeState extends State<InnerHomeWidget> {
               )
             ],
           ),
-          StreamBuilder(
-              stream: sharedItemService.getSharedItemsWithinRadius(
-                  userLocation: widget.userLocation,
-                  radiusInKm: radius,
-                  userId: userId),
-              builder: (BuildContext sharedItemContext,
-                  AsyncSnapshot<SharedItem> sharedItemSnapshot) {
+          UserLocationAwareWidget(
+              builder: (BuildContext context, GeoPoint userLocation) =>
+                  StreamBuilder(
+                      stream: sharedItemService.getSharedItemsWithinRadius(
+                          userLocation: userLocation,
+                          radiusInKm: radius,
+                          userId: userId),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<SharedItem> sharedItemSnapshot) {
+                        if (sharedItemSnapshot.connectionState == ConnectionState.active && sharedItemSnapshot.hasData) {
+                          SharedItem sharedItem = sharedItemSnapshot.data!;
 
-                if (sharedItemSnapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(),);
-                }
-
-                return Expanded(
-                    child: ListView.separated(
-                  itemCount: 0,
-                  itemBuilder: (_, index) {
-                    return Placeholder();
-                  },
-                  separatorBuilder: (_, index) {
-                    return const Divider();
-                  },
-                ));
-              })
+                          logger.d('Got an item: $sharedItem');
+                          sharedItems.add(sharedItem);
+                          return Expanded(
+                              child: ListView.separated(
+                                itemCount: sharedItems.length,
+                                itemBuilder: (_, index) {
+                                  return Post(postData: sharedItems[index]);
+                                },
+                                separatorBuilder: (_, index) {
+                                  return const Divider();
+                                },
+                              ));
+                        } else {
+                          return const Center(child: CircularProgressIndicator(),);
+                        }
+                      }))
         ],
       ),
     );
@@ -279,7 +231,6 @@ class _RadiusPickerState extends State<RadiusPicker> {
   }
 }
 
-
 class SearchBar extends StatelessWidget {
   const SearchBar({super.key});
 
@@ -316,42 +267,35 @@ class Post extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => PostPage(postData: postData)));
-        },
-        style: ButtonStyle(
-          overlayColor: MaterialStatePropertyAll(
-              Theme.of(context).colorScheme.background),
-          textStyle: const MaterialStatePropertyAll(TextStyle(
-            color: Colors.black,
-          )),
-          padding: const MaterialStatePropertyAll(EdgeInsets.zero),
-        ),
-        child: FractionallySizedBox(
-          widthFactor: 1.0,
-          child: Container(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Item name: ${postData.name}',
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                  Text(
-                    'Amount: ${postData.amount.nominal} ${postData.amount.unit}',
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                  Text(
-                    'Distance: {TODO}',
-                    style: const TextStyle(color: Colors.black),
-                  )
-                ],
-              )),
-        ));
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => PostPage(postData: postData)));
+      },
+      child: FractionallySizedBox(
+        widthFactor: 1.0,
+        child: Container(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Item name: ${postData.name}',
+                  style: const TextStyle(color: Colors.black),
+                ),
+                Text(
+                  'Amount: ${postData.amount.nominal} ${postData.amount.unit}',
+                  style: const TextStyle(color: Colors.black),
+                ),
+                Text(
+                  'Distance: ${postData.distance}',
+                  style: const TextStyle(color: Colors.black),
+                )
+              ],
+            )),
+      )
+    );
   }
 }
