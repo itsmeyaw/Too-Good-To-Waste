@@ -5,58 +5,56 @@ import '../dto/shared_item_model.dart';
 
 class SharedItemService {
   static const String COLLECTION = "shared_items";
-  static const String SUB_COLLECTION = "items";
 
   final Logger logger = Logger();
   FirebaseFirestore db = FirebaseFirestore.instance;
 
   SharedItemService.withCustomFirestore({required this.db});
 
-  Future<Iterable<SharedItem?>> getSharedItem(String userUid) async {
-    return await db
+  Future<SharedItem?> getSharedItembyGEO(String sharedItemUid) async {
+    try {
+      await db
           .collection(COLLECTION)
-          .doc(userUid)
-          .collection(SUB_COLLECTION)
+          .doc(sharedItemUid)
           .get()
           .then((querySnapshot) {
-      logger.d('Got ${querySnapshot.size} shared items, converting to item');
-        return querySnapshot.docs.map((doc) => SharedItem.fromJson(doc.data()));
-      });
+        return SharedItem.fromJson(querySnapshot.data() as Map<String, dynamic>);
+        });
+    } catch (e) {
+      logger.e('Got error when getting shared item $sharedItemUid with detail: $e');
+      return null;
+    }
 }
 
 
   Future<bool> updateSharedItem(
-      String userUid, String itemUid, SharedItem newItemData) async {
+      String userUid, String sharedItemUid, SharedItem newItemData) async {
     logger.d(
-        'Updating shared item $itemUid for user $userUid with data ${newItemData.toJson()}');
+        'Updating shared item $sharedItemUid for user $userUid with data ${newItemData.toJson()}');
     return await db
         .collection(COLLECTION)
-        .doc(userUid)
-        .collection(SUB_COLLECTION)
-        .doc(itemUid)
+        .doc(sharedItemUid)
         .set(newItemData.toJson())
         .then((_) {
-      logger.d('Successfully updated item $itemUid for user $userUid');
+      logger.d('Successfully updated item $sharedItemUid for user $userUid');
       return true;
     }).catchError((err) {
-      logger.e('Got error when updating item $itemUid for user $userUid with detail: $err');
+      logger.e('Got error when updating item $sharedItemUid for user $userUid with detail: $err');
       return false;
     });
   }
 
-  Future<bool> deleteSharedItem(String userUid, String itemUid) async {
-    logger.d('Deleting item $itemUid for user $userUid');
+  Future<bool> deleteSharedItem(String userUid, String sharedItemUid) async {
+    logger.d('Deleting item $sharedItemUid for user $userUid');
     return await db
         .collection(COLLECTION)
-        .doc(userUid)
-        .collection(SUB_COLLECTION)
-        .doc(itemUid)
+        .doc(sharedItemUid)
         .delete()
         .then((_) {
-      logger.d('Successfully deleted shared item $itemUid for user $userUid');
+      logger.d('Successfully deleted shared item $sharedItemUid for user $userUid');
       return true;
     }).catchError((err) {
-      logger.e('Got error when deleting shared item $itemUid for user $userUid with detail: $err');
+      logger.e('Got error when deleting shared item $sharedItemUid for user $userUid with detail: $err');
       return false;
     });
   }
@@ -65,8 +63,6 @@ class SharedItemService {
     logger.d('Adding new shared item for user $userUid');
     return await db
         .collection(COLLECTION)
-        // .doc(userUid)
-        // .collection(SUB_COLLECTION)
         .add(newItemData.toJson())
         .then((docRef) {
       logger.d('Successfully added shared item ${docRef.id} for user $userUid');

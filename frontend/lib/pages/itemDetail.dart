@@ -33,7 +33,7 @@ class itemDetailPage extends StatelessWidget {
       categoryIconImagePath = GlobalCateIconMap[foodDetail.category]!;
     }
 
-    Future<dto_user.User> getUserFromDatabase(String uid) async {
+    Future<dto_user.TGTWUser> getUserFromDatabase(String uid) async {
       Logger logger = Logger();
 
       return FirebaseFirestore.instance
@@ -42,7 +42,7 @@ class itemDetailPage extends StatelessWidget {
           .get()
           .then((DocumentSnapshot doc) {
         logger.d('Got data ${doc.data()}');
-        return dto_user.User.fromJson(doc.data() as Map<String, dynamic>);
+        return dto_user.TGTWUser.fromJson(doc.data() as Map<String, dynamic>);
       });
     }
 
@@ -131,7 +131,7 @@ class itemDetailPage extends StatelessWidget {
                   if (currentUser == null) {
                     throw Exception('User is null but want to publish item');
                   } else {
-                    getUserFromDatabase(currentUser.uid).then((dto_user.User userData) {
+                    getUserFromDatabase(currentUser.uid).then((dto_user.TGTWUser userData) {
                       SharedItem sharedItem = SharedItem(
                         name: foodDetail.name,
                         category: foodDetail.category,
@@ -141,7 +141,7 @@ class itemDetailPage extends StatelessWidget {
                         ),
                         buyDate: foodDetail.remainDays,
                         expiryDate: foodDetail.remainDays,                 
-                        location: GeoPoint(
+                        geoPoint: GeoPoint(
                           0.0,
                           0.0,
                         ),

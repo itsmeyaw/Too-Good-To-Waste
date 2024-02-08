@@ -18,6 +18,7 @@ import 'dart:async';
 
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:tooGoodToWaste/widgets/expandableFab.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'itemDetail.dart';
@@ -581,34 +582,58 @@ class _BottomTopScreenState extends State<Inventory>
         ],
       ),
       floatingActionButton:
-          Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-        FloatingActionButton(
-          tooltip: "Add item",
-          onPressed: () {
-            // clear out txt buffer before entering new screen
-            txt.value = const TextEditingValue();
-            //pushAddItemPage();
-            pushAddItemScreen();
-          },
-          child: const Icon(Icons.add),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        FloatingActionButton(
-          onPressed: () => pickImage(false),
-          heroTag: null,
-          child: const Icon(Icons.photo_album),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        FloatingActionButton(
-          onPressed: () => pickImage(true),
-          heroTag: null,
-          child: const Icon(Icons.camera_alt),
-        )
-      ]),
+          ExpandableFab(
+              distance: 112.0,
+              children: [
+            FloatingActionButton(
+              tooltip: "Add item",
+              onPressed: () {
+                // clear out txt buffer before entering new screen
+                txt.value = const TextEditingValue();
+                //pushAddItemPage();
+                pushAddItemScreen();
+              },
+              child: const Icon(Icons.add),
+            ),
+            FloatingActionButton(
+              onPressed: () => pickImage(false),
+              heroTag: null,
+              child: const Icon(Icons.photo_album),
+            ),
+             FloatingActionButton(
+              onPressed: () => pickImage(true),
+              heroTag: null,
+              child: const Icon(Icons.camera_alt),
+            )
+          ]),
+          // Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+          //   FloatingActionButton(
+          //     tooltip: "Add item",
+          //     onPressed: () {
+          //       // clear out txt buffer before entering new screen
+          //       txt.value = const TextEditingValue();
+          //       //pushAddItemPage();
+          //       pushAddItemScreen();
+          //     },
+          //     child: const Icon(Icons.add),
+          //   ),
+          //   const SizedBox(
+          //     height: 10,
+          //   ),
+          //   FloatingActionButton(
+          //     onPressed: () => pickImage(false),
+          //     heroTag: null,
+          //     child: const Icon(Icons.photo_album),
+          //   ),
+          //   const SizedBox(
+          //     height: 10,
+          //   ),
+          //   FloatingActionButton(
+          //     onPressed: () => pickImage(true),
+          //     heroTag: null,
+          //     child: const Icon(Icons.camera_alt),
+          //   )
+          // ]),
     );
   }
 
@@ -1004,7 +1029,7 @@ class _BottomTopScreenState extends State<Inventory>
 
   Widget heightSpacer(double myHeight) => SizedBox(height: myHeight);
 
-   Future<dto_user.User> getUserFromDatabase(String uid) async {
+   Future<dto_user.TGTWUser> getUserFromDatabase(String uid) async {
       Logger logger = Logger();
 
       return FirebaseFirestore.instance
@@ -1013,7 +1038,7 @@ class _BottomTopScreenState extends State<Inventory>
           .get()
           .then((DocumentSnapshot doc) {
         logger.d('Got data ${doc.data()}');
-        return dto_user.User.fromJson(doc.data() as Map<String, dynamic>);
+        return dto_user.TGTWUser.fromJson(doc.data() as Map<String, dynamic>);
       });
     }
 

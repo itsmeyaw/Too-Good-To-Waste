@@ -27,10 +27,10 @@ class TGTWUser extends PublicUser {
     required this.reducedCarbonKg,
   });
 
-  factory TGTWUser.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  factory TGTWUser.fromJson(Map<String, dynamic> json) => _$TGTWUserFromJson(json);
 
   @override
-  Map<String, dynamic> toJson() => _$UserToJson(this);
+  Map<String, dynamic> toJson() => _$TGTWUserToJson(this);
 }
 
 @immutable
