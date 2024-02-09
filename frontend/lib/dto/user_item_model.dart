@@ -6,7 +6,7 @@ part 'user_item_model.g.dart';
 @immutable
 @JsonSerializable(explicitToJson: true)
 class UserItem {
-  //int id;
+  String id;
   String name;
   String category;
   int boughttime;
@@ -18,7 +18,7 @@ class UserItem {
 
 UserItem(
   {
-    //required this.id,
+    required this.id,
     required this.name,
     required this.category,
     required this.boughttime,

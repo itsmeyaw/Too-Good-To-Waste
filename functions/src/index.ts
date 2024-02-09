@@ -28,5 +28,4 @@ export const anotherHelloWorld = onRequest((request, response) => {
 
 export const addUserInventory = onRequest((request, response) => {
   logger.info("Adding new item to user inventory", {structuredData: true});
-
-})
+});

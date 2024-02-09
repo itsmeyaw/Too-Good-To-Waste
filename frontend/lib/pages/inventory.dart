@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -82,7 +84,7 @@ class _BottomTopScreenState extends State<Inventory>
 
   //Create Databse Object
   DBHelper dbhelper = DBHelper();
-  UserItem food = UserItem(name: 'name', category: '', boughttime: -1, expiretime: -1, quantitytype: '', quantitynum: 0.0, consumestate: 0.0, state: 'good');
+  UserItem food = UserItem(id: '', name: 'name', category: '', boughttime: -1, expiretime: -1, quantitytype: '', quantitynum: 0.0, consumestate: 0.0, state: 'good');
   //List food = ['name', '', -1, -1, '', -1.0, -1.0, ''];
 
   //check the primary state of uservalue should be updated or not; if so, update to the latest
@@ -133,6 +135,7 @@ class _BottomTopScreenState extends State<Inventory>
   Future<void> insertItem() async {
     //Insert a new Food butter
     var butter = UserItem(
+        id: '1',
         name: 'butter',
         category: 'cheese',
         boughttime: 154893,
@@ -143,6 +146,7 @@ class _BottomTopScreenState extends State<Inventory>
         state: 'good');
     await dbhelper.insertFood(butter);
     var egg = UserItem(
+        id: '2',
         name: 'eggs',
         category: 'Egg',
         boughttime: 134554,
@@ -408,6 +412,7 @@ class _BottomTopScreenState extends State<Inventory>
         timeNowDate.add(const Duration(days: 7)).millisecondsSinceEpoch;
     print('#########################$expireDate##################');
     var newFood = UserItem(
+        id: Random().nextInt(1000).toString(),
         name: name,
         category: 'Meat',
         boughttime: timeNow,
@@ -1300,6 +1305,7 @@ class _BottomTopScreenState extends State<Inventory>
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () async {
             try {
+            
               food.name = nameController.text;
               food.category = categoryController.text;
               food.boughttime = timeNow;
@@ -1321,22 +1327,26 @@ class _BottomTopScreenState extends State<Inventory>
               addItemName(food.name);
               print(food);
 
-              //Calculate the current state of the new food
-              //well actually i should assume the state of a new food should always be good, unless the user is an idiot
-              //But i'm going to do the calculation anyway
-
-              //insert new data into local sqlite database
-              insertDB(food);
-
-              //insert new data into cloud firebase
+               //insert new data into cloud firebase first and get the auto-generated id
               UserItemService userItemService = UserItemService.withCustomFirestore(db: FirebaseFirestore.instance);
               User? currentUser = FirebaseAuth.instance.currentUser;
 
               if (currentUser == null) {
                 throw Exception('You should Login first!');
               } else {
-                userItemService.addUserItem(currentUser.uid, food);
+                // Future<UserItem?> newUserItem = userItemService.addUserItem(currentUser.uid, food);
+                userItemService.addUserItem(currentUser.uid, food).then((value) => food.id = value!.id);
+
+                  //insert new data into local sqlite database
+                insertDB(food);
               }
+                           
+              //Calculate the current state of the new food
+              //well actually i should assume the state of a new food should always be good, unless the user is an idiot
+              //But i'm going to do the calculation anyway
+
+
+             
               print(
                   '#################################${dbhelper.queryAll('foods')}#####################');
 
