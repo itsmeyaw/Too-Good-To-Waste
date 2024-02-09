@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tooGoodToWaste/dto/message_model.dart';
-import '../dto/user_model.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -14,6 +13,6 @@ class _ChatState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Placeholder();
+    return const Placeholder();
   }
 }

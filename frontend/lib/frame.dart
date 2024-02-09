@@ -4,7 +4,6 @@ import 'package:tooGoodToWaste/Pages/account.dart';
 import 'package:tooGoodToWaste/pages/inventory.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'dart:async';
-import 'package:tooGoodToWaste/dto/user_item_model.dart';
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 
 class Frame extends StatefulWidget {
@@ -218,7 +217,7 @@ class _FrameState extends State<Frame> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: const Text('Too Good To Waste'),
-          actions: [],
+          actions: const [],
         ),
         body: Container(
           child: _getPage(currentPage),

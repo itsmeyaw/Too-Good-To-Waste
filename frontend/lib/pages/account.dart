@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -217,12 +215,12 @@ class AccountSettingPage extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                       height: MediaQuery.of(context).size.height,
-                      child: ListView(children: [
-                        const SizedBox(
+                      child: ListView(children: const [
+                        SizedBox(
                           height: 10,
                         ),
 
-                        const SizedBox(
+                        SizedBox(
                           height: 20,
                         ),
                       ]),

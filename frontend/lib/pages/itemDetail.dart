@@ -6,15 +6,12 @@ import 'package:tooGoodToWaste/dto/user_item_detail_model.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import 'package:tooGoodToWaste/service/shared_item_service.dart';
-import 'package:tooGoodToWaste/pages/account.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:tooGoodToWaste/dto/public_user_model.dart';
 import 'package:tooGoodToWaste/service/user_item_service.dart';
 import '../dto/user_name_model.dart';
 import '../dto/user_item_amount_model.dart';
-import '../util/geo_point_converter.dart';
 
 class itemDetailPage extends StatelessWidget {
   const itemDetailPage({super.key, required this.foodDetail});
@@ -96,26 +93,26 @@ class itemDetailPage extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
       ),
-      child: Container(
+      child: SizedBox(
         height: 200,
         child: Column(
           children: <Widget>[
-            Padding(
+            const Padding(
               padding: EdgeInsets.all(10.0),
               child: Text('Please enter the location for picking up:'),
             ),
             Padding(
-              padding: EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(10.0),
               child: TextField(
                 controller: locationController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Location',
                 ),
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(10.0),
               child: ElevatedButton(
                 onPressed: () {
                   //Extract Location information
@@ -141,7 +138,7 @@ class itemDetailPage extends StatelessWidget {
                         ),
                         buyDate: foodDetail.remainDays,
                         expiryDate: foodDetail.remainDays,                 
-                        geoPoint: GeoPoint(
+                        geoPoint: const GeoPoint(
                           0.0,
                           0.0,
                         ),
@@ -166,7 +163,7 @@ class itemDetailPage extends StatelessWidget {
                   Navigator.of(context, rootNavigator: true).pop();
                   Navigator.pop(context);
                 },
-                child: Text('Submit'),
+                child: const Text('Submit'),
               ),
             )
           ],
@@ -246,7 +243,7 @@ class itemDetailPage extends StatelessWidget {
             }
           },
           tooltip: 'Publish Item',
-          label: Text('Publish Item'),
+          label: const Text('Publish Item'),
           icon: const Icon(Icons.add),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -308,25 +305,25 @@ class DetailsList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
             Expanded(
               child: Card(
                 child: ListTile(
                   contentPadding:
-                      EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                      const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                   leading: Container(
-                    padding: EdgeInsets.only(right: 12.0),
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.only(right: 12.0),
+                    decoration: const BoxDecoration(
                         border: Border(right: BorderSide(width: 1.0))),
                     child: Image(
-                      image: AssetImage("$imagePth"),
+                      image: AssetImage(imagePth),
                       width: 32,
                       height: 32,
                     ),
                   ),
-                  title: Text(
+                  title: const Text(
                     'Storage Now:',
                     style: TextStyle(fontSize: 25),
                   ),
@@ -339,28 +336,28 @@ class DetailsList extends StatelessWidget {
                ),
               ),
             ),
-            Divider(),
+            const Divider(),
             Expanded(
               child: Card(
                child: ListTile(
                   contentPadding:
-                      EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                      const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                   leading: Container(
-                    padding: EdgeInsets.only(right: 12.0),
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.only(right: 12.0),
+                    decoration: const BoxDecoration(
                         border: Border(right: BorderSide(width: 1.0))),
                     child: Image(
-                      image: AssetImage("$imagePth"),
+                      image: AssetImage(imagePth),
                       width: 32,
                       height: 32,
                     ),
                   ),
-                  title: Text(
+                  title: const Text(
                     'Category:',
                     style: TextStyle(fontSize: 25),
                   ),
                   // subtitle: Text("Expired in $expire days", style: TextStyle(fontStyle: FontStyle.italic),),
-                  trailing: Text("$category",
+                  trailing: Text(category,
                       style: const TextStyle(
                         fontFamily: 'Roboto',
                         fontSize: 24,
@@ -368,23 +365,23 @@ class DetailsList extends StatelessWidget {
                ),
               ),
             ),
-            Divider(),
+            const Divider(),
             Expanded(
               child: Card(
                child: ListTile(
                   contentPadding:
-                      EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                      const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                   leading: Container(
-                    padding: EdgeInsets.only(right: 12.0),
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.only(right: 12.0),
+                    decoration: const BoxDecoration(
                         border: Border(right: BorderSide(width: 1.0))),
                     child: Image(
-                      image: AssetImage("$imagePth"),
+                      image: AssetImage(imagePth),
                       width: 32,
                       height: 32,
                     ),
                   ),
-                  title: Text(
+                  title: const Text(
                     'Expires in:',
                     style: TextStyle(fontSize: 25),
                   ),

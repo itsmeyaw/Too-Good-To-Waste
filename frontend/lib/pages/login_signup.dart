@@ -297,7 +297,7 @@ class SignUpInformationPage extends StatefulWidget {
 
 class _SignUpInformationState extends State<SignUpInformationPage> {
   var logger = Logger();
-  bool _isPasswordObscured = true;
+  final bool _isPasswordObscured = true;
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -526,8 +526,8 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
                             zipCode: _zipCodeController.value.text,
                             city: _cityController.value.text,
                             country: _countryController.value.text),
-                        allergies: [],
-                        chatroomIds: [],
+                        allergies: const [],
+                        chatroomIds: const [],
                         goodPoints: 0,
                         reducedCarbonKg: 0.0);
 
@@ -586,7 +586,7 @@ class _VerifyPhoneState extends State<VerifyPhonePage> {
   String? _phoneNumber;
   int? _resendToken;
   PhoneVerificationStatus _verificationStatus = PhoneVerificationStatus.init;
-  TextEditingController _userCodeController = TextEditingController();
+  final TextEditingController _userCodeController = TextEditingController();
   PhoneAuthCredential? _cred;
   final Logger logger = Logger();
 

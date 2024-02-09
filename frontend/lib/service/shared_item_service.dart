@@ -24,6 +24,7 @@ class SharedItemService {
       logger.e('Got error when getting shared item $sharedItemUid with detail: $e');
       return null;
     }
+    return null;
 }
 
 

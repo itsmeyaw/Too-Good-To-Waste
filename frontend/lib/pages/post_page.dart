@@ -1,9 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:tooGoodToWaste/dto/user_item_amount_model.dart';
 import '../dto/shared_item_model.dart';
-import '../service/shared_items_service.dart';
 
 class PostPage extends StatelessWidget {
   final SharedItem postData;
@@ -19,7 +15,7 @@ class PostPage extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: const Text('Shared Item Information'),
-          actions: [],
+          actions: const [],
         ),
         body: Container(
             padding: const EdgeInsets.all(10),
@@ -50,7 +46,7 @@ class PostPage extends StatelessWidget {
                 const Spacer(),
                 FilledButton(
                     onPressed: () {},
-                    child: FractionallySizedBox(
+                    child: const FractionallySizedBox(
                       widthFactor: 1,
                       child: Text(
                         'Chat with ', // TODO: Insert user name here

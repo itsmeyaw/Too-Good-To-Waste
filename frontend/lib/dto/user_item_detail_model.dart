@@ -1,7 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:flutter/material.dart';
-import './user_item_amount_model.dart';
-import './user_item_expiry_model.dart';
 
 
 @immutable
