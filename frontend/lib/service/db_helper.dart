@@ -29,36 +29,13 @@ class DBHelper {
     return openDatabase(path, version: 1,
         onCreate: (Database db, int newerVersion) async {
       await db.execute(
-        'CREATE TABLE users(name TEXT PRIMARY KEY, positive INTEGER, negative INTEGER, primarystate TEXT, secondarystate TEXT, secondaryevent TEXT, thirdstate TEXT, state TEXT, species TEXT, childrennum INTEGER, fatherstate TEXT, motherstate TEXT, time INTEGER)',
+        'CREATE TABLE users(id TEXT PRIMARY KEY, name TEXT, positive INTEGER, negative INTEGER, primarystate TEXT, secondarystate TEXT, secondaryevent TEXT, thirdstate TEXT, state TEXT, species TEXT, childrennum INTEGER, fatherstate TEXT, motherstate TEXT, time INTEGER)',
       );
       await db.execute(
-          'CREATE TABLE foods(name TEXT PRIMARY KEY, category TEXT, buy_date INTEGER, expiry_date INTEGER, quantity_type TEXT, quantity_num REAL, state TEXT, consume_state REAL)');
+          'CREATE TABLE foods(id TEXT PRIMARY KEY, name TEXT, category TEXT, buy_date INTEGER, expiry_date INTEGER, quantity_type TEXT, quantity_num REAL, state TEXT, consume_state REAL)');
     });
   }
 
-/*
-  //Open the database and store the reference.
-  final database = openDatabase(
-    //Set the path to the database. Use the 'join' function from the 
-    //'path' package is best practice to ensure the path is correctly 
-    //constructed for each platform.
-    join(getDatabasesPath(), 'project_database.db'),
-
-    //when the database is first created, create a table to store foods.
-    onCreate: (db, version) {
-      //run the CREATE TABLE statement on the database
-      db.execute('CREATE TABLE users(name TEXT PRIMARY KEY, positive INTEGER, negative INTEGER, primarystate TEXT, secondarystate TEXT, secondaryevent TEXT, thirdstate TEXT, state TEXT, species TEXT, childrennum INTEGER, fatherstate TEXT, motherstate TEXT, time INTEGER)',);
-      return db.execute(  
-        'CREATE TABLE foods(id INTEGER PRIMARY KEY, name TEXT, category TEXT, boughttime INTEGER, expiretime INTEGER, quantitytype TEXT, quantitynum INTEGER, state TEXT, consumestate REAL)',
-          //'boughttime INTERGER DEFAULT (cast(strftime("%s","now") as int)),'
-          //'expiretime INTERGER DEFAULT (cast(strftime("%s","now") as int)),'
-      );
-    },
-    //Set the version, this executes the onCreate function and provides a
-    //path to perform database upgrades and downgrades.
-    version: 1,
-  );
-  */
 
   //Define the function that inserts food into the 'foods' table
   Future<void> insertFood(UserItem food) async {
@@ -120,7 +97,7 @@ class DBHelper {
 
       return List.generate(maps.length, (i) {
         return UserItem(
-          //id: maps[i]['id'],
+          id: maps[i]['id'],
           name: maps[i]['name'],
           category: maps[i]['category'],
           boughtTime: maps[i]['buy_date'],
@@ -169,7 +146,7 @@ class DBHelper {
       //shoud be only one row, how to simplfy the code?
       return List.generate(maps.length, (i) {
         return UserItem(
-          //id: maps[0]['id'],
+          id: maps[0]['id'],
           name: maps[0]['name'],
           category: maps[0]['category'],
           boughtTime: maps[0]['buy_date'],
@@ -235,6 +212,8 @@ class DBHelper {
 
     return foodsname;
   }
+
+  //TODO!!!!!!!!
 
   Future<String> getOneFoodValue(String name, String value) async {
     //Get a reference to the database.
@@ -310,7 +289,7 @@ class DBHelper {
 
     return List.generate(maps.length, (i) {
       return UserItem(
-        //id: maps[i]['id'],
+        id: maps[i]['id'],
         name: maps[i]['name'],
         category: maps[i]['category'],
         boughtTime: maps[i]['buy_date'],
@@ -374,7 +353,7 @@ class DBHelper {
     //Query table for all the foods.
 
     final List<Map<String, dynamic>> maps = await dbHelper.query('foods',
-        columns: [value], where: 'consumestate < 1.0');
+        columns: [value], where: 'consume_state < 1.0');
 
     //Convert the List<Map<String, dynamic> into a List<String>
     var foodsdouble = List<double>.generate(maps.length, (i) => maps[i][value]);
@@ -439,7 +418,7 @@ class DBHelper {
 
     return List.generate(maps.length, (i) {
       return UserItem(
-        //id: maps[i]['id'],
+        id: maps[i]['id'],
         name: maps[i]['name'],
         category: maps[i]['category'],
         boughtTime: maps[i]['buy_date'],
@@ -464,7 +443,7 @@ class DBHelper {
 
     return List.generate(maps.length, (i) {
       return UserItem(
-        //id: maps[i]['id'],
+        id: maps[i]['id'],
         name: maps[i]['name'],
         category: maps[i]['category'],
         boughtTime: maps[i]['buy_date'],
@@ -585,6 +564,7 @@ class DBHelper {
 
     //Insert a new Food butter
     var butter = UserItem(
+        id: '5d0osYynsfbVICrewrwr',
         name: 'milk',
         category: 'MilkProduct',
         boughtTime: 154893,
@@ -594,6 +574,7 @@ class DBHelper {
         consumeState: 0.50,
         state: 'good');
     var egg = UserItem(
+        id: '5d0osYbVICrgaregvdfg',
         name: 'beaf',
         category: 'Meat',
         boughtTime: 134554,
