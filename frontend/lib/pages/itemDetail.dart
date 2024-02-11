@@ -5,7 +5,7 @@ import 'package:tooGoodToWaste/dto/shared_item_model.dart';
 import 'package:tooGoodToWaste/dto/user_item_detail_model.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
-import 'package:tooGoodToWaste/service/shared_item_service.dart';
+import 'package:tooGoodToWaste/service/shared_items_service.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tooGoodToWaste/dto/public_user_model.dart';
