@@ -15,6 +15,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import 'package:tooGoodToWaste/dto/item_allergies_enum.dart';
 import 'package:tooGoodToWaste/dto/item_category_enum.dart';
+import 'package:tooGoodToWaste/pages/home.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'dart:async';
@@ -84,7 +85,7 @@ class _BottomTopScreenState extends State<Inventory>
 
   //Create Databse Object
   DBHelper dbhelper = DBHelper();
-  UserItem food = UserItem(id: '', name: 'name', category: '', boughtTime: -1, expireTime: -1, quantityType: '', quantityNum: 0.0, consumeState: 0.0, state: 'good');
+  UserItem food = UserItem(id: '', name: '', category: '', boughtTime: -1, expireTime: -1, quantityType: '', quantityNum: 0.0, consumeState: 0.0, state: 'good');
   //List food = ['name', '', -1, -1, '', -1.0, -1.0, ''];
 
   //check the primary state of uservalue should be updated or not; if so, update to the latest
@@ -163,13 +164,9 @@ class _BottomTopScreenState extends State<Inventory>
     //print(await dbhelper.queryAll("foods"));
   }
 
-  Future<void> insertDB(UserItem food) async {
-    //var maxId = await dbhelper.getMaxId();
-    //print('##########################MaxID = $maxId###############################');
-    //maxId = maxId + 1;
-
+  Future<void> inserDB(UserItem food) async {
+    //Insert a new UserValue instance
     await dbhelper.insertFood(food);
-    // print(await dbhelper.queryAll('foods'));
   }
 
   Future<List<dynamic>> getAllItems(String dbname) async {
@@ -224,7 +221,7 @@ class _BottomTopScreenState extends State<Inventory>
 
   Future<List<DateTime>> getItemExpiringTime() async {
     List<int> expire =
-        await dbhelper.getAllUncosumedFoodIntValues('expiretime');
+        await dbhelper.getAllUncosumedFoodIntValues('expiry_date');
     var expireDate = List<DateTime>.generate(
         expire.length, (i) => DateTime.fromMillisecondsSinceEpoch(expire[i]));
     return expireDate;
@@ -232,7 +229,7 @@ class _BottomTopScreenState extends State<Inventory>
 
   Future<List<DateTime>> getItemBoughtTime() async {
     List<int> boughttime =
-        await dbhelper.getAllUncosumedFoodIntValues('boughttime');
+        await dbhelper.getAllUncosumedFoodIntValues('buy_date');
     var boughtDate = List<DateTime>.generate(boughttime.length,
         (i) => DateTime.fromMillisecondsSinceEpoch(boughttime[i]));
     return boughtDate;
@@ -250,7 +247,7 @@ class _BottomTopScreenState extends State<Inventory>
 
   Future<void> addItemExpi(value) async {
     List<int> expires =
-        await dbhelper.getAllUncosumedFoodIntValues('expiretime');
+        await dbhelper.getAllUncosumedFoodIntValues('expiry_date');
     print(expires);
 
     setState(() {
@@ -274,11 +271,9 @@ class _BottomTopScreenState extends State<Inventory>
     var updatedFood = await dbhelper.queryOne('foods', name);
     print(updatedFood);
     if (attribute == 'consumed') {
-      //var consumedFoodUpdate = Food(id: id, name: name, category: updatedFood[0].category, boughttime: updatedFood[0].boughttime, expiretime: updatedFood[0].expiretime, quantitytype: updatedFood[0].quantitytype, quantitynum: 0, consumestate: 1.0, state: 'consumed');
-      await dbhelper.updateFoodConsumed(name, 'consumed');
+       await dbhelper.updateFoodConsumed(name, 'consumed');
       print(await dbhelper.queryAll('foods'));
     } else {
-      //var wastedFoodUpdate = Food(id: id, name: name, category: updatedFood[0].category, boughttime: updatedFood[0].boughttime, expiretime: updatedFood[0].expiretime, quantitytype: updatedFood[0].quantitytype, quantitynum: updatedFood[0].quantitynum, consumestate: 1.0, state: 'wasted');
       await dbhelper.updateFoodWaste(name);
       print(await dbhelper.queryAll('foods'));
     }
@@ -639,11 +634,11 @@ class _BottomTopScreenState extends State<Inventory>
     return FutureBuilder(
         future: Future.wait([
           getWasteItemString('name'),
-          //getWasteItemInt('expiretime'),
+          //getWasteItemInt('expiry_date'),
           getWasteItemDouble('quantity_num'),
           getWasteItemString('quantity_type'),
           getWasteItemString('category'),
-          //getWasteItemInt('boughttime'),
+          //getWasteItemInt('buy_date'),
         ]),
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
           if (!snapshot.hasData) {
@@ -1045,22 +1040,27 @@ class _BottomTopScreenState extends State<Inventory>
     }
   }
 
+  Future<void> addItemAndAssignId(UserItemService userItemService, String userId, UserItem food) async {
+  var id = await userItemService.addUserItem(userId, food);
+
+  // If the initial value is null, keep fetching until a non-null value is received
+  while (id == null) {
+    print('Waiting for the new item to be created in Cloud Firestore...');
+    await Future.delayed(const Duration(seconds: 1));
+    id = await userItemService.addUserItem(userId, food);
+  }
+
+  // Once a non-null value is received, assign it to food.id
+  food.id = id;
+}
+
+
   /// opens add new item screen
   void pushAddItemScreen() {
     //String date = dateToday.toString().substring(0, 10);
     Color color = Theme.of(context).primaryColor;
     const double padding = 15;
 
-    // final category = [
-    //   "Vegetable",
-    //   "Meat",
-    //   "Fruit",
-    //   "Milk Product",
-    //   "Milk",
-    //   "Sea Food",
-    //   "Egg",
-    //   "Others"
-    // ];
     categoryController.text = 'Vegetable';
     quanTypeController.text = 'g';
     // List<Widget> categortyList =
@@ -1314,7 +1314,7 @@ class _BottomTopScreenState extends State<Inventory>
               food.quantityNum = double.parse(quanNumController.text);
               food.consumeState = 0.0;
               food.state = 'good';
-              print(food);
+              logger.f( 'food: $food');
               //var quantityNum = int.parse(quanNumController.text);
               //接上InputPage裏DateTime時間組件，再轉化成timestamp存進數據庫
               //var expiretime = int.parse(expireTimeController.text);
@@ -1325,7 +1325,7 @@ class _BottomTopScreenState extends State<Inventory>
               var remainExpireDays = expireDays.difference(timeNowDate).inDays;
               addItemExpi(remainExpireDays);
               addItemName(food.name);
-              print(food);
+           
 
                //insert new data into cloud firebase first and get the auto-generated id
               UserItemService userItemService = UserItemService.withCustomFirestore(db: FirebaseFirestore.instance);
@@ -1334,25 +1334,23 @@ class _BottomTopScreenState extends State<Inventory>
               if (currentUser == null) {
                 throw Exception('You should Login first!');
               } else {
-                // Future<UserItem?> newUserItem = userItemService.addUserItem(currentUser.uid, food);
-                userItemService.addUserItem(currentUser.uid, food).then((value) => food.id = value!.id);
-
+                
+                await addItemAndAssignId(userItemService, currentUser.uid, food);
+  
+                logger.d(food);
                   //insert new data into local sqlite database
-                insertDB(food);
+                await inserDB(food);
+               // await dbhelper.insertFood(food);
+               
               }
                            
               //Calculate the current state of the new food
               //well actually i should assume the state of a new food should always be good, unless the user is an idiot
               //But i'm going to do the calculation anyway
 
+              await getAllItems('foods').then((value) => print("##################$value#################"));
 
-             
-              print(
-                  '#################################${dbhelper.queryAll('foods')}#####################');
 
-              //user positive value add 1
-              //var user1 = dbhelper.queryAll('users');
-              updateUserValue('positive');
             } on FormatException {
               print('Format Error!');
             }

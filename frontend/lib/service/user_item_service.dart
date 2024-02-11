@@ -60,7 +60,7 @@ class UserItemService {
     });
   }
 
-  Future<UserItem?> addUserItem(String userUid, UserItem newItemData) async {
+  Future<String?> addUserItem(String userUid, UserItem newItemData) async {
     logger.d('Adding new item for user $userUid');
     return await db
         .collection(COLLECTION)
@@ -69,7 +69,7 @@ class UserItemService {
         .add(newItemData.toJson())
         .then((docRef) {
       logger.d('Successfully added item ${docRef.id} for user $userUid');
-      return newItemData;
+      return docRef.id;
     }).catchError((err) {
       logger.e('Got error when adding item for user $userUid with detail: $err');
       return null;

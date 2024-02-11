@@ -33,7 +33,7 @@ UserItem(
   //of the columns in the databse.
   Map<String, dynamic> toMap() {
     return {
-      //'id': id,
+      'id': id,
       'name': name,
       'category': category,
       'buy_date': boughtTime,
@@ -49,7 +49,7 @@ UserItem(
   //each food when using the print statement
   @override
   String toString() {
-    return 'UserItem{name: $name, category: $category, buy_date: $boughtTime, expiry_date: $expireTime, quantity_type: $quantityType, quantity_num: $quantityNum, state: $state, consume_state: $consumeState}';
+    return 'UserItem{id: $id, name: $name, category: $category, buy_date: $boughtTime, expiry_date: $expireTime, quantity_type: $quantityType, quantity_num: $quantityNum, state: $state, consume_state: $consumeState}';
   }
 
   factory UserItem.fromJson(Map<String, dynamic> json) =>

@@ -36,29 +36,6 @@ class DBHelper {
     });
   }
 
-/*
-  //Open the database and store the reference.
-  final database = openDatabase(
-    //Set the path to the database. Use the 'join' function from the 
-    //'path' package is best practice to ensure the path is correctly 
-    //constructed for each platform.
-    join(getDatabasesPath(), 'project_database.db'),
-
-    //when the database is first created, create a table to store foods.
-    onCreate: (db, version) {
-      //run the CREATE TABLE statement on the database
-      db.execute('CREATE TABLE users(name TEXT PRIMARY KEY, positive INTEGER, negative INTEGER, primarystate TEXT, secondarystate TEXT, secondaryevent TEXT, thirdstate TEXT, state TEXT, species TEXT, childrennum INTEGER, fatherstate TEXT, motherstate TEXT, time INTEGER)',);
-      return db.execute(  
-        'CREATE TABLE foods(id INTEGER PRIMARY KEY, name TEXT, category TEXT, boughttime INTEGER, expiretime INTEGER, quantitytype TEXT, quantitynum INTEGER, state TEXT, consumestate REAL)',
-          //'boughttime INTERGER DEFAULT (cast(strftime("%s","now") as int)),'
-          //'expiretime INTERGER DEFAULT (cast(strftime("%s","now") as int)),'
-      );
-    },
-    //Set the version, this executes the onCreate function and provides a
-    //path to perform database upgrades and downgrades.
-    version: 1,
-  );
-  */
 
   //Define the function that inserts food into the 'foods' table
   Future<void> insertFood(UserItem food) async {
@@ -376,7 +353,7 @@ class DBHelper {
     //Query table for all the foods.
 
     final List<Map<String, dynamic>> maps = await dbHelper.query('foods',
-        columns: [value], where: 'consumestate < 1.0');
+        columns: [value], where: 'consume_state < 1.0');
 
     //Convert the List<Map<String, dynamic> into a List<String>
     var foodsdouble = List<double>.generate(maps.length, (i) => maps[i][value]);
