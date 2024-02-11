@@ -35,53 +35,6 @@ class SharedItemService {
       return false;
     });
   }
-  
-  Future<SharedItem?> addSharedItem(String userUid, SharedItem newItemData) async {
-    logger.d('Adding new shared item for user $userUid');
-    return await db
-        .collection(COLLECTION)
-        .add(newItemData.toJson())
-        .then((docRef) {
-      logger.d('Successfully added shared item ${docRef.id} for user $userUid');
-      return newItemData;
-    }).catchError((err) {
-      logger.e('Got error when adding shared item for user $userUid with detail: $err');
-      return newItemData;
-    });
-  }
-
-  Future<bool> deleteSharedItem(String userUid, String sharedItemUid) async {
-    logger.d('Deleting item $sharedItemUid for user $userUid');
-    return await db
-        .collection(COLLECTION)
-        .doc(sharedItemUid)
-        .delete()
-        .then((_) {
-      logger.d('Successfully deleted shared item $sharedItemUid for user $userUid');
-      return true;
-    }).catchError((err) {
-      logger.e('Got error when deleting shared item $sharedItemUid for user $userUid with detail: $err');
-      return false;
-    });
-  }
-
-  Future<bool> updateSharedItem(
-      String userUid, String sharedItemUid, SharedItem newItemData) async {
-    logger.d(
-        'Updating shared item $sharedItemUid for user $userUid with data ${newItemData.toJson()}');
-    return await db
-        .collection(COLLECTION)
-        .doc(sharedItemUid)
-        .set(newItemData.toJson())
-        .then((_) {
-      logger.d('Successfully updated item $sharedItemUid for user $userUid');
-      return true;
-    }).catchError((err) {
-      logger.e('Got error when updating item $sharedItemUid for user $userUid with detail: $err');
-      return false;
-    });
-  }
-
 
   Iterable<SharedItem> _createSharedItemList(
       List<DocumentSnapshot<Object?>> docList) sync* {
