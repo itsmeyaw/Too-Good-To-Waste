@@ -1,28 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:tooGoodToWaste/dto/public_user_model.dart';
+import 'package:tooGoodToWaste/util/geo_point_converter.dart';
 
 import './user_item_amount_model.dart';
-import '../util/geo_point_converter.dart';
 
 part 'shared_item_model.g.dart';
 
-@immutable
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable()
 class SharedItem {
   final UserItemAmount amount;
   final int buyDate;
-  final int expiryDate;
+  final int expireDate;
   final String itemRef;
-  @GeoPointConverter()
-  final GeoPoint geoPoint;
   final String name;
   final String category;
-  final PublicUser user;
+  final String user;
 
-  @JsonKey(includeToJson: false, defaultValue: {})
-  Map<String, dynamic> location = {};
+  @JsonKey(includeToJson: false)
+  SharedItemLocation location = SharedItemLocation.defaultValue();
 
   @JsonKey(includeToJson: false, defaultValue: double.infinity)
   double distance = double.infinity;
@@ -30,9 +25,8 @@ class SharedItem {
   SharedItem(
       {required this.amount,
       required this.buyDate,
-      required this.expiryDate,
+      required this.expireDate,
       required this.itemRef,
-      required this.geoPoint,
       required this.name,
       required this.category,
       required this.user});
@@ -41,4 +35,19 @@ class SharedItem {
       _$SharedItemFromJson(json);
 
   Map<String, dynamic> toJson() => _$SharedItemToJson(this);
+}
+
+class SharedItemLocation {
+  final String geohash;
+  final GeoPoint geopoint;
+
+  factory SharedItemLocation.defaultValue() =>
+      SharedItemLocation(geohash: '', geopoint: const GeoPoint(0, 0));
+
+  SharedItemLocation({required this.geohash, required this.geopoint});
+
+  factory SharedItemLocation.fromJson(Map<String, dynamic> json) =>
+      SharedItemLocation(
+          geohash: json['geohash'] as String,
+          geopoint: json['geopoint'] as GeoPoint);
 }

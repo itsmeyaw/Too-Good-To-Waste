@@ -29,7 +29,7 @@ class _HomeState extends State<Home> {
   double radius = 1;
   ItemCategory? category;
   List<ItemAllergy> allergies = [];
-  List<SharedItem> sharedItems = [];
+  List<SharedItem?> sharedItems = [];
 
   Future<void> _showRangeDialog() async {
     final double? selectedRadius = await showDialog<double>(
@@ -157,17 +157,21 @@ class _HomeState extends State<Home> {
                           radiusInKm: radius,
                           userId: userId),
                       builder: (BuildContext context,
-                          AsyncSnapshot<SharedItem> sharedItemSnapshot) {
+                          AsyncSnapshot<List<DocumentSnapshot>> sharedItemSnapshot) {
                         if (sharedItemSnapshot.connectionState == ConnectionState.active && sharedItemSnapshot.hasData) {
-                          SharedItem sharedItem = sharedItemSnapshot.data!;
+                          if (sharedItemSnapshot.data != null) {
+                            sharedItems.addAll(sharedItemService.createSharedItemList(sharedItemSnapshot.data!));
+                          }
 
-                          logger.d('Got an item: $sharedItem');
-                          sharedItems.add(sharedItem);
                           return Expanded(
                               child: ListView.separated(
                                 itemCount: sharedItems.length,
                                 itemBuilder: (_, index) {
-                                  return Post(postData: sharedItems[index]);
+                                  if (sharedItems[index] != null) {
+                                    logger.d('Got items: ${sharedItems[index]!.toJson()}');
+                                    return Post(postData: sharedItems[index]!);
+                                  }
+                                  return null;
                                 },
                                 separatorBuilder: (_, index) {
                                   return const Divider();

@@ -36,16 +36,19 @@ class SharedItemService {
     });
   }
 
-  Iterable<SharedItem> _createSharedItemList(
-      List<DocumentSnapshot<Object?>> docList) sync* {
-    for (var obj in docList) {
-      if (obj.exists) {
-        yield SharedItem.fromJson(obj.data() as Map<String, dynamic>);
+  List<SharedItem?> createSharedItemList(
+      List<DocumentSnapshot<Object?>> docList) {
+    return docList.map((e) {
+      if (e.exists) {
+        logger.d('Converting shared item data: ${e.data() as Map<String, dynamic>}');
+        return SharedItem.fromJson(e.data() as Map<String, dynamic>);
+      } else {
+        return null;
       }
-    }
+    }).toList();
   }
 
-  Stream<SharedItem> getSharedItemsWithinRadius(
+  Stream<List<DocumentSnapshot>> getSharedItemsWithinRadius(
       {required GeoPoint userLocation,
       required double radiusInKm,
       required String userId,
@@ -63,10 +66,6 @@ class SharedItemService {
             center: GeoFirePoint(userLocation.latitude, userLocation.longitude),
             radius: radiusInKm,
             field: "location",
-            strictMode: true)
-        .expand((docList) {
-          logger.d('Got results: ${docList.length}');
-          return _createSharedItemList(docList);
-    });
+            strictMode: true);
   }
 }

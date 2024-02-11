@@ -11,17 +11,8 @@ class UserItemAmount {
 
   const UserItemAmount({required this.nominal, required this.unit});
 
-  UserItemAmount.fromJson(Map<String, Object?> json)
-      : this(
-          nominal: json['nominal']! as double,
-          unit: json['unit']! as String,
-        );
+  factory UserItemAmount.fromJson(Map<String, dynamic> json) =>
+   _$UserItemAmountFromJson(json);
 
-  // factory UserItemAmount.fromJson(Map<String, dynamic> json) =>
-  //     _$UserItemAmountFromJson(json);
-
-  // Map<String, dynamic> toJson() => _$UserItemAmountToJson(this);
-  Map<String, Object?> toJson() {
-    return {'nominal': nominal, 'unit': unit};
-  }
+  Map<String, dynamic> toJson() => _$UserItemAmountToJson(this);
 }
