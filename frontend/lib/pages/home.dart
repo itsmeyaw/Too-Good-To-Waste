@@ -6,6 +6,7 @@ import 'package:logger/logger.dart';
 import 'package:tooGoodToWaste/dto/item_allergies_enum.dart';
 import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
+import 'package:tooGoodToWaste/util/geo_utils.dart';
 import 'package:tooGoodToWaste/widgets/allergies_picker.dart';
 import 'package:tooGoodToWaste/widgets/category_picker.dart';
 import 'package:tooGoodToWaste/widgets/user_location_aware_widget.dart';
@@ -29,7 +30,11 @@ class _HomeState extends State<Home> {
   double radius = 1;
   ItemCategory? category;
   List<ItemAllergy> allergies = [];
-  List<SharedItem?> sharedItems = [];
+  List<SharedItem> sharedItems = [];
+
+  void _resetSharedItems() {
+    sharedItems = [];
+  }
 
   Future<void> _showRangeDialog() async {
     final double? selectedRadius = await showDialog<double>(
@@ -38,6 +43,7 @@ class _HomeState extends State<Home> {
 
     if (selectedRadius != null) {
       setState(() {
+        _resetSharedItems();
         radius = selectedRadius;
       });
     }
@@ -50,6 +56,7 @@ class _HomeState extends State<Home> {
 
     if (selectedCategory != null) {
       setState(() {
+        _resetSharedItems();
         category = selectedCategory;
       });
     }
@@ -63,6 +70,7 @@ class _HomeState extends State<Home> {
 
     if (selectedAllergies != null) {
       setState(() {
+        _resetSharedItems();
         allergies = selectedAllergies;
       });
     }
@@ -160,7 +168,13 @@ class _HomeState extends State<Home> {
                           AsyncSnapshot<List<DocumentSnapshot>> sharedItemSnapshot) {
                         if (sharedItemSnapshot.connectionState == ConnectionState.active && sharedItemSnapshot.hasData) {
                           if (sharedItemSnapshot.data != null) {
-                            sharedItems.addAll(sharedItemService.createSharedItemList(sharedItemSnapshot.data!));
+                            List<SharedItem?> results = sharedItemService.createSharedItemList(sharedItemSnapshot.data!);
+                            for (var res in results) {
+                              if (res != null) {
+                                res.distance = GeoUtils.calculateDistance(userLocation, res.location.geopoint);
+                                sharedItems.add(res);
+                              }
+                            }
                           }
 
                           return Expanded(
@@ -294,7 +308,7 @@ class Post extends StatelessWidget {
                   style: const TextStyle(color: Colors.black),
                 ),
                 Text(
-                  'Distance: ${postData.distance}',
+                  'Distance: ${postData.distance} m',
                   style: const TextStyle(color: Colors.black),
                 )
               ],

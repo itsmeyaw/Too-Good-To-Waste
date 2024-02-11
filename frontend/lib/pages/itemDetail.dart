@@ -93,11 +93,11 @@ class itemDetailPage extends StatelessWidget {
   showLocationDialog(){
     // BuildContext dialogContext;
     Dialog dialog = Dialog(
-      
+
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
       ),
-       child: 
+       child:
       //   children: [
           UserLocationAwareWidget(
             loader: (BuildContext context) => FractionallySizedBox(
@@ -112,7 +112,7 @@ class itemDetailPage extends StatelessWidget {
                 ),
               ),
             ),
-            builder: (BuildContext context, GeoPoint userLocation) => 
+            builder: (BuildContext context, GeoPoint userLocation) =>
               SizedBox(
                 height: 200,
                 child: Column(
@@ -134,7 +134,7 @@ class itemDetailPage extends StatelessWidget {
                     // GoogleMap(
                     //   initialCameraPosition: CameraPosition(
                     //     target: LatLng(
-                    //       userLocation.latitude, userLocation.longitude), 
+                    //       userLocation.latitude, userLocation.longitude),
                     //     zoom: 15.0,
                     // )),
                     Padding(
@@ -144,52 +144,49 @@ class itemDetailPage extends StatelessWidget {
                           //Extract Location information
                           locationController.value.text;
 
-                          SharedItemService sharedItemService = SharedItemService.withCustomFirestore(db: FirebaseFirestore.instance);
+                  // add a new item to Shared_Item_Collection
+                // add the user_id attribute to the shared_item
+                // add the location attribute to the shared_item                
+            
+                SharedItemService sharedItemService = SharedItemService.withCustomFirestore(db: FirebaseFirestore.instance);
 
-                          User? currentUser = FirebaseAuth.instance.currentUser;
-                            if (currentUser == null) {
-                              throw Exception('User is null but want to publish item');
-                            } else {
-                              getUserFromDatabase(currentUser.uid).then((dto_user.TGTWUser userData) {
-                                SharedItem sharedItem = SharedItem(
-                                  name: foodDetail.name,
-                                  category: foodDetail.category,
-                                  amount:  UserItemAmount(
-                                    nominal: foodDetail.quantitynum,
-                                    unit: foodDetail.quantitytype
-                                  ),
-                                  buyDate: foodDetail.remainDays,
-                                  expiryDate: foodDetail.remainDays,                 
-                                  geoPoint: userLocation,
-                                  user: PublicUser(
-                                      name: UserName(
-                                        first: userData.name.first,
-                                        last: userData.name.last,
-                                      ),
-                                      rating: userData.rating,
-                                    ),
-                                    itemRef: '',
-                                );
-                                // sharedItemService.postSharedItem
-                                sharedItemService.postSharedItem(userLocation, sharedItem);
-                                
-                                });
-                            } 
-                                          //TODO: delete the card in Inventory
-                            UserItemService userItemService = UserItemService.withCustomFirestore(db: FirebaseFirestore.instance);
-                            // userItemService.deleteUserItem(currentUser.uid, foodDetail.id);
+                User? currentUser = FirebaseAuth.instance.currentUser;
+                  if (currentUser == null) {
+                    throw Exception('User is null but want to publish item');
+                  } else {
+                    getUserFromDatabase(currentUser.uid).then((dto_user.TGTWUser userData) {
+                      SharedItem sharedItem = SharedItem(
+                        name: foodDetail.name,
+                        category: foodDetail.category,
+                        amount:  UserItemAmount(
+                          nominal: foodDetail.quantitynum,
+                          unit: foodDetail.quantitytype
+                        ),
+                        buyDate: foodDetail.remainDays,
+                        expireDate: foodDetail.remainDays,
+                        user: 'asdasdasdasd',
+                        itemRef: '',
+                      );
+                      sharedItemService.postSharedItem(userLocation, sharedItem);
+
+                    });
+                  }
+
+                  //TODO: delete the card in Inventory
+                  UserItemService userItemService = UserItemService.withCustomFirestore(db: FirebaseFirestore.instance);
+                  // userItemService.deleteUserItem(currentUser.uid, foodDetail.id);
 
                             Navigator.of(context, rootNavigator: true).pop();
-                            // Navigator.pop(context); 
+                            // Navigator.pop(context);
                         },
                         child: const Text('Submit'),
                       )
                     ),
-                  ]             
+                  ]
                   )
               ),
-          )      
-    );       
+          )
+    );
     showDialog(
       context: context,
       builder: (BuildContext context) {
