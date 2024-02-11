@@ -88,7 +88,7 @@ class DBHelper {
 
     //In this case, the quantity for this food should be added. How????
     //Or the backend should judge if the newly request tobe added food already exists in database
-    await dbHelper.insert('foods', food.toMap(),
+    await dbHelper.insert('foods', food.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
@@ -104,7 +104,7 @@ class DBHelper {
     //In this case, replace any previous data.
     await dbHelper.insert(
       'users',
-      uservalue.toMap(),
+      uservalue.toJson(),
       conflictAlgorithm: ConflictAlgorithm.ignore,
     );
   }
@@ -123,11 +123,11 @@ class DBHelper {
           id: maps[i]['id'],
           name: maps[i]['name'],
           category: maps[i]['category'],
-          boughttime: maps[i]['buy_date'],
-          expiretime: maps[i]['expiry_date'],
-          quantitytype: maps[i]['quantity_type'],
-          quantitynum: maps[i]['quantity_num'],
-          consumestate: maps[i]['consume_state'],
+          boughtTime: maps[i]['buy_date'],
+          expireTime: maps[i]['expiry_date'],
+          quantityType: maps[i]['quantity_type'],
+          quantityNum: maps[i]['quantity_num'],
+          consumeState: maps[i]['consume_state'],
           state: maps[i]['state'],
         );
       });
@@ -172,12 +172,12 @@ class DBHelper {
           id: maps[0]['id'],
           name: maps[0]['name'],
           category: maps[0]['category'],
-          boughttime: maps[0]['buy_date'],
-          expiretime: maps[0]['expiry_date'],
-          quantitynum: maps[0]['quantity_num'],
-          quantitytype: maps[0]['quantity_type'],
+          boughtTime: maps[0]['buy_date'],
+          expireTime: maps[0]['expiry_date'],
+          quantityNum: maps[0]['quantity_num'],
+          quantityType: maps[0]['quantity_type'],
           state: maps[0]['state'],
-          consumestate: maps[0]['consume_state'],
+          consumeState: maps[0]['consume_state'],
         );
       });
     } else if (object == "users") {
@@ -315,12 +315,12 @@ class DBHelper {
         id: maps[i]['id'],
         name: maps[i]['name'],
         category: maps[i]['category'],
-        boughttime: maps[i]['buy_date'],
-        expiretime: maps[i]['expiry_date'],
-        quantitynum: maps[i]['quantity_num'],
-        quantitytype: maps[i]['quantity_type'],
+        boughtTime: maps[i]['buy_date'],
+        expireTime: maps[i]['expiry_date'],
+        quantityNum: maps[i]['quantity_num'],
+        quantityType: maps[i]['quantity_type'],
         state: maps[i]['state'],
-        consumestate: maps[i]['consume_state'],
+        consumeState: maps[i]['consume_state'],
       );
     });
   }
@@ -444,12 +444,12 @@ class DBHelper {
         id: maps[i]['id'],
         name: maps[i]['name'],
         category: maps[i]['category'],
-        boughttime: maps[i]['buy_date'],
-        expiretime: maps[i]['expiry_date'],
-        quantitynum: maps[i]['quantity_num'],
-        quantitytype: maps[i]['quantity_type'],
+        boughtTime: maps[i]['buy_date'],
+        expireTime: maps[i]['expiry_date'],
+        quantityNum: maps[i]['quantity_num'],
+        quantityType: maps[i]['quantity_type'],
         state: maps[i]['state'],
-        consumestate: maps[i]['consume_state'],
+        consumeState: maps[i]['consume_state'],
       );
     });
   }
@@ -469,12 +469,12 @@ class DBHelper {
         id: maps[i]['id'],
         name: maps[i]['name'],
         category: maps[i]['category'],
-        boughttime: maps[i]['buy_date'],
-        expiretime: maps[i]['expiry_date'],
-        quantitynum: maps[i]['quantity_num'],
-        quantitytype: maps[i]['quantity_type'],
+        boughtTime: maps[i]['buy_date'],
+        expireTime: maps[i]['expiry_date'],
+        quantityNum: maps[i]['quantity_num'],
+        quantityType: maps[i]['quantity_type'],
         state: maps[i]['state'],
-        consumestate: maps[i]['consume_state'],
+        consumeState: maps[i]['consume_state'],
       );
     });
   }
@@ -487,7 +487,7 @@ class DBHelper {
 
     await dbHelper.update(
       'foods',
-      food.toMap(),
+      food.toJson(),
       //Ensure the food has a matching id
     );
   }
@@ -498,7 +498,7 @@ class DBHelper {
     Database dbHelper = await db;
 
     //update the food data
-    await dbHelper.update('users', uservalue.toMap(),
+    await dbHelper.update('users', uservalue.toJson(),
         //Ensure the food has a matching id
         where: 'name = ?',
         //Pass the Food's id as a whereArg to prevent SQL injection
@@ -590,21 +590,21 @@ class DBHelper {
         id: '5d0osYynsfbVICrewrwr',
         name: 'milk',
         category: 'MilkProduct',
-        boughttime: 154893,
-        expiretime: 156432,
-        quantitytype: 'pieces',
-        quantitynum: 3.0,
-        consumestate: 0.50,
+        boughtTime: 154893,
+        expireTime: 156432,
+        quantityType: 'pieces',
+        quantityNum: 3.0,
+        consumeState: 0.50,
         state: 'good');
     var egg = UserItem(
         id: '5d0osYbVICrgaregvdfg',
         name: 'beaf',
         category: 'Meat',
-        boughttime: 134554,
-        expiretime: 1654757,
-        quantitytype: 'number',
-        quantitynum: 4.0,
-        consumestate: 0,
+        boughtTime: 134554,
+        expireTime: 1654757,
+        quantityType: 'number',
+        quantityNum: 4.0,
+        consumeState: 0,
         state: 'good');
     dbhelper.insertFood(butter);
     dbhelper.insertFood(egg);
@@ -699,7 +699,7 @@ class DBHelper {
 
 //   //Convert a Food into a Map. The keys must correspond to the names
 //   //of the columns in the databse.
-//   Map<String, dynamic> toMap() {
+//   Map<String, dynamic> toJson() {
 //     return {
 //       //'id': id,
 //       'name': name,
@@ -752,7 +752,7 @@ class UserValue {
 
   //Convert a UserValue into a Map. The keys must correspond to the names
   //of the columns in the databse.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'name': name,
       'positive': positive,

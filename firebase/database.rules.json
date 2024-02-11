@@ -1,7 +1,39 @@
 {
-  /* Visit https://firebase.google.com/docs/database/security to learn more about security rules. */
   "rules": {
-    ".read": false,
-    ".write": false
+    "chatrooms": {
+      "$room_id": {
+        ".read": "auth !== null && (data.child('participants/one').val() == auth.uid || data.child('participants/two').val() == auth.uid)",
+        "participants": {
+          "one": {
+            ".write": "auth !== null && !data.exists() && newData.exists()",
+            ".validate": "newData.isString() && newData.val() == auth.uid && newData.parent().child('two').exists()"
+          },
+          "two": {
+            ".write": "auth !== null && !data.exists() && newData.exists()",
+            ".validate": "newData.isString() && newData.val() != newData.parent().child('one').val()"
+          }
+        },
+        "messages": {
+          "one": {
+            ".write": "auth !== null && auth.uid == data.parent().child('participants/one').val()",
+            "message": {
+              ".validate": "newData.exists() && newData.isString()"
+            },
+            "timestamp": {
+              ".validate" : "newData.val() < now"
+            }
+          },
+          "two": {
+            ".write": "auth !== null && auth.uid == data.parent().child('participants/two').val()",
+            "message": {
+              ".validate": "newData.exists() && newData.isString()"
+            },
+            "timestamp": {
+              ".validate" : "newData.val() < now"
+            }
+          }
+        }
+      }
+    }
   }
 }

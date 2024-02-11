@@ -3,29 +3,28 @@ import 'package:flutter/material.dart';
 
 part 'user_item_model.g.dart';
 
-@immutable
 @JsonSerializable(explicitToJson: true)
 class UserItem {
   String id;
   String name;
   String category;
-  int boughttime;
-  int expiretime;
-  String quantitytype;
-  double quantitynum;
+  int boughtTime;
+  int expireTime;
+  String quantityType;
+  double quantityNum;
   String state;
-  double consumestate;
+  double consumeState;
 
 UserItem(
   {
     required this.id,
     required this.name,
     required this.category,
-    required this.boughttime,
-    required this.expiretime,
-    required this.quantitytype,
-    required this.quantitynum,
-    required this.consumestate,
+    required this.boughtTime,
+    required this.expireTime,
+    required this.quantityType,
+    required this.quantityNum,
+    required this.consumeState,
     required this.state
   }
 );
@@ -37,12 +36,12 @@ UserItem(
       //'id': id,
       'name': name,
       'category': category,
-      'buy_date': boughttime,
-      'expiry_date': expiretime,
-      'quantity_type': quantitytype,
-      'quantity_num': quantitynum,
+      'buy_date': boughtTime,
+      'expiry_date': expireTime,
+      'quantity_type': quantityType,
+      'quantity_num': quantityNum,
       'state': state,
-      'consume_state': consumestate,
+      'consume_state': consumeState,
     };
   }
 
@@ -50,7 +49,7 @@ UserItem(
   //each food when using the print statement
   @override
   String toString() {
-    return 'UserItem{name: $name, category: $category, buy_date: $boughttime, expiry_date: $expiretime, quantity_type: $quantitytype, quantity_num: $quantitynum, state: $state, consume_state: $consumestate}';
+    return 'UserItem{name: $name, category: $category, buy_date: $boughtTime, expiry_date: $expireTime, quantity_type: $quantityType, quantity_num: $quantityNum, state: $state, consume_state: $consumeState}';
   }
 
   factory UserItem.fromJson(Map<String, dynamic> json) =>
@@ -58,27 +57,3 @@ UserItem(
 
   Map<String, dynamic> toJson() => _$UserItemToJson(this);
 }
-
-
-// @immutable
-// @JsonSerializable()
-// class UserItem {
-//   final DateTime buyDate;
-//   final String name;
-//   final String category;
-//   final UserItemAmount amount;
-//   final UserItemExpiry expiry;
-//   // TODO: Add state here
-
-//   const UserItem(
-//       {required this.name,
-//       required this.buyDate,
-//       required this.category,
-//       required this.amount,
-//       required this.expiry});
-
-//   factory UserItem.fromJson(Map<String, dynamic> json) =>
-//       _$UserItemFromJson(json);
-
-//   Map<String, dynamic> toJson() => _$UserItemToJson(this);
-// }
