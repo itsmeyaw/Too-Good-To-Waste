@@ -267,31 +267,50 @@ class PostPageWidget extends StatelessWidget {
             return const CircularProgressIndicator();
           }
 
-          final List<SharedItem> sharedItems = sharedItemsSnapshot.data!.toList();
+          final List<SharedItem> sharedItems =
+              sharedItemsSnapshot.data!.toList();
 
           return Expanded(
-            child: ListView.separated(
+            child: ListView.builder(
                 itemBuilder: (_, index) => FractionallySizedBox(
-                  widthFactor: 1.0,
-                  child: Container(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Item name: ${sharedItems[index].name}',
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                          Text(
-                            'Amount: ${sharedItems[index].amount.nominal} ${sharedItems[index].amount.unit}',
-                            style: const TextStyle(color: Colors.black),
-                          )
-                        ],
-                      )),
-                ),
-                separatorBuilder: (_, index) => const Divider(),
+                    widthFactor: 1.0,
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        FractionallySizedBox(
+                            widthFactor: 1.0,
+                            child: UserSharedItemPost(
+                              sharedItem: sharedItems[index],
+                            ))
+                      ],
+                    )),
                 itemCount: sharedItems.length),
           );
         });
+  }
+}
+
+class UserSharedItemPost extends StatelessWidget {
+  final SharedItem sharedItem;
+
+  const UserSharedItemPost({super.key, required this.sharedItem});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: const Color.fromRGBO(232, 245, 233, 1.0)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Item name: ${sharedItem.name}"),
+          Text("Amount: ${sharedItem.amount.nominal} ${sharedItem.amount.unit}")
+        ],
+      ),
+    );
   }
 }
