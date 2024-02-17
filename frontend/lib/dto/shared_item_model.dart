@@ -7,7 +7,7 @@ import './user_item_amount_model.dart';
 
 part 'shared_item_model.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class SharedItem {
   final UserItemAmount amount;
   final int buyDate;

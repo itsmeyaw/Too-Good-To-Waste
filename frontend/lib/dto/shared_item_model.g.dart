@@ -21,7 +21,7 @@ SharedItem _$SharedItemFromJson(Map<String, dynamic> json) => SharedItem(
 
 Map<String, dynamic> _$SharedItemToJson(SharedItem instance) =>
     <String, dynamic>{
-      'amount': instance.amount,
+      'amount': instance.amount.toJson(),
       'buy_date': instance.buyDate,
       'expire_date': instance.expireDate,
       'item_ref': instance.itemRef,
