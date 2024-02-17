@@ -447,6 +447,7 @@ class _BottomTopScreenState extends State<Inventory>
     String date = dateToday.toString().substring(0, 10);
 
     Color color = Theme.of(context).primaryColor;
+    bool toClose = false;
 
     return Scaffold(
       appBar: AppBar(
@@ -589,6 +590,7 @@ class _BottomTopScreenState extends State<Inventory>
       floatingActionButton:
           ExpandableFab(
               distance: 112.0,
+              toClose: toClose,
               children: [
                 FloatingActionButton(
                   tooltip: "Add item",
@@ -597,6 +599,9 @@ class _BottomTopScreenState extends State<Inventory>
                     txt.value = const TextEditingValue();
                     //pushAddItemPage();
                     pushAddItemScreen();
+                    setState(() {
+                      toClose = true;
+                    });
                   },
                   child: const Icon(Icons.add),
                 ),
