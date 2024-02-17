@@ -623,6 +623,57 @@ class _BottomTopScreenState extends State<Inventory>
         });
   }
 
+  showDeleteDialog(String foodname, String userId, String itemId, int index) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    AlertDialog dialog = AlertDialog(
+      title: const Text("Hey!", 
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 30,
+          )
+        ),
+      content: Container(
+        width: 3 * width / 5,
+        height: height / 8,
+        padding: const EdgeInsets.all(10.0),
+        child: 
+          Text('Are you sure you want to delete this item?',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ))
+      ),
+      actions: [
+        TextButton(
+          onPressed: () async {
+            await deleteItem(itemId);
+
+            UserItemService userItemService = UserItemService();         
+            await userItemService.deleteUserItem(userId, itemId);
+            logger.d('Deleted item $itemId');
+
+            setState(() {
+              items.removeAt(index);
+              // Navigator.of(context).pushNamedAndRemoveUntil('/', ModalRoute.withName('/'));
+              Navigator.of(context, rootNavigator: true).pop();
+            });
+           
+          },
+          child: const Text('Yes'),
+        ),
+      ],
+    );
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return dialog;
+        });
+  }
+
+
   Widget buildItem(String userId, String itemId, UserItem userItem, int remainDays, int index, double progressPercentage) {
     String? categoryIconImagePath;
     Color progressColor;
@@ -764,14 +815,18 @@ class _BottomTopScreenState extends State<Inventory>
           },
           onLongPress: () async {
             //長按卡片刪除
-            await deleteItem(itemId);
+            showDeleteDialog(userItem.name, userId, itemId, index);
 
-            UserItemService userItemService = UserItemService();         
-            await userItemService.deleteUserItem(userId, itemId);
-            setState(() {
-              items.removeAt(index);
-            });
-            logger.d('Deleted item $itemId');
+            // await deleteItem(itemId);
+
+            // UserItemService userItemService = UserItemService();         
+            // await userItemService.deleteUserItem(userId, itemId);
+            // setState(() {
+            //   items.removeAt(index);
+                
+                            
+            // });
+            // logger.d('Deleted item $itemId');
     
           },
         ),
