@@ -165,7 +165,6 @@ class _ItemDetailPage extends State<itemDetailPage> {
                               });
                             }
 
-                              //TODO: delete the card in Inventory
                               UserItemService userItemService = UserItemService();
                               
                               await userItemService.deleteUserItem(currentUser.uid, widget.foodDetail.id);
