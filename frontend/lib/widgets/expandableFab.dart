@@ -109,6 +109,7 @@ class _ExpandableFabState extends State<ExpandableFab>
           maxDistance: widget.distance,
           progress: _expandAnimation,
           child: widget.children[i],
+          
         ),
       );
     }

@@ -570,27 +570,27 @@ class _BottomTopScreenState extends State<Inventory>
           ExpandableFab(
               distance: 112.0,
               children: [
-            FloatingActionButton(
-              tooltip: "Add item",
-              onPressed: () {
-                // clear out txt buffer before entering new screen
-                txt.value = const TextEditingValue();
-                //pushAddItemPage();
-                pushAddItemScreen();
-              },
-              child: const Icon(Icons.add),
-            ),
-            FloatingActionButton(
-              onPressed: () => pickImage(false),
-              heroTag: null,
-              child: const Icon(Icons.photo_album),
-            ),
-             FloatingActionButton(
-              onPressed: () => pickImage(true),
-              heroTag: null,
-              child: const Icon(Icons.camera_alt),
-            )
-          ]),
+                FloatingActionButton(
+                  tooltip: "Add item",
+                  onPressed: () {
+                    // clear out txt buffer before entering new screen
+                    txt.value = const TextEditingValue();
+                    //pushAddItemPage();
+                    pushAddItemScreen();
+                  },
+                  child: const Icon(Icons.add),
+                ),
+                FloatingActionButton(
+                  onPressed: () => pickImage(false),
+                  heroTag: null,
+                  child: const Icon(Icons.photo_album),
+                ),
+                FloatingActionButton(
+                  onPressed: () => pickImage(true),
+                  heroTag: null,
+                  child: const Icon(Icons.camera_alt),
+                ),
+              ],),
     );
   }
 
@@ -925,11 +925,6 @@ class _BottomTopScreenState extends State<Inventory>
                 fontSize: 24,
               )),
           onTap: () {
-            //edit one specific card ---------直接跳去詳情頁面吧
-            //txt.value = new TextEditingController.fromValue(new TextEditingValue(text: items[index])).value;
-            //transport the index or name of the tapped food card to itemDetailPage
-
-            //builder: (BuildContext index) => itemDetailPage();
             pushItemDetailScreen(index, text);
           },
           onLongPress: () async {
@@ -1002,22 +997,10 @@ class _BottomTopScreenState extends State<Inventory>
     if (selectedCategory != null) {
       setState(() {
         category = selectedCategory;
+        categoryController.text = category!.name;
       });
     }
     // return selectedCategory;
-  }
-
-  Future<void> _showAllergyDialog() async {
-    final List<ItemAllergy>? selectedAllergies =
-        await showDialog<List<ItemAllergy>>(
-            context: context,
-            builder: (context) => AllergiesPicker(initialAllergies: allergies));
-
-    if (selectedAllergies != null) {
-      setState(() {
-        allergies = selectedAllergies;
-      });
-    }
   }
 
   Future<void> addItemAndAssignId(UserItemService userItemService, String userId, UserItem food) async {
@@ -1100,9 +1083,6 @@ class _BottomTopScreenState extends State<Inventory>
                 onTap: () {
                   FocusScope.of(context).requestFocus(FocusNode());
                   _showCategoryDialog();
-                  setState(() {
-                    categoryController.text = category!.name;
-                  });
                 },    
                 controller: categoryController,
               ),
@@ -1187,24 +1167,6 @@ class _BottomTopScreenState extends State<Inventory>
                     hintText: 'Expiration date'),
                 onTap: () {
                   FocusScope.of(context).requestFocus(FocusNode());
-                    // DataPicker( getdatePicker: (int value) { 
-                    //   // if (value != selectedDate) {
-                    //       setState(() {
-                    //         int year = selectedDate.year;
-                    //         int month = selectedDate.month;
-                    //         int day = selectedDate.day;
-                    //         int timestamp = selectedDate
-                    //             .millisecondsSinceEpoch;
-                    //         print("timestamp$timestamp");
-                    //         expireTimeStamp = timestamp;
-                    //         food.expiretime = expireTimeStamp;
-                    //         expireTimeController.text =
-                    //             "$year-$month-$day";
-                    //         // Navigator.pop(context)
-                    //         //記錄下用戶選擇的時間 ------> 存入數據庫
-                    //       });
-                      
-                    //  },);
                   showCupertinoModalPopup(
                       context: context,
                       builder: (context) {
@@ -1305,7 +1267,6 @@ class _BottomTopScreenState extends State<Inventory>
               var remainExpireDays = expireDays.difference(timeNowDate).inDays;
               addItemExpi(remainExpireDays);
               addItemName(food.name);
-           
 
                //insert new data into cloud firebase first and get the auto-generated id
               UserItemService userItemService = UserItemService.withCustomFirestore(db: FirebaseFirestore.instance);
@@ -1323,11 +1284,7 @@ class _BottomTopScreenState extends State<Inventory>
                // await dbhelper.insertFood(food);
                
               }
-                           
-              //Calculate the current state of the new food
-              //well actually i should assume the state of a new food should always be good, unless the user is an idiot
-              //But i'm going to do the calculation anyway
-
+                     
               await getAllItems('foods').then((value) => print("##################$value#################"));
 
 
@@ -1335,15 +1292,16 @@ class _BottomTopScreenState extends State<Inventory>
               print('Format Error!');
             }
           
-            // close route
-            // when push is used, it pushes new item on stack of navigator
-            // simply pop off stack and it goes back
             nameController.clear();
             categoryController.clear();
             quanNumController.clear();
             quanTypeController.clear();
             expireTimeController.clear();
             quanNumAndTypeController.clear();
+
+            setState(() {
+              buildList();
+            });
             Navigator.pop(context);
           },
           tooltip: 'Add item',
