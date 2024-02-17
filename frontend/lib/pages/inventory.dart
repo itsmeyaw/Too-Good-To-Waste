@@ -91,51 +91,6 @@ class _BottomTopScreenState extends State<Inventory>
   //Create Databse Object
   DBHelper dbhelper = DBHelper();
   UserItem food = UserItem(id: '', name: '', category: '', buyDate: -1, expiryDate: -1, quantityType: '', quantityNum: 0.0, consumeState: 0.0, state: 'good');
-  //List food = ['name', '', -1, -1, '', -1.0, -1.0, ''];
-
-  //check the primary state of uservalue should be updated or not; if so, update to the latest
-  Future<void> updateStates() async {
-    var user1 = await dbhelper.queryAll('users');
-    int value = user1[0].positive - user1[0].negative;
-    String primaryState;
-    // String check = checkIfPrimaryStateChanged(value);
-    String secondaryState = user1[0].secondarystate;
-
-    if (value < 2) {
-      primaryState = 'initialization';
-      await dbhelper.updateUserPrimary(primaryState);
-    } else if (value <= 6) {
-      //judge the primary state
-      primaryState = 'encounter';
-      await dbhelper.updateUserPrimary(primaryState);
-    } else if (value > 6 && value <= 14) {
-      primaryState = 'mate';
-      await dbhelper.updateUserPrimary(primaryState);
-    } else if (value > 14 && value <= 30) {
-      primaryState = 'nest';
-      await dbhelper.updateUserPrimary(primaryState);
-    } else if (value > 30 && value <= 46) {
-      primaryState = 'hatch';
-      await dbhelper.updateUserPrimary(primaryState);
-    } else if (value > 46 && value <= 78) {
-      primaryState = 'learn';
-      await dbhelper.updateUserPrimary(primaryState);
-    } else if (value > 78 && value <= 82) {
-      primaryState = 'leavehome';
-      await dbhelper.updateUserPrimary(primaryState);
-    } else if (value > 82 && value <= 91) {
-      primaryState = 'snow owl';
-      await dbhelper.updateUserPrimary(primaryState);
-    } else if (value > 91 && value <= 100) {
-      primaryState = 'tawny owl';
-      await dbhelper.updateUserPrimary(primaryState);
-    }
-
-    // if (secondaryState=="true" && check!="None"){
-    if (secondaryState == "true") {
-      await dbhelper.updateUserSecondary("false");
-    }
-  }
 
   //mock data
   Future<void> insertItem() async {
@@ -186,24 +141,16 @@ class _BottomTopScreenState extends State<Inventory>
   }
 
   Future<List<String>> getItemName() async {
-    //await insertItem();
-
-    //get all foods name as a list of string
+ 
     List<String> items = await dbhelper.getAllUncosumedFoodStringValues('name');
-    //print('##################################first######################################');
-    //print(items);
 
     return items;
   }
 
   Future<List<String>> getItemCategory() async {
-    //await insertItem();
 
-    //get all foods name as a list of string
     List<String> category =
         await dbhelper.getAllUncosumedFoodStringValues('category');
-    //print('##################################first######################################');
-    //print(items);
 
     return category;
   }
@@ -281,52 +228,6 @@ class _BottomTopScreenState extends State<Inventory>
     } else {
       await dbhelper.updateFoodWaste(name);
       print(await dbhelper.queryAll('foods'));
-    }
-  }
-
-  //edit the state to 'consumed' and consumestate to 1, and user positive data adds 1
-  //the arugument should be 'positive'(which means positive + 1) or 'negative'(which means negative + 1)
-  Future<void> updateUserValue(String state) async {
-    var user1 = await dbhelper.queryAll('users');
-    //int value = user1[0]['positive'] - user1[0]['negative'];
-    print('================= user =================');
-    print(user1);
-
-    if (state == 'positive') {
-      //judge the primary state
-      var uservalue = UserValue(
-          name: user1[0].name,
-          negative: user1[0].negative,
-          positive: user1[0].positive + 1,
-          primarystate: user1[0].primarystate,
-          secondarystate: 'true',
-          secondaryevent: "single",
-          thirdstate: "move",
-          species: "folca",
-          childrennum: 0,
-          fatherstate: "single",
-          motherstate: "single",
-          time: timeNow);
-      await dbhelper.updateUser(uservalue);
-      await updateStates();
-      print(await dbhelper.queryAll("users"));
-    } else {
-      var uservalue = UserValue(
-          name: user1[0].name,
-          negative: user1[0].negative + 1,
-          positive: user1[0].positive,
-          primarystate: user1[0].primarystate,
-          secondarystate: 'true',
-          secondaryevent: "single",
-          thirdstate: "move",
-          species: "folca",
-          childrennum: 0,
-          fatherstate: "single",
-          motherstate: "single",
-          time: timeNow);
-      await dbhelper.updateUser(uservalue);
-      await updateStates();
-      print(await dbhelper.queryAll("users"));
     }
   }
 
@@ -769,7 +670,6 @@ class _BottomTopScreenState extends State<Inventory>
     //test = food name, 
     updateFoodDB(text, index, attribute) async {
           await updateFoodState(text, attribute);
-          await updateUserValue(attribute == "consumed" ? 'positive' : 'negative');
           items.removeAt(index);
           print(items);
           print(await getAllItems('foods'));
@@ -803,8 +703,8 @@ class _BottomTopScreenState extends State<Inventory>
                 // ignore: list_remove_unrelated_type
                 //items is supposed to be [] right?
                 //items.remove(text);
-                //await Provider.of<BottomTopScreen>(context, listen: false).remove(items[0]);
-                // print('#########${user1[0].primarystate}#############');
+                //  await Provider.of<BottomTopScreen>(context, listen: false).remove(items[0]);
+          
               },
               backgroundColor: const Color(0xFFFE4A49),
               foregroundColor: Colors.white,
