@@ -91,51 +91,6 @@ class _BottomTopScreenState extends State<Inventory>
   //Create Databse Object
   DBHelper dbhelper = DBHelper();
   UserItem food = UserItem(id: '', name: '', category: '', buyDate: -1, expiryDate: -1, quantityType: '', quantityNum: 0.0, consumeState: 0.0, state: 'good');
-  //List food = ['name', '', -1, -1, '', -1.0, -1.0, ''];
-
-  //check the primary state of uservalue should be updated or not; if so, update to the latest
-  Future<void> updateStates() async {
-    var user1 = await dbhelper.queryAll('users');
-    int value = user1[0].positive - user1[0].negative;
-    String primaryState;
-    // String check = checkIfPrimaryStateChanged(value);
-    String secondaryState = user1[0].secondarystate;
-
-    if (value < 2) {
-      primaryState = 'initialization';
-      await dbhelper.updateUserPrimary(primaryState);
-    } else if (value <= 6) {
-      //judge the primary state
-      primaryState = 'encounter';
-      await dbhelper.updateUserPrimary(primaryState);
-    } else if (value > 6 && value <= 14) {
-      primaryState = 'mate';
-      await dbhelper.updateUserPrimary(primaryState);
-    } else if (value > 14 && value <= 30) {
-      primaryState = 'nest';
-      await dbhelper.updateUserPrimary(primaryState);
-    } else if (value > 30 && value <= 46) {
-      primaryState = 'hatch';
-      await dbhelper.updateUserPrimary(primaryState);
-    } else if (value > 46 && value <= 78) {
-      primaryState = 'learn';
-      await dbhelper.updateUserPrimary(primaryState);
-    } else if (value > 78 && value <= 82) {
-      primaryState = 'leavehome';
-      await dbhelper.updateUserPrimary(primaryState);
-    } else if (value > 82 && value <= 91) {
-      primaryState = 'snow owl';
-      await dbhelper.updateUserPrimary(primaryState);
-    } else if (value > 91 && value <= 100) {
-      primaryState = 'tawny owl';
-      await dbhelper.updateUserPrimary(primaryState);
-    }
-
-    // if (secondaryState=="true" && check!="None"){
-    if (secondaryState == "true") {
-      await dbhelper.updateUserSecondary("false");
-    }
-  }
 
   //mock data
   Future<void> insertItem() async {
@@ -186,24 +141,16 @@ class _BottomTopScreenState extends State<Inventory>
   }
 
   Future<List<String>> getItemName() async {
-    //await insertItem();
-
-    //get all foods name as a list of string
+ 
     List<String> items = await dbhelper.getAllUncosumedFoodStringValues('name');
-    //print('##################################first######################################');
-    //print(items);
 
     return items;
   }
 
   Future<List<String>> getItemCategory() async {
-    //await insertItem();
 
-    //get all foods name as a list of string
     List<String> category =
         await dbhelper.getAllUncosumedFoodStringValues('category');
-    //print('##################################first######################################');
-    //print(items);
 
     return category;
   }
@@ -272,61 +219,15 @@ class _BottomTopScreenState extends State<Inventory>
     await dbhelper.deleteFood(value);
   }
 
-  Future<void> updateFoodState(String name, String attribute) async {
-    var updatedFood = await dbhelper.queryOne('foods', name);
+  Future<void> updateFoodState(String id, String attribute) async {
+    var updatedFood = await dbhelper.queryOne('foods', id);
     print(updatedFood);
     if (attribute == 'consumed') {
-       await dbhelper.updateFoodConsumed(name, 'consumed');
+       await dbhelper.updateFoodConsumed(id, 'consumed');
       print(await dbhelper.queryAll('foods'));
     } else {
-      await dbhelper.updateFoodWaste(name);
+      await dbhelper.updateFoodWaste(id);
       print(await dbhelper.queryAll('foods'));
-    }
-  }
-
-  //edit the state to 'consumed' and consumestate to 1, and user positive data adds 1
-  //the arugument should be 'positive'(which means positive + 1) or 'negative'(which means negative + 1)
-  Future<void> updateUserValue(String state) async {
-    var user1 = await dbhelper.queryAll('users');
-    //int value = user1[0]['positive'] - user1[0]['negative'];
-    print('================= user =================');
-    print(user1);
-
-    if (state == 'positive') {
-      //judge the primary state
-      var uservalue = UserValue(
-          name: user1[0].name,
-          negative: user1[0].negative,
-          positive: user1[0].positive + 1,
-          primarystate: user1[0].primarystate,
-          secondarystate: 'true',
-          secondaryevent: "single",
-          thirdstate: "move",
-          species: "folca",
-          childrennum: 0,
-          fatherstate: "single",
-          motherstate: "single",
-          time: timeNow);
-      await dbhelper.updateUser(uservalue);
-      await updateStates();
-      print(await dbhelper.queryAll("users"));
-    } else {
-      var uservalue = UserValue(
-          name: user1[0].name,
-          negative: user1[0].negative + 1,
-          positive: user1[0].positive,
-          primarystate: user1[0].primarystate,
-          secondarystate: 'true',
-          secondaryevent: "single",
-          thirdstate: "move",
-          species: "folca",
-          childrennum: 0,
-          fatherstate: "single",
-          motherstate: "single",
-          time: timeNow);
-      await dbhelper.updateUser(uservalue);
-      await updateStates();
-      print(await dbhelper.queryAll("users"));
     }
   }
 
@@ -353,54 +254,6 @@ class _BottomTopScreenState extends State<Inventory>
     } else {
       logger.e('Cannot determine mime');
     }
-  }
-
-  //upload picture request related
-  final url_to_api = "http://34.65.81.128:5000/";
-
-  doUpload() async {
-    Map<String, dynamic> jsonMap = {
-      "image": imageData,
-      "headers": {"Content-Type": "application/json"}
-    };
-    String jsonString = json.encode(jsonMap);
-    http.Response response =
-        await http.post(Uri.parse(url_to_api), body: jsonString);
-    var parsed = jsonDecode(response.body);
-    //fromJson(parsed);
-    parsed.forEach((key, value) async {
-      //record the key and value
-      await insertDBbyKey(key, value);
-      print('#####$key######$value############');
-    });
-    //updateUserValue();
-    print(response.body);
-  }
-
- // Mock data for testing Image Uploading function
-  Future<void> insertDBbyKey(String name, int number) async {
-    // var maxId = await dbhelper.getMaxId();
-    //print('##########################MaxID = $maxId###############################');
-    //maxId = maxId + 1;
-    //timeNow -> DateTime, + 7 days, --> int timestamp
-    var expireDate =
-        timeNowDate.add(const Duration(days: 7)).millisecondsSinceEpoch;
-    print('#########################$expireDate##################');
-    var newFood = UserItem(
-        id: Random().nextInt(1000).toString(),
-        name: name,
-        category: 'Meat',
-        buyDate: timeNow,
-        expiryDate: expireDate,
-        quantityType: 'bag',
-        quantityNum: 0.0,
-        consumeState: 0.0,
-        state: 'good');
-
-    print(newFood);
-
-    await dbhelper.insertFood(newFood);
-    print(await dbhelper.queryAll('foods'));
   }
 
   var txt = TextEditingController();
@@ -790,13 +643,15 @@ class _BottomTopScreenState extends State<Inventory>
 
                     var category = item.category;
 
-                    return buildItem(item.name, remainDays, foodNum, foodType, index,
+                   
+                    return buildItem(item.id!, item.name, remainDays, foodNum, foodType, index,
                         category, progressPercentage);
+
                   }));
         });
   }
 
-  Widget buildItem(String text, int expire, double foodNum, String foodType,
+  Widget buildItem(String id, String text, int expire, double foodNum, String foodType,
       int index, String category, double progressPercentage) {
     String? categoryIconImagePath;
     Color progressColor;
@@ -816,8 +671,8 @@ class _BottomTopScreenState extends State<Inventory>
     }
     //test = food name, 
     updateFoodDB(text, index, attribute) async {
-          await updateFoodState(text, attribute);
-          await updateUserValue(attribute == "consumed" ? 'positive' : 'negative');
+
+          await updateFoodState(id, attribute);
           items.removeAt(index);
           print(items);
           print(await getAllItems('foods'));
@@ -851,8 +706,8 @@ class _BottomTopScreenState extends State<Inventory>
                 // ignore: list_remove_unrelated_type
                 //items is supposed to be [] right?
                 //items.remove(text);
-                //await Provider.of<BottomTopScreen>(context, listen: false).remove(items[0]);
-                // print('#########${user1[0].primarystate}#############');
+                //  await Provider.of<BottomTopScreen>(context, listen: false).remove(items[0]);
+          
               },
               backgroundColor: const Color(0xFFFE4A49),
               foregroundColor: Colors.white,
@@ -1009,17 +864,19 @@ class _BottomTopScreenState extends State<Inventory>
   }
 
   Future<void> addItemAndAssignId(UserItemService userItemService, String userId, UserItem food) async {
-  var id = await userItemService.addUserItem(userId, food);
+    var id = await userItemService.addUserItem(userId, food);
 
-  // If the initial value is null, keep fetching until a non-null value is received
-  while (id == null) {
-    print('Waiting for the new item to be created in Cloud Firestore...');
-    await Future.delayed(const Duration(seconds: 1));
-    id = await userItemService.addUserItem(userId, food);
-  }
+    // If the initial value is null, keep fetching until a non-null value is received
+    while (id == null) {
+      print('Waiting for the new item to be created in Cloud Firestore...');
+      await Future.delayed(const Duration(seconds: 1));
+      id = await userItemService.addUserItem(userId, food);
+    }
 
   // Once a non-null value is received, assign it to food.id
-  food.id = id;
+    setState(() {
+      food.id = id;
+    });
 }
 
 
@@ -1282,11 +1139,26 @@ class _BottomTopScreenState extends State<Inventory>
               } else {
                 
                 await addItemAndAssignId(userItemService, currentUser.uid, food);
-  
-                logger.d(food);
-                  //insert new data into local sqlite database
-                await inserDB(food);
-               // await dbhelper.insertFood(food);
+
+                if(food.id == null) {
+                  throw Exception('Failed to insert food into local database');
+                } else {
+                  logger.d(food);
+                    //insert new data into local sqlite database
+                  await inserDB(food);
+                  UserItem newItemData = UserItem(
+                    id: food.id,
+                    name: food.name,
+                    category: food.category,
+                    buyDate: food.buyDate,
+                    expiryDate: food.expiryDate,
+                    quantityType: food.quantityType,
+                    quantityNum: food.quantityNum,
+                    consumeState: food.consumeState,
+                    state: food.state
+                  );
+                  await userItemService.updateUserItem(currentUser.uid, food.id!, newItemData);
+                }
                
               }
                      

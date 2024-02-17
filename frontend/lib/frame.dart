@@ -154,48 +154,6 @@ class _FrameState extends State<Frame> {
           return dialog;
         });
   }
-
-  Future<void> insertItem() async {
-    //Insert a new Food butter
-    // var butter = Food(
-    //     name: 'butter',
-    //     category: 'Milk Product',
-    //     boughttime: timeNow,
-    //     expiretime: 1649969762604,
-    //     quantitytype: 'piece',
-    //     quantitynum: 3,
-    //     consumestate: 0.50,
-    //     state: 'good');
-    // await dbHelper.insertFood(butter);
-    // var egg = Food(
-    //     name: 'eggs',
-    //     category: 'Egg',
-    //     boughttime: timeNow,
-    //     expiretime: 1697969762604,
-    //     quantitytype: 'num',
-    //     quantitynum: 4,
-    //     consumestate: 0,
-    //     state: 'good');
-    // await dbHelper.insertFood(egg);
-
-    //Insert a new UserValue instance
-    var user1 = UserValue(
-        name: "user1",
-        negative: 0,
-        positive: 0,
-        primarystate: "initialization",
-        secondarystate: "false",
-        secondaryevent: "single",
-        thirdstate: "move",
-        species: "folca",
-        childrennum: 0,
-        fatherstate: "single",
-        motherstate: "single",
-        time: timeNow);
-    await dbHelper.insertUser(user1);
-    print(await dbHelper.queryAll("users"));
-  }
-
   int currentPage = 1;
 
   GlobalKey bottomNavigationKey = GlobalKey();
@@ -227,7 +185,7 @@ class _FrameState extends State<Frame> {
               setState(() {
                 currentPage = index;
                 const oneDay = Duration(hours: 24);
-                insertItem();
+                //insertItem();
                 Timer.periodic(oneDay, (Timer timer) {
                   autocheckWaste();
                   //pop up  a propmt
