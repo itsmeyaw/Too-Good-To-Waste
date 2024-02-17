@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:tooGoodToWaste/util/geo_fire_point_converter.dart';
@@ -9,6 +8,7 @@ part 'shared_item_model.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class SharedItem {
+  String? id;
   final UserItemAmount amount;
   final int buyDate;
   final int expireDate;
@@ -24,7 +24,8 @@ class SharedItem {
   double distance = double.infinity;
 
   SharedItem(
-      {required this.amount,
+      {this.id,
+      required this.amount,
       required this.buyDate,
       required this.expireDate,
       required this.itemRef,

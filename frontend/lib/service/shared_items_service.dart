@@ -40,8 +40,11 @@ class SharedItemService {
       List<DocumentSnapshot<Object?>> docList) {
     return docList.map((e) {
       if (e.exists) {
-        logger.d('Converting shared item data: ${e.data() as Map<String, dynamic>}');
-        return SharedItem.fromJson(e.data() as Map<String, dynamic>);
+        logger.d(
+            'Converting shared item data: ${e.data() as Map<String, dynamic>}');
+        final SharedItem sharedItem = SharedItem.fromJson(e.data() as Map<String, dynamic>);
+        sharedItem.id = e.id;
+        return sharedItem;
       } else {
         return null;
       }
@@ -60,12 +63,21 @@ class SharedItemService {
       collection.where("category", isEqualTo: category);
     }
 
-    return geo
-        .collection(collectionRef: collection)
-        .within(
-            center: GeoFirePoint(userLocation.latitude, userLocation.longitude),
-            radius: radiusInKm,
-            field: "location",
-            strictMode: true);
+    return geo.collection(collectionRef: collection).within(
+        center: GeoFirePoint(userLocation.latitude, userLocation.longitude),
+        radius: radiusInKm,
+        field: "location",
+        strictMode: true);
+  }
+
+  Future<Iterable<SharedItem>> getSharedItemOfUser(String userId) {
+    return db
+        .collection(COLLECTION)
+        .where('user', isEqualTo: userId)
+        .get()
+        .then((querySnapshot) {
+      logger.d("Got ${querySnapshot.size} shared items of user $userId");
+      return querySnapshot.docs.map((doc) => SharedItem.fromJson(doc.data()));
+    });
   }
 }
