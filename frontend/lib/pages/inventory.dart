@@ -786,7 +786,7 @@ class _BottomTopScreenState extends State<Inventory>
                 fontSize: 24,
               )),
           onTap: () {
-            pushItemDetailScreen(index, text);
+            pushItemDetailScreen(id, text);
           },
           onLongPress: () async {
             //長按卡片刪除
@@ -800,17 +800,17 @@ class _BottomTopScreenState extends State<Inventory>
     );
   }
 
-  void pushItemDetailScreen(int index, String text) async {
-    String quantype = await dbhelper.getOneFoodValue(text, 'quantity_type');
-    double quannum = await dbhelper.getOneFoodDoubleValue(text, 'quantity_num');
-    int expitime = await dbhelper.getOneFoodIntValue(text, 'expiry_date');
-    String state = await dbhelper.getOneFoodValue(text, 'state');
+  void pushItemDetailScreen(String id, String text) async {
+    String quantype = await dbhelper.getOneFoodValue(id, 'quantity_type');
+    double quannum = await dbhelper.getOneFoodDoubleValue(id, 'quantity_num');
+    int expitime = await dbhelper.getOneFoodIntValue(id, 'expiry_date');
+    String state = await dbhelper.getOneFoodValue(id, 'state');
     var expireDate = DateTime.fromMillisecondsSinceEpoch(expitime);
     var remainDays = expireDate.difference(timeNowDate).inDays;
 
-    String category = await dbhelper.getOneFoodValue(text, 'category');
+    String category = await dbhelper.getOneFoodValue(id, 'category');
     double consumeprogress =
-        await dbhelper.getOneFoodDoubleValue(text, 'consume_state');
+        await dbhelper.getOneFoodDoubleValue(id, 'consume_state');
 
     var foodDetail = UserItemDetail(
         name: text,
@@ -820,7 +820,7 @@ class _BottomTopScreenState extends State<Inventory>
         quantitynum: quannum,
         consumestate: consumeprogress,
         state: state
-        );
+      );
 
     //navigate to the item detail page
     Navigator.push(
