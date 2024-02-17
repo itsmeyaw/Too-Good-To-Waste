@@ -12,6 +12,8 @@ class UserItemService {
 
   UserItemService.withCustomFirestore({required this.db});
 
+  UserItemService();
+
   Future<Iterable<UserItem>> getUserItems(String userUid) async {
     return await db
         .collection(COLLECTION)
@@ -67,9 +69,9 @@ class UserItemService {
         .doc(userUid)
         .collection(SUB_COLLECTION)
         .add(newItemData.toJson())
-        .then((doc) {
-      logger.d('Successfully added item ${doc.id} for user $userUid');
-      return doc.id;
+        .then((docRef) {
+      logger.d('Successfully added item ${docRef.path}');
+      return docRef.id;
     }).catchError((err) {
       logger.e('Got error when adding item for user $userUid with detail: $err');
       return null;
