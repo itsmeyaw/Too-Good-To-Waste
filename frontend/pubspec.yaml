@@ -97,6 +97,7 @@ flutter:
     - assets/anime/noWasted.riv
     - assets/images/backyard.png
     - assets/images/tree.png
+    - assets/images/sharedItem.png
     - assets/achievements/initialization.png
     - assets/achievements/first_encounter.png
     - assets/achievements/nesting.png

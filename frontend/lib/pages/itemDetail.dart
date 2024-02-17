@@ -1,19 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
 import 'package:tooGoodToWaste/dto/user_item_detail_model.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import 'package:tooGoodToWaste/service/shared_items_service.dart';
-import 'package:tooGoodToWaste/service/user_location_service.dart';
 import 'package:tooGoodToWaste/widgets/user_location_aware_widget.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tooGoodToWaste/dto/public_user_model.dart';
 import 'package:tooGoodToWaste/service/user_item_service.dart';
-import '../dto/user_name_model.dart';
 import '../dto/user_item_amount_model.dart';
 
 class itemDetailPage extends StatelessWidget {
@@ -103,7 +99,7 @@ class itemDetailPage extends StatelessWidget {
             loader: (BuildContext context) => FractionallySizedBox(
               widthFactor: 1.0,
               child: SizedBox(
-                height: 200,
+                height: 300,
                 child: Container(
                   color: Theme.of(context).colorScheme.secondaryContainer,
                   child: const Center(
@@ -114,70 +110,58 @@ class itemDetailPage extends StatelessWidget {
             ),
             builder: (BuildContext context, GeoPoint userLocation) =>
               SizedBox(
-                height: 200,
+                height: 300,
                 child: Column(
                   children: <Widget>[
                     const Padding(
                       padding: EdgeInsets.all(10.0),
-                      child: Text('Please enter the location for picking up:'),
+                      child: Text('Are you sue to share this item?',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(10.0),
-                      child: TextField(
-                        controller: locationController,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Location',
-                        ),
-                      ),
+                      child: 
+                        // Image.asset('assets/images/food_icons/${foodDetail.category}.png')
+                        Image.asset('assets/images/sharedItem.png'),
                     ),
-                    // GoogleMap(
-                    //   initialCameraPosition: CameraPosition(
-                    //     target: LatLng(
-                    //       userLocation.latitude, userLocation.longitude),
-                    //     zoom: 15.0,
-                    // )),
                     Padding(
-                      padding: const EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
                         onPressed: () {
                           //Extract Location information
-                          locationController.value.text;
-
-                  // add a new item to Shared_Item_Collection
-                // add the user_id attribute to the shared_item
-                // add the location attribute to the shared_item                
+                          locationController.value.text;              
             
-                SharedItemService sharedItemService = SharedItemService.withCustomFirestore(db: FirebaseFirestore.instance);
+                          SharedItemService sharedItemService = SharedItemService.withCustomFirestore(db: FirebaseFirestore.instance);
 
-                User? currentUser = FirebaseAuth.instance.currentUser;
-                  if (currentUser == null) {
-                    throw Exception('User is null but want to publish item');
-                  } else {
-                    getUserFromDatabase(currentUser.uid).then((dto_user.TGTWUser userData) {
-                      SharedItem sharedItem = SharedItem(
-                        name: foodDetail.name,
-                        category: foodDetail.category,
-                        amount:  UserItemAmount(
-                          nominal: foodDetail.quantitynum,
-                          unit: foodDetail.quantitytype
-                        ),
-                        buyDate: foodDetail.remainDays,
-                        expireDate: foodDetail.remainDays,
-                        user: currentUser.uid,
-                        itemRef: '',
-                      );
-                      sharedItemService.postSharedItem(userLocation, sharedItem);
+                          User? currentUser = FirebaseAuth.instance.currentUser;
+                            if (currentUser == null) {
+                              throw Exception('User is null but want to publish item');
+                            } else {
+                              getUserFromDatabase(currentUser.uid).then((dto_user.TGTWUser userData) {
+                                SharedItem sharedItem = SharedItem(
+                                  name: foodDetail.name,
+                                  category: foodDetail.category,
+                                  amount:  UserItemAmount(
+                                    nominal: foodDetail.quantitynum,
+                                    unit: foodDetail.quantitytype
+                                  ),
+                                  buyDate: foodDetail.remainDays,
+                                  expireDate: foodDetail.remainDays,
+                                  user: currentUser.uid,
+                                  itemRef: '',
+                                );
+                                sharedItemService.postSharedItem(userLocation, sharedItem);
 
-                    });
-                  }
+                              });
+                            }
 
-                            //TODO: delete the card in Inventory
-                            UserItemService userItemService = UserItemService();
-                            // userItemService.deleteUserItem(currentUser.uid, foodDetail.id);
+                              //TODO: delete the card in Inventory
+                              UserItemService userItemService = UserItemService();
+                              // userItemService.deleteUserItem(currentUser.uid, foodDetail.id);
 
-                            Navigator.of(context, rootNavigator: true).pop();
-                            // Navigator.pop(context);
+                              Navigator.of(context, rootNavigator: true).pop();
+                              // Navigator.pop(context);
                         },
                         child: const Text('Submit'),
                       )
