@@ -38,7 +38,7 @@ class _FrameState extends State<Frame> {
 
     for (int i = 0; i < foods.length; i++) {
       //var expiretime = await dbhelper.getAllGoodFoodIntValues('expiretime', 'good');
-      var expiretime = foods[i].expireTime;
+      var expiretime = foods[i].expiryDate;
       var foodName = foods[i].name;
       var foodState = foods[i].state;
       if (expiretime < timeNow) {
@@ -54,7 +54,7 @@ class _FrameState extends State<Frame> {
       }
     }
     for (int i = 0; i < foods.length; i++) {
-      var expiretime = foods[i].expireTime;
+      var expiretime = foods[i].expiryDate;
       var foodName = foods[i].name;
       var foodState = foods[i].state;
       int remainDays = DateTime.fromMillisecondsSinceEpoch(expiretime)

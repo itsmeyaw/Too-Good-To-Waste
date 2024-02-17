@@ -8,8 +8,8 @@ class UserItem {
   String? id;
   String name;
   String category;
-  int boughtTime;
-  int expireTime;
+  int buyDate;
+  int expiryDate;
   String quantityType;
   double quantityNum;
   String state;
@@ -20,8 +20,8 @@ UserItem(
     required this.id,
     required this.name,
     required this.category,
-    required this.boughtTime,
-    required this.expireTime,
+    required this.buyDate,
+    required this.expiryDate,
     required this.quantityType,
     required this.quantityNum,
     required this.consumeState,
@@ -36,8 +36,8 @@ UserItem(
       'id': id,
       'name': name,
       'category': category,
-      'buy_date': boughtTime,
-      'expiry_date': expireTime,
+      'buy_date': buyDate,
+      'expiry_date': expiryDate,
       'quantity_type': quantityType,
       'quantity_num': quantityNum,
       'state': state,
@@ -45,11 +45,11 @@ UserItem(
     };
   }
 
-  //Implement toString tomake it easier to see information about
+  //Implement toString to make it easier to see information about
   //each food when using the print statement
   @override
   String toString() {
-    return 'UserItem{id: $id, name: $name, category: $category, buy_date: $boughtTime, expiry_date: $expireTime, quantity_type: $quantityType, quantity_num: $quantityNum, state: $state, consume_state: $consumeState}';
+    return 'UserItem{id: $id, name: $name, category: $category, buy_date: $buyDate, expiry_date: $expiryDate, quantity_type: $quantityType, quantity_num: $quantityNum, state: $state, consume_state: $consumeState}';
   }
 
   factory UserItem.fromJson(Map<String, dynamic> json) =>

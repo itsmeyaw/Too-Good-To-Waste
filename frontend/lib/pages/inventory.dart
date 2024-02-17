@@ -90,7 +90,7 @@ class _BottomTopScreenState extends State<Inventory>
 
   //Create Databse Object
   DBHelper dbhelper = DBHelper();
-  UserItem food = UserItem(id: '', name: '', category: '', boughtTime: -1, expireTime: -1, quantityType: '', quantityNum: 0.0, consumeState: 0.0, state: 'good');
+  UserItem food = UserItem(id: '', name: '', category: '', buyDate: -1, expiryDate: -1, quantityType: '', quantityNum: 0.0, consumeState: 0.0, state: 'good');
   //List food = ['name', '', -1, -1, '', -1.0, -1.0, ''];
 
   //check the primary state of uservalue should be updated or not; if so, update to the latest
@@ -144,8 +144,8 @@ class _BottomTopScreenState extends State<Inventory>
         id: '1',
         name: 'butter',
         category: 'cheese',
-        boughtTime: 154893,
-        expireTime: 156432,
+        buyDate: 154893,
+        expiryDate: 156432,
         quantityType: 'Piece',
         quantityNum: 3,
         consumeState: 0.50,
@@ -155,8 +155,8 @@ class _BottomTopScreenState extends State<Inventory>
         id: '2',
         name: 'eggs',
         category: 'Egg',
-        boughtTime: 134554,
-        expireTime: 1654757,
+        buyDate: 134554,
+        expiryDate: 1654757,
         quantityType: 'Number',
         quantityNum: 4,
         consumeState: 0,
@@ -390,8 +390,8 @@ class _BottomTopScreenState extends State<Inventory>
         id: Random().nextInt(1000).toString(),
         name: name,
         category: 'Meat',
-        boughtTime: timeNow,
-        expireTime: expireDate,
+        buyDate: timeNow,
+        expiryDate: expireDate,
         quantityType: 'bag',
         quantityNum: 0.0,
         consumeState: 0.0,
@@ -779,12 +779,12 @@ class _BottomTopScreenState extends State<Inventory>
 
                     //var expires = getItemExpiringTime();
                     //how to show the listsby sequence of expire time?
-                    var remainDays = DateTime.fromMillisecondsSinceEpoch(item.expireTime).difference(DateTime.now()).inDays;
-                    var progressPercentage = 1.0 - (remainDays / DateTime.fromMillisecondsSinceEpoch(item.expireTime).difference(DateTime.fromMillisecondsSinceEpoch(item.boughtTime)).inDays);
+                    var remainDays = DateTime.fromMillisecondsSinceEpoch(item.expiryDate).difference(DateTime.now()).inDays;
+                    var progressPercentage = 1.0 - (remainDays / DateTime.fromMillisecondsSinceEpoch(item.expiryDate).difference(DateTime.fromMillisecondsSinceEpoch(item.buyDate)).inDays);
                     progressPercentage = progressPercentage > 1.0 ? 1.0 : progressPercentage;
                     print(remainDays);
                     print(progressPercentage);
-                    print(DateTime.fromMillisecondsSinceEpoch(item.expireTime));
+                    print(DateTime.fromMillisecondsSinceEpoch(item.expiryDate));
                     var foodNum = item.quantityNum;
                     var foodType = item.quantityType;
 
@@ -1203,7 +1203,7 @@ class _BottomTopScreenState extends State<Inventory>
                                               .millisecondsSinceEpoch;
                                           print("timestamp$timestamp");
                                           expireTimeStamp = timestamp;
-                                          food.expireTime = expireTimeStamp;
+                                          food.expiryDate = expireTimeStamp;
                                           expireTimeController.text =
                                               "$year-$month-$day";
                                           // Navigator.pop(context)
@@ -1255,7 +1255,7 @@ class _BottomTopScreenState extends State<Inventory>
             
               food.name = nameController.text;
               food.category = categoryController.text;
-              food.boughtTime = timeNow;
+              food.buyDate = timeNow;
               //food[3] = expireTimeStamp;
               food.quantityType = quanTypeController.text;
               food.quantityNum = double.parse(quanNumController.text);
@@ -1268,7 +1268,7 @@ class _BottomTopScreenState extends State<Inventory>
 
               //food[3]是可以直接傳入數據庫的int timestamp
               DateTime expireDays =
-                  DateTime.fromMillisecondsSinceEpoch(food.expireTime);
+                  DateTime.fromMillisecondsSinceEpoch(food.expiryDate);
               var remainExpireDays = expireDays.difference(timeNowDate).inDays;
               addItemExpi(remainExpireDays);
               addItemName(food.name);
@@ -1324,7 +1324,7 @@ class _BottomTopScreenState extends State<Inventory>
       onPressed: () {
         //record new expire time ----> value
         var later = timeNowDate.add(Duration(days: value));
-        food.expireTime = later.millisecondsSinceEpoch;
+        food.expiryDate = later.millisecondsSinceEpoch;
         int year = later.year;
         int month = later.month;
         int day = later.day;
