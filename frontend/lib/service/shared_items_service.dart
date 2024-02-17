@@ -42,7 +42,9 @@ class SharedItemService {
       if (e.exists) {
         logger.d(
             'Converting shared item data: ${e.data() as Map<String, dynamic>}');
-        return SharedItem.fromJson(e.data() as Map<String, dynamic>);
+        final SharedItem sharedItem = SharedItem.fromJson(e.data() as Map<String, dynamic>);
+        sharedItem.id = e.id;
+        return sharedItem;
       } else {
         return null;
       }

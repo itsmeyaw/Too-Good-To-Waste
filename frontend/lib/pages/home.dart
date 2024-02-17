@@ -76,8 +76,22 @@ class _HomeState extends State<Home> {
     }
   }
 
-  void _onMapCreated(GoogleMapController controller) {
-    logger.d('Created Google Map');
+  Set<Marker> createMarkers(List<SharedItem> sharedItems) {
+    logger.d('Created Google Map, adding ${sharedItems.length} results');
+    Set<Marker> markers = {};
+
+    for (final sharedItem in sharedItems) {
+      if (sharedItem.id == null) {
+        continue;
+      }
+
+      markers.add(Marker(
+          markerId: MarkerId(sharedItem.id!),
+          position: LatLng(
+              sharedItem.location.latitude, sharedItem.location.longitude)));
+    }
+    
+    return markers;
   }
 
   @override
@@ -87,32 +101,62 @@ class _HomeState extends State<Home> {
       child: Column(
         children: [
           UserLocationAwareWidget(
-            loader: (BuildContext context) => FractionallySizedBox(
-              widthFactor: 1.0,
-              child: SizedBox(
-                height: 200,
-                child: Container(
-                  color: Theme.of(context).colorScheme.secondaryContainer,
-                  child: const Center(
-                    child: CircularProgressIndicator(),
+              loader: (BuildContext context) => FractionallySizedBox(
+                    widthFactor: 1.0,
+                    child: SizedBox(
+                      height: 200,
+                      child: Container(
+                        color: Theme.of(context).colorScheme.secondaryContainer,
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
-            builder: (BuildContext context, GeoPoint userLocation) =>
-                FractionallySizedBox(
-              widthFactor: 1.0,
-              child: SizedBox(
-                  height: 200,
-                  child: GoogleMap(
-                      onMapCreated: _onMapCreated,
-                      initialCameraPosition: CameraPosition(
-                        target: LatLng(
-                            userLocation.latitude, userLocation.longitude),
-                        zoom: 15.0 - radius / 5,
-                      ))),
-            ),
-          ),
+              builder: (BuildContext context, GeoPoint userLocation) =>
+                  StreamBuilder(
+                      stream: sharedItemService.getSharedItemsWithinRadius(
+                          userLocation: userLocation,
+                          radiusInKm: radius,
+                          userId: userId),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<List<DocumentSnapshot>>
+                              sharedItemSnapshot) {
+                        if (sharedItemSnapshot.connectionState ==
+                                ConnectionState.active &&
+                            sharedItemSnapshot.hasData) {
+                          if (sharedItemSnapshot.data != null) {
+                            List<SharedItem?> results = sharedItemService
+                                .createSharedItemList(sharedItemSnapshot.data!);
+                            for (var res in results) {
+                              if (res != null) {
+                                res.distance = GeoUtils.calculateDistance(
+                                    userLocation,
+                                    GeoPoint(res.location.latitude,
+                                        res.location.longitude));
+                                sharedItems.add(res);
+                              }
+                            }
+                          }
+
+                          return FractionallySizedBox(
+                            widthFactor: 1.0,
+                            child: SizedBox(
+                                height: 200,
+                                child: GoogleMap(
+                                    initialCameraPosition: CameraPosition(
+                                      target: LatLng(userLocation.latitude,
+                                          userLocation.longitude),
+                                      zoom: 15.0 - radius / 5,
+                                    ),
+                                markers: createMarkers(sharedItems),)),
+                          );
+                        } else {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                      })),
           const SizedBox(
             height: 10,
           ),
@@ -165,13 +209,20 @@ class _HomeState extends State<Home> {
                           radiusInKm: radius,
                           userId: userId),
                       builder: (BuildContext context,
-                          AsyncSnapshot<List<DocumentSnapshot>> sharedItemSnapshot) {
-                        if (sharedItemSnapshot.connectionState == ConnectionState.active && sharedItemSnapshot.hasData) {
+                          AsyncSnapshot<List<DocumentSnapshot>>
+                              sharedItemSnapshot) {
+                        if (sharedItemSnapshot.connectionState ==
+                                ConnectionState.active &&
+                            sharedItemSnapshot.hasData) {
                           if (sharedItemSnapshot.data != null) {
-                            List<SharedItem?> results = sharedItemService.createSharedItemList(sharedItemSnapshot.data!);
+                            List<SharedItem?> results = sharedItemService
+                                .createSharedItemList(sharedItemSnapshot.data!);
                             for (var res in results) {
                               if (res != null) {
-                                res.distance = GeoUtils.calculateDistance(userLocation, GeoPoint(res.location.latitude, res.location.longitude));
+                                res.distance = GeoUtils.calculateDistance(
+                                    userLocation,
+                                    GeoPoint(res.location.latitude,
+                                        res.location.longitude));
                                 sharedItems.add(res);
                               }
                             }
@@ -179,20 +230,23 @@ class _HomeState extends State<Home> {
 
                           return Expanded(
                               child: ListView.separated(
-                                itemCount: sharedItems.length,
-                                itemBuilder: (_, index) {
-                                  if (sharedItems[index] != null) {
-                                    logger.d('Got items: ${sharedItems[index].toJson()}');
-                                    return Post(postData: sharedItems[index]);
-                                  }
-                                  return null;
-                                },
-                                separatorBuilder: (_, index) {
-                                  return const Divider();
-                                },
-                              ));
+                            itemCount: sharedItems.length,
+                            itemBuilder: (_, index) {
+                              if (sharedItems[index] != null) {
+                                logger.d(
+                                    'Got items: ${sharedItems[index].toJson()}');
+                                return Post(postData: sharedItems[index]);
+                              }
+                              return null;
+                            },
+                            separatorBuilder: (_, index) {
+                              return const Divider();
+                            },
+                          ));
                         } else {
-                          return const Center(child: CircularProgressIndicator(),);
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
                       }))
         ],
@@ -286,34 +340,33 @@ class Post extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => PostPage(postData: postData)));
-      },
-      child: FractionallySizedBox(
-        widthFactor: 1.0,
-        child: Container(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Item name: ${postData.name}',
-                  style: const TextStyle(color: Colors.black),
-                ),
-                Text(
-                  'Amount: ${postData.amount.nominal} ${postData.amount.unit}',
-                  style: const TextStyle(color: Colors.black),
-                ),
-                Text(
-                  'Distance: ${postData.distance} m',
-                  style: const TextStyle(color: Colors.black),
-                )
-              ],
-            )),
-      )
-    );
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => PostPage(postData: postData)));
+        },
+        child: FractionallySizedBox(
+          widthFactor: 1.0,
+          child: Container(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Item name: ${postData.name}',
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                  Text(
+                    'Amount: ${postData.amount.nominal} ${postData.amount.unit}',
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                  Text(
+                    'Distance: ${postData.distance} m',
+                    style: const TextStyle(color: Colors.black),
+                  )
+                ],
+              )),
+        ));
   }
 }
