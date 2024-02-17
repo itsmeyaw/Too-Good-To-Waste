@@ -355,54 +355,6 @@ class _BottomTopScreenState extends State<Inventory>
     }
   }
 
-  //upload picture request related
-  final url_to_api = "http://34.65.81.128:5000/";
-
-  doUpload() async {
-    Map<String, dynamic> jsonMap = {
-      "image": imageData,
-      "headers": {"Content-Type": "application/json"}
-    };
-    String jsonString = json.encode(jsonMap);
-    http.Response response =
-        await http.post(Uri.parse(url_to_api), body: jsonString);
-    var parsed = jsonDecode(response.body);
-    //fromJson(parsed);
-    parsed.forEach((key, value) async {
-      //record the key and value
-      await insertDBbyKey(key, value);
-      print('#####$key######$value############');
-    });
-    //updateUserValue();
-    print(response.body);
-  }
-
- // Mock data for testing Image Uploading function
-  Future<void> insertDBbyKey(String name, int number) async {
-    // var maxId = await dbhelper.getMaxId();
-    //print('##########################MaxID = $maxId###############################');
-    //maxId = maxId + 1;
-    //timeNow -> DateTime, + 7 days, --> int timestamp
-    var expireDate =
-        timeNowDate.add(const Duration(days: 7)).millisecondsSinceEpoch;
-    print('#########################$expireDate##################');
-    var newFood = UserItem(
-        id: Random().nextInt(1000).toString(),
-        name: name,
-        category: 'Meat',
-        buyDate: timeNow,
-        expiryDate: expireDate,
-        quantityType: 'bag',
-        quantityNum: 0.0,
-        consumeState: 0.0,
-        state: 'good');
-
-    print(newFood);
-
-    await dbhelper.insertFood(newFood);
-    print(await dbhelper.queryAll('foods'));
-  }
-
   var txt = TextEditingController();
   late TooltipBehavior _tooltipBehavior;
   //late bool _isLoading;

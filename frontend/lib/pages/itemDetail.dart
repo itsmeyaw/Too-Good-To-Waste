@@ -164,7 +164,7 @@ class itemDetailPage extends StatelessWidget {
                         ),
                         buyDate: foodDetail.remainDays,
                         expireDate: foodDetail.remainDays,
-                        user: 'asdasdasdasd',
+                        user: currentUser.uid,
                         itemRef: '',
                       );
                       sharedItemService.postSharedItem(userLocation, sharedItem);
