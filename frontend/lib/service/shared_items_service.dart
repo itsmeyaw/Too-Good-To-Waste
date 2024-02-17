@@ -20,9 +20,9 @@ class SharedItemService {
       GeoPoint userLocation, SharedItem sharedItem) async {
     // TODO: Check whether an item with the same ref is already exists, if yes then false
     var collection = db.collection(COLLECTION);
-    var location = geo.point(
+    final GeoFirePoint location = geo.point(
         latitude: userLocation.latitude, longitude: userLocation.longitude);
-    sharedItem.location = location.data;
+    sharedItem.location = location;
 
     return geo
         .collection(collectionRef: collection)

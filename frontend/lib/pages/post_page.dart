@@ -39,8 +39,8 @@ class _PostPageState extends State<PostPage> {
                         onMapCreated: (event) {},
                         initialCameraPosition: CameraPosition(
                           target: LatLng(
-                              widget.postData.location.geopoint.latitude,
-                              widget.postData.location.geopoint.longitude),
+                              widget.postData.location.latitude,
+                              widget.postData.location.longitude),
                           zoom: 15.0,
                         ))),
               ),

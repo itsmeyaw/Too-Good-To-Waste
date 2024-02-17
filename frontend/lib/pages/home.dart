@@ -171,7 +171,7 @@ class _HomeState extends State<Home> {
                             List<SharedItem?> results = sharedItemService.createSharedItemList(sharedItemSnapshot.data!);
                             for (var res in results) {
                               if (res != null) {
-                                res.distance = GeoUtils.calculateDistance(userLocation, res.location.geopoint);
+                                res.distance = GeoUtils.calculateDistance(userLocation, GeoPoint(res.location.latitude, res.location.longitude));
                                 sharedItems.add(res);
                               }
                             }
@@ -182,8 +182,8 @@ class _HomeState extends State<Home> {
                                 itemCount: sharedItems.length,
                                 itemBuilder: (_, index) {
                                   if (sharedItems[index] != null) {
-                                    logger.d('Got items: ${sharedItems[index]!.toJson()}');
-                                    return Post(postData: sharedItems[index]!);
+                                    logger.d('Got items: ${sharedItems[index].toJson()}');
+                                    return Post(postData: sharedItems[index]);
                                   }
                                   return null;
                                 },

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:tooGoodToWaste/util/geo_point_converter.dart';
+import 'package:tooGoodToWaste/util/geo_fire_point_converter.dart';
 
 import './user_item_amount_model.dart';
 
@@ -16,8 +17,8 @@ class SharedItem {
   final String category;
   final String user;
 
-  @JsonKey(includeToJson: false)
-  SharedItemLocation location = SharedItemLocation.defaultValue();
+  @GeoFirePointConverter()
+  GeoFirePoint location = GeoFirePoint(0.0, 0.0);
 
   @JsonKey(includeToJson: false, defaultValue: double.infinity)
   double distance = double.infinity;
@@ -35,19 +36,4 @@ class SharedItem {
       _$SharedItemFromJson(json);
 
   Map<String, dynamic> toJson() => _$SharedItemToJson(this);
-}
-
-class SharedItemLocation {
-  final String geohash;
-  final GeoPoint geopoint;
-
-  factory SharedItemLocation.defaultValue() =>
-      SharedItemLocation(geohash: '', geopoint: const GeoPoint(0, 0));
-
-  SharedItemLocation({required this.geohash, required this.geopoint});
-
-  factory SharedItemLocation.fromJson(Map<String, dynamic> json) =>
-      SharedItemLocation(
-          geohash: json['geohash'] as String,
-          geopoint: json['geopoint'] as GeoPoint);
 }

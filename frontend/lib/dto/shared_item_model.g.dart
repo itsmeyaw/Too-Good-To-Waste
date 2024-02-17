@@ -15,8 +15,8 @@ SharedItem _$SharedItemFromJson(Map<String, dynamic> json) => SharedItem(
       category: json['category'] as String,
       user: json['user'] as String,
     )
-      ..location =
-          SharedItemLocation.fromJson(json['location'] as Map<String, dynamic>)
+      ..location = const GeoFirePointConverter()
+          .fromJson(json['location'] as Map<String, dynamic>)
       ..distance = (json['distance'] as num?)?.toDouble() ?? double.infinity;
 
 Map<String, dynamic> _$SharedItemToJson(SharedItem instance) =>
@@ -28,4 +28,5 @@ Map<String, dynamic> _$SharedItemToJson(SharedItem instance) =>
       'name': instance.name,
       'category': instance.category,
       'user': instance.user,
+      'location': const GeoFirePointConverter().toJson(instance.location),
     };
