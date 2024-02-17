@@ -1,8 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tooGoodToWaste/Pages/post_page.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:tooGoodToWaste/service/shared_items_service.dart';
 import 'package:tooGoodToWaste/service/user_service.dart';
+
+import '../dto/shared_item_model.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -36,13 +40,16 @@ class AccountSettingPage extends StatelessWidget {
 
     return FutureBuilder(
         future: userService.getUserData(user.uid),
-        builder: (BuildContext context, AsyncSnapshot<TGTWUser> userDataSnapshot) {
+        builder:
+            (BuildContext context, AsyncSnapshot<TGTWUser> userDataSnapshot) {
           if (userDataSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
           if (userDataSnapshot.hasError) {
-            return Center(child: Text('Error: ${userDataSnapshot.error}'),);
+            return Center(
+              child: Text('Error: ${userDataSnapshot.error}'),
+            );
           }
 
           TGTWUser userData = userDataSnapshot.requireData;
@@ -168,7 +175,9 @@ class AccountSettingPage extends StatelessWidget {
                         ),
                         const Text('Allergies'),
                         Text(
-                          userData.allergies.isEmpty ? 'No allergies listed' : userData.allergies.join(', '),
+                          userData.allergies.isEmpty
+                              ? 'No allergies listed'
+                              : userData.allergies.join(', '),
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                         const SizedBox(
@@ -219,7 +228,6 @@ class AccountSettingPage extends StatelessWidget {
                         SizedBox(
                           height: 10,
                         ),
-
                         SizedBox(
                           height: 20,
                         ),
@@ -228,16 +236,63 @@ class AccountSettingPage extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                       height: MediaQuery.of(context).size.height,
-                      child: ListView(children: const [
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text('You have no active post currently'),
-                      ]),
+                      child: PostPageWidget(),
                     )
                   ],
                 ),
               ));
+        });
+  }
+}
+
+class PostPageWidget extends StatelessWidget {
+  final SharedItemService sharedItemService = SharedItemService();
+  final User? user = FirebaseAuth.instance.currentUser;
+
+  PostPageWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    if (user == null) {
+      throw Exception("Accessting post page without authentication");
+    }
+
+    final String userId = user!.uid;
+
+    return FutureBuilder(
+        future: sharedItemService.getSharedItemOfUser(userId),
+        builder: (BuildContext context,
+            AsyncSnapshot<Iterable<SharedItem>> sharedItemsSnapshot) {
+          if (sharedItemsSnapshot.connectionState == ConnectionState.active &&
+              !sharedItemsSnapshot.hasData) {
+            return const CircularProgressIndicator();
+          }
+
+          final List<SharedItem> sharedItems = sharedItemsSnapshot.data!.toList();
+
+          return Expanded(
+            child: ListView.separated(
+                itemBuilder: (_, index) => FractionallySizedBox(
+                  widthFactor: 1.0,
+                  child: Container(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Item name: ${sharedItems[index].name}',
+                            style: const TextStyle(color: Colors.black),
+                          ),
+                          Text(
+                            'Amount: ${sharedItems[index].amount.nominal} ${sharedItems[index].amount.unit}',
+                            style: const TextStyle(color: Colors.black),
+                          )
+                        ],
+                      )),
+                ),
+                separatorBuilder: (_, index) => const Divider(),
+                itemCount: sharedItems.length),
+          );
         });
   }
 }
