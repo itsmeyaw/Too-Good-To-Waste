@@ -72,14 +72,14 @@ class DBHelper {
     return List.empty();
   }
 
-  Future<List> queryOne(String object, String specName) async {
+  Future<List> queryOne(String object, String id) async {
     //Get a reference to the database.
     Database dbHelper = await db;
 
     //Query table for all the foods.
     if (object == "foods") {
       final List<Map<String, dynamic>> maps = await dbHelper
-          .rawQuery('SELECT * FROM foods WHERE name = ?', [specName]);
+          .rawQuery('SELECT * FROM foods WHERE id = ?', [id]);
       //Convert the List<Map<String, dynamic> into a List<Food>
 
       //shoud be only one row, how to simplfy the code?
@@ -367,34 +367,34 @@ class DBHelper {
     );
   }
 
-  Future<void> updateFoodWaste(String name) async {
+  Future<void> updateFoodWaste(String id) async {
     Database dbHelper = await db;
 
     await dbHelper.rawUpdate(
-        'UPDATE foods SET consume_state = ?, state = ? WHERE name = ?',
-        [1.0, 'wasted', name]);
+        'UPDATE foods SET consume_state = ?, state = ? WHERE id = ?',
+        [1.0, 'wasted', id]);
     print('###############update##################');
   }
 
-  Future<void> updateFoodConsumed(String name, String status) async {
+  Future<void> updateFoodConsumed(String id, String status) async {
     Database dbHelper = await db;
 
     await dbHelper.rawUpdate(
-        'UPDATE foods SET quantity_num = ?, consume_state = ?, state = ? WHERE name = ?',
-        [0.0, 1.0, status, name]);
+        'UPDATE foods SET quantity_num = ?, consume_state = ?, state = ? WHERE id = ?',
+        [0.0, 1.0, status, id]);
     print('###############update##################');
   }
 
-  Future<void> updateFoodExpiring(String name) async {
+  Future<void> updateFoodExpiring(String id) async {
     Database dbHelper = await db;
 
     await dbHelper.rawUpdate(
-        'UPDATE foods SET state = ? WHERE name = ?', ['expiring', name]);
+        'UPDATE foods SET state = ? WHERE name = ?', ['expiring', id]);
     print('###############update##################');
   }
 
   //Define method to delete food
-  Future<void> deleteFood(String name) async {
+  Future<void> deleteFood(String id) async {
     //Get a reference to the database
     Database dbHelper = await db;
 
@@ -402,8 +402,8 @@ class DBHelper {
     await dbHelper.delete(
       'foods',
       //Use a 'where' clause to delete a specific food -> id or name?
-      where: 'name = ?',
-      whereArgs: [name],
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 

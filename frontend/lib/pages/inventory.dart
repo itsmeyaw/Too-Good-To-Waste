@@ -219,14 +219,14 @@ class _BottomTopScreenState extends State<Inventory>
     await dbhelper.deleteFood(value);
   }
 
-  Future<void> updateFoodState(String name, String attribute) async {
-    var updatedFood = await dbhelper.queryOne('foods', name);
+  Future<void> updateFoodState(String id, String attribute) async {
+    var updatedFood = await dbhelper.queryOne('foods', id);
     print(updatedFood);
     if (attribute == 'consumed') {
-       await dbhelper.updateFoodConsumed(name, 'consumed');
+       await dbhelper.updateFoodConsumed(id, 'consumed');
       print(await dbhelper.queryAll('foods'));
     } else {
-      await dbhelper.updateFoodWaste(name);
+      await dbhelper.updateFoodWaste(id);
       print(await dbhelper.queryAll('foods'));
     }
   }
@@ -643,13 +643,15 @@ class _BottomTopScreenState extends State<Inventory>
 
                     var category = item.category;
 
-                    return buildItem(item.name, remainDays, foodNum, foodType, index,
+                   
+                    return buildItem(item.id!, item.name, remainDays, foodNum, foodType, index,
                         category, progressPercentage);
+
                   }));
         });
   }
 
-  Widget buildItem(String text, int expire, double foodNum, String foodType,
+  Widget buildItem(String id, String text, int expire, double foodNum, String foodType,
       int index, String category, double progressPercentage) {
     String? categoryIconImagePath;
     Color progressColor;
@@ -669,7 +671,8 @@ class _BottomTopScreenState extends State<Inventory>
     }
     //test = food name, 
     updateFoodDB(text, index, attribute) async {
-          await updateFoodState(text, attribute);
+
+          await updateFoodState(id, attribute);
           items.removeAt(index);
           print(items);
           print(await getAllItems('foods'));
@@ -861,17 +864,19 @@ class _BottomTopScreenState extends State<Inventory>
   }
 
   Future<void> addItemAndAssignId(UserItemService userItemService, String userId, UserItem food) async {
-  var id = await userItemService.addUserItem(userId, food);
+    var id = await userItemService.addUserItem(userId, food);
 
-  // If the initial value is null, keep fetching until a non-null value is received
-  while (id == null) {
-    print('Waiting for the new item to be created in Cloud Firestore...');
-    await Future.delayed(const Duration(seconds: 1));
-    id = await userItemService.addUserItem(userId, food);
-  }
+    // If the initial value is null, keep fetching until a non-null value is received
+    while (id == null) {
+      print('Waiting for the new item to be created in Cloud Firestore...');
+      await Future.delayed(const Duration(seconds: 1));
+      id = await userItemService.addUserItem(userId, food);
+    }
 
   // Once a non-null value is received, assign it to food.id
-  food.id = id;
+    setState(() {
+      food.id = id;
+    });
 }
 
 
@@ -1134,11 +1139,26 @@ class _BottomTopScreenState extends State<Inventory>
               } else {
                 
                 await addItemAndAssignId(userItemService, currentUser.uid, food);
-  
-                logger.d(food);
-                  //insert new data into local sqlite database
-                await inserDB(food);
-               // await dbhelper.insertFood(food);
+
+                if(food.id == null) {
+                  throw Exception('Failed to insert food into local database');
+                } else {
+                  logger.d(food);
+                    //insert new data into local sqlite database
+                  await inserDB(food);
+                  UserItem newItemData = UserItem(
+                    id: food.id,
+                    name: food.name,
+                    category: food.category,
+                    buyDate: food.buyDate,
+                    expiryDate: food.expiryDate,
+                    quantityType: food.quantityType,
+                    quantityNum: food.quantityNum,
+                    consumeState: food.consumeState,
+                    state: food.state
+                  );
+                  await userItemService.updateUserItem(currentUser.uid, food.id!, newItemData);
+                }
                
               }
                      
