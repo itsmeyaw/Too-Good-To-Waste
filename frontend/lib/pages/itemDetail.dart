@@ -7,26 +7,35 @@ import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import 'package:tooGoodToWaste/service/shared_items_service.dart';
 import 'package:tooGoodToWaste/widgets/user_location_aware_widget.dart';
+import 'package:tooGoodToWaste/service/db_helper.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tooGoodToWaste/service/user_item_service.dart';
 import '../dto/user_item_amount_model.dart';
 
-class itemDetailPage extends StatelessWidget {
+class itemDetailPage extends StatefulWidget {
+    // Declare a field that holds the food.
+  final UserItemDetail foodDetail;
+
   const itemDetailPage({super.key, required this.foodDetail});
 
-  // Declare a field that holds the food.
-  final UserItemDetail foodDetail;
+  @override
+  State<StatefulWidget> createState() => _ItemDetailPage();
+}
+
+class _ItemDetailPage extends State<itemDetailPage> {
+  // UserItemDetail _foodDetail;
+  //  _foodDetail = widget.foodDetail;
 
    @override
   Widget build(BuildContext context) {
-
+    DBHelper dbhelper = DBHelper();
     String categoryIconImagePath;
 
-    if (GlobalCateIconMap[foodDetail.category] == null) {
+    if (GlobalCateIconMap[widget.foodDetail.category] == null) {
       categoryIconImagePath = GlobalCateIconMap["Others"]!;
     } else {
-      categoryIconImagePath = GlobalCateIconMap[foodDetail.category]!;
+      categoryIconImagePath = GlobalCateIconMap[widget.foodDetail.category]!;
     }
 
     Future<dto_user.TGTWUser> getUserFromDatabase(String uid) async {
@@ -99,7 +108,7 @@ class itemDetailPage extends StatelessWidget {
             loader: (BuildContext context) => FractionallySizedBox(
               widthFactor: 1.0,
               child: SizedBox(
-                height: 300,
+                height: 400,
                 child: Container(
                   color: Theme.of(context).colorScheme.secondaryContainer,
                   child: const Center(
@@ -110,7 +119,7 @@ class itemDetailPage extends StatelessWidget {
             ),
             builder: (BuildContext context, GeoPoint userLocation) =>
               SizedBox(
-                height: 300,
+                height: 400,
                 child: Column(
                   children: <Widget>[
                     const Padding(
@@ -128,11 +137,11 @@ class itemDetailPage extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           //Extract Location information
                           locationController.value.text;              
             
-                          SharedItemService sharedItemService = SharedItemService.withCustomFirestore(db: FirebaseFirestore.instance);
+                          SharedItemService sharedItemService = SharedItemService();
 
                           User? currentUser = FirebaseAuth.instance.currentUser;
                             if (currentUser == null) {
@@ -140,14 +149,14 @@ class itemDetailPage extends StatelessWidget {
                             } else {
                               getUserFromDatabase(currentUser.uid).then((dto_user.TGTWUser userData) {
                                 SharedItem sharedItem = SharedItem(
-                                  name: foodDetail.name,
-                                  category: foodDetail.category,
+                                  name: widget.foodDetail.name,
+                                  category: widget.foodDetail.category,
                                   amount:  UserItemAmount(
-                                    nominal: foodDetail.quantitynum,
-                                    unit: foodDetail.quantitytype
+                                    nominal: widget.foodDetail.quantitynum,
+                                    unit: widget.foodDetail.quantitytype
                                   ),
-                                  buyDate: foodDetail.remainDays,
-                                  expireDate: foodDetail.remainDays,
+                                  buyDate: widget.foodDetail.remainDays,
+                                  expireDate: widget.foodDetail.remainDays,
                                   user: currentUser.uid,
                                   itemRef: '',
                                 );
@@ -158,12 +167,19 @@ class itemDetailPage extends StatelessWidget {
 
                               //TODO: delete the card in Inventory
                               UserItemService userItemService = UserItemService();
-                              // userItemService.deleteUserItem(currentUser.uid, foodDetail.id);
-
-                              Navigator.of(context, rootNavigator: true).pop();
+                              
+                              await userItemService.deleteUserItem(currentUser.uid, widget.foodDetail.id);
+                         
+                              await dbhelper.deleteFood(widget.foodDetail.id);
+                              
+                              // Navigator.of(context, rootNavigator: true).pop();
                               // Navigator.pop(context);
+                              setState(() {
+                                Navigator.of(context).pushNamedAndRemoveUntil('/', ModalRoute.withName('/'));
+                              });
+                             
                         },
-                        child: const Text('Submit'),
+                        child: const Text('Yes, I do!'),
                       )
                     ),
                   ]
@@ -202,10 +218,10 @@ class itemDetailPage extends StatelessWidget {
                   children: [
                    
                     DetailsList(
-                      quantitynum: foodDetail.quantitynum,
-                      quantitytype: foodDetail.quantitytype,
-                      category: foodDetail.category,
-                      remainDays: foodDetail.remainDays,
+                      quantitynum: widget.foodDetail.quantitynum,
+                      quantitytype: widget.foodDetail.quantitytype,
+                      category: widget.foodDetail.category,
+                      remainDays: widget.foodDetail.remainDays,
                       imagePth: categoryIconImagePath,
                     ),
                     
@@ -217,7 +233,7 @@ class itemDetailPage extends StatelessWidget {
                 child: LinearProgressIndicator(
                   backgroundColor: Colors.grey[200],
                   valueColor: const AlwaysStoppedAnimation(Colors.blue),
-                  value: foodDetail.consumestate,
+                  value: widget.foodDetail.consumestate,
                 ),
               ),
             ],
@@ -229,7 +245,7 @@ class itemDetailPage extends StatelessWidget {
             try {
       
               //check if the state is still good
-              if(foodDetail.state == 'good'){
+              if(widget.foodDetail.state == 'good'){
                 // add a new item to Shared_Item_Collection
                 // add the user_id attribute to the shared_item
                 // add the location attribute to the shared_item
@@ -237,7 +253,7 @@ class itemDetailPage extends StatelessWidget {
                 showLocationDialog();
                 // Navigator.pop(context);
               } else {
-                showExpiredDialog(foodDetail.name, foodDetail.category);
+                showExpiredDialog(widget.foodDetail.name, widget.foodDetail.category);
               }
             } catch (e) {
               print(e);

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 @immutable
 @JsonSerializable()
 class UserItemDetail {
-  // String id;
+  String id;
   String name;
   String category;
   String quantitytype;
@@ -16,7 +16,7 @@ class UserItemDetail {
 
 UserItemDetail(
   {
-    // required this.id,
+    required this.id,
     required this.name,
     required this.category,
     required this.quantitytype,
@@ -31,7 +31,7 @@ UserItemDetail(
   //of the columns in the databse.
   Map<String, dynamic> toMap() {
     return {
-      // 'id': id,
+      'id': id,
       'name': name,
       'category': category,
       'quantitytype': quantitytype,
@@ -46,6 +46,6 @@ UserItemDetail(
   //each food when using the print statement
   @override
   String toString() {
-    return 'UserItemDetail{name: $name, category: $category, quantitytype: $quantitytype, quantitynum: $quantitynum, remainDays: $remainDays, consumestate: $consumestate}, state: $state';
+    return 'UserItemDetail{id: $id, name: $name, category: $category, quantitytype: $quantitytype, quantitynum: $quantitynum, remainDays: $remainDays, consumestate: $consumestate}, state: $state';
   }
 }

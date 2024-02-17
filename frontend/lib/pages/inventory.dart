@@ -92,38 +92,6 @@ class _BottomTopScreenState extends State<Inventory>
   DBHelper dbhelper = DBHelper();
   UserItem food = UserItem(id: '', name: '', category: '', buyDate: -1, expiryDate: -1, quantityType: '', quantityNum: 0.0, consumeState: 0.0, state: 'good');
 
-  //mock data
-  Future<void> insertItem() async {
-    //Insert a new Food butter
-    var butter = UserItem(
-        id: '1',
-        name: 'butter',
-        category: 'cheese',
-        buyDate: 154893,
-        expiryDate: 156432,
-        quantityType: 'Piece',
-        quantityNum: 3,
-        consumeState: 0.50,
-        state: 'good');
-    await dbhelper.insertFood(butter);
-    var egg = UserItem(
-        id: '2',
-        name: 'eggs',
-        category: 'Egg',
-        buyDate: 134554,
-        expiryDate: 1654757,
-        quantityType: 'Number',
-        quantityNum: 4,
-        consumeState: 0,
-        state: 'good');
-    await dbhelper.insertFood(egg);
-
-    //await dbhelper.testDB();
-
-    //print('###################################third##################################');
-    //print(await dbhelper.queryAll("foods"));
-  }
-
   Future<void> insertDB(UserItem food) async {
     //Insert a new UserValue instance
     await dbhelper.insertFood(food);
@@ -813,6 +781,7 @@ class _BottomTopScreenState extends State<Inventory>
         await dbhelper.getOneFoodDoubleValue(id, 'consume_state');
 
     var foodDetail = UserItemDetail(
+        id: id,
         name: text,
         category: category,
         remainDays: remainDays,
@@ -863,23 +832,6 @@ class _BottomTopScreenState extends State<Inventory>
     }
     // return selectedCategory;
   }
-
-  Future<void> addItemAndAssignId(UserItemService userItemService, String userId, UserItem food) async {
-    var id = await userItemService.addUserItem(userId, food);
-
-    // If the initial value is null, keep fetching until a non-null value is received
-    while (id == null) {
-      print('Waiting for the new item to be created in Cloud Firestore...');
-      await Future.delayed(const Duration(seconds: 1));
-      id = await userItemService.addUserItem(userId, food);
-    }
-
-  // Once a non-null value is received, assign it to food.id
-    setState(() {
-      food.id = id;
-    });
-}
-
 
   /// opens add new item screen
   void pushAddItemScreen() {
