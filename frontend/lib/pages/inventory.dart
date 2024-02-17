@@ -1132,7 +1132,7 @@ class _BottomTopScreenState extends State<Inventory>
               addItemName(food.name);
 
                //insert new data into cloud firebase first and get the auto-generated id
-              UserItemService userItemService = UserItemService.withCustomFirestore(db: FirebaseFirestore.instance);
+              UserItemService userItemService = UserItemService();
               User? currentUser = FirebaseAuth.instance.currentUser;
 
               if (currentUser == null) {
@@ -1144,9 +1144,9 @@ class _BottomTopScreenState extends State<Inventory>
                   logger.w('Failed to insert food into local database');
                 } else {
                   logger.d(food);
-                  setState(() {
-                    food.id = id;
-                  });  
+                
+                  food.id = id;
+                  
                   await insertDB(food);
                   UserItem newItemData = UserItem(
                     id: food.id,

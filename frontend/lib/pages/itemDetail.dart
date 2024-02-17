@@ -172,9 +172,9 @@ class itemDetailPage extends StatelessWidget {
                     });
                   }
 
-                  //TODO: delete the card in Inventory
-                  UserItemService userItemService = UserItemService.withCustomFirestore(db: FirebaseFirestore.instance);
-                  // userItemService.deleteUserItem(currentUser.uid, foodDetail.id);
+                            //TODO: delete the card in Inventory
+                            UserItemService userItemService = UserItemService();
+                            // userItemService.deleteUserItem(currentUser.uid, foodDetail.id);
 
                             Navigator.of(context, rootNavigator: true).pop();
                             // Navigator.pop(context);
