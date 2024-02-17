@@ -25,7 +25,7 @@ class BodyWidget extends StatelessWidget {
             title: const Text('Meat'),
             subtitle: const Text('A strong animal'),
             onTap: () {
-              print('Meat');
+              
               category = 'Meat';
               //Navigator.pop(context, category);
             },
@@ -38,7 +38,7 @@ class BodyWidget extends StatelessWidget {
             title: const Text('Milk Product'),
             subtitle: const Text('Provider of milk'),
             onTap: () {
-              print('MilkProduct');
+           
               category = 'Milk Product';
               //Navigator.pop(context, category);
             },
@@ -50,7 +50,7 @@ class BodyWidget extends StatelessWidget {
             title: const Text('Seafood'),
             subtitle: const Text('Comes with humps'),
             onTap: () {
-              print('Seafood');
+              
               category = 'Seafood';
               //Navigator.pop(context, category);
             },
@@ -63,7 +63,7 @@ class BodyWidget extends StatelessWidget {
             title: const Text('Fruits'),
             subtitle: const Text('Provides wool'),
             onTap: () {
-              print('Fruits');
+           
               category = 'Fruits';
               //Navigator.pop(context, category);
             },
@@ -75,7 +75,7 @@ class BodyWidget extends StatelessWidget {
             title: const Text('Vegetables'),
             subtitle: const Text('Some have horns'),
             onTap: () {
-              print('Vegetables');
+  
               category = 'Vegetables';
               //Navigator.pop(context, category);
             },

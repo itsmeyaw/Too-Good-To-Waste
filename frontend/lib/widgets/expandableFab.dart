@@ -50,7 +50,6 @@ class _ExpandableFabState extends State<ExpandableFab>
 
   void _toggle(bool toClose) {
     setState(() {
-      print("#######12344234523445" + toClose.toString() );
       if (toClose) {
         _open = false;
         _controller.reverse();

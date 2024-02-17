@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:mime/mime.dart';
 import 'package:tooGoodToWaste/Pages/home.dart';
 import 'package:tooGoodToWaste/Pages/account.dart';
 import 'package:tooGoodToWaste/pages/inventory.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'dart:async';
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
+import 'package:logger/logger.dart';
 
 class Frame extends StatefulWidget {
   const Frame({super.key});
@@ -15,6 +17,7 @@ class Frame extends StatefulWidget {
 
 class _FrameState extends State<Frame> {
   bool b = false;
+  final Logger logger = Logger();
 
   // Create Database Object
   DBHelper dbHelper = DBHelper();
@@ -34,50 +37,46 @@ class _FrameState extends State<Frame> {
     //int maxID = await dbhelper.getMaxId();
     var foods = await dbHelper.queryAllGoodFood('good');
     //var foods = await dbhelper.queryAllUnconsumedFood();
-    print('######################$foods#################');
 
     for (int i = 0; i < foods.length; i++) {
       //var expiretime = await dbhelper.getAllGoodFoodIntValues('expiretime', 'good');
       var expiretime = foods[i].expiryDate;
       var foodName = foods[i].name;
       var foodState = foods[i].state;
+      var foodID = foods[i].id;
       if (expiretime < timeNow) {
-        if (foodState == 'good' || foodState == 'expiring') {
-          await dbHelper.updateFoodWaste(foodName);
-        }
-        //update uservalue negative
-
-        if (foods[i].id != null) {
+        if (foodID == null) {
           throw Exception('Failed to fetch this expired food id from local database');
         } else {
-          String category = await dbHelper.getOneFoodValue(foods[i].id!, 'category');
+          if (foodState == 'good' || foodState == 'expiring') {
+            await dbHelper.updateFoodWaste(foodID);
+          }
+          String category = await dbHelper.getOneFoodValue(foodID, 'category');
           showExpiredDialog(foodName, category);
         }
-        
-        print(
-            '###########################$foodName is wasted###########################');
+   
+        logger.e('###########################$foodName is wasted###########################');
       }
     }
     for (int i = 0; i < foods.length; i++) {
       var expiretime = foods[i].expiryDate;
       var foodName = foods[i].name;
       var foodState = foods[i].state;
+      var foodID = foods[i].id;
       int remainDays = DateTime.fromMillisecondsSinceEpoch(expiretime)
           .difference(timeNowDate)
           .inDays;
-      print('#######################$remainDays#######################');
-      // ignore: unrelated_type_equality_checks
+    
       if (remainDays < 2 && foodState == 'good' && remainDays > 0) {
         //pop up a toast
-        await dbHelper.updateFoodExpiring(foodName);
-
-        if (foods[i].id != null) {
+        if (foodID == null) {
           throw Exception('Failed to fetch this expiring food id from local database');
         } else {
-          String category = await dbHelper.getOneFoodValue(foods[i].id!, 'category');
+          await dbHelper.updateFoodExpiring(foodID);
+          String category = await dbHelper.getOneFoodValue(foodID, 'category');
           showExpiringDialog(foodName, category);
         }
-        print(
+        logger.e(
             '###########################$foodName is expiring!!!###########################');
       }
     }
@@ -86,7 +85,7 @@ class _FrameState extends State<Frame> {
   //toast contains 'Alert! Your ***  will expire in two days'
   showExpiredDialog(String foodname, String category) {
     String? categoryIconImagePath;
-    var progressColor;
+
     if (GlobalCateIconMap[category] == null) {
       categoryIconImagePath = GlobalCateIconMap["Others"];
     } else {
@@ -98,7 +97,7 @@ class _FrameState extends State<Frame> {
       title: const Text("Alert!", textAlign: TextAlign.center),
       content: Container(
         width: 3 * width / 5,
-        height: height / 3,
+        height: height / 2,
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
@@ -112,7 +111,7 @@ class _FrameState extends State<Frame> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context, 'OK'),
+          onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
           child: const Text('OK'),
         ),
       ],
@@ -127,7 +126,7 @@ class _FrameState extends State<Frame> {
   //toast contains 'Alert! Your ***  will expire in two days'
   showExpiringDialog(String foodname, String category) {
     String? categoryIconImagePath;
-    var progressColor;
+
     if (GlobalCateIconMap[category] == null) {
       categoryIconImagePath = GlobalCateIconMap["Others"];
     } else {
@@ -139,13 +138,13 @@ class _FrameState extends State<Frame> {
       title: const Text("Alert!", textAlign: TextAlign.center),
       content: Container(
         width: 3 * width / 5,
-        height: height / 3,
+        height: height / 2,
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
             Image.asset(categoryIconImagePath!),
             //Expanded(child: stateIndex>-1? Image.asset(imageList[stateIndex]):Image.asset(imageList[12])),
-            Text('Your $foodname will expire in two days!',
+            Text('Your $foodname will expire in one day!',
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontWeight: FontWeight.bold))
           ],
@@ -153,7 +152,7 @@ class _FrameState extends State<Frame> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context, 'OK'),
+          onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
           child: const Text('OK'),
         ),
       ],
@@ -194,12 +193,12 @@ class _FrameState extends State<Frame> {
             onDestinationSelected: (int index) {
               setState(() {
                 currentPage = index;
-                const oneDay = Duration(hours: 24);
+                const oneDay = Duration(minutes: 1);
                 //insertItem();
                 Timer.periodic(oneDay, (Timer timer) {
                   autocheckWaste();
                   //pop up  a propmt
-                  print("Repeat task every day");  // This statement will be printed after every one second
+                  logger.d("Repeat task every day");  // This statement will be printed after every one second
                 }); 
               });
             },

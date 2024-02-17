@@ -98,12 +98,9 @@ class _BottomTopScreenState extends State<Inventory>
   }
 
   Future<List<dynamic>> getAllItems(String dbname) async {
-    //await insertItem();
 
     //get all foods name as a list of string
     List<dynamic> items = await dbhelper.queryAll(dbname);
-    //print('##################################first######################################');
-    print(items);
 
     return items;
   }
@@ -157,9 +154,6 @@ class _BottomTopScreenState extends State<Inventory>
 
   Future<void> addItemName(value) async {
     List<String> items = await dbhelper.getAllUncosumedFoodStringValues('name');
-    //items = await getItemName();
-    //print(items);
-
     setState(() {
       items.add(value);
     });
@@ -168,7 +162,6 @@ class _BottomTopScreenState extends State<Inventory>
   Future<void> addItemExpi(value) async {
     List<int> expires =
         await dbhelper.getAllUncosumedFoodIntValues('expiry_date');
-    print(expires);
 
     setState(() {
       expires.add(value);
@@ -189,13 +182,11 @@ class _BottomTopScreenState extends State<Inventory>
 
   Future<void> updateFoodState(String id, String attribute) async {
     var updatedFood = await dbhelper.queryOne('foods', id);
-    print(updatedFood);
     if (attribute == 'consumed') {
        await dbhelper.updateFoodConsumed(id, 'consumed');
-      print(await dbhelper.queryAll('foods'));
+
     } else {
       await dbhelper.updateFoodWaste(id);
-      print(await dbhelper.queryAll('foods'));
     }
   }
 
@@ -422,8 +413,7 @@ class _BottomTopScreenState extends State<Inventory>
 
   Future<List<String>> getWasteItemString(String value) async {
     List<Map<String, dynamic>> items = await dbhelper.getAllWastedFoodList();
-    print(
-        '#################################$items############################');
+
     List<String> WasteName =
         List<String>.generate(items.length, (i) => items[i][value]);
     return WasteName;
@@ -470,9 +460,7 @@ class _BottomTopScreenState extends State<Inventory>
           List<double> num = snapshot.requireData[1];
           List<String> type = snapshot.requireData[2];
           List<String> categoryies = snapshot.requireData[3];
-          print(
-              '###################$Category##############$num#####################3$type#######################$itemsWaste##################');
-
+ 
           return ListTileTheme(
               contentPadding: const EdgeInsets.all(15),
               textColor: Colors.black54,
@@ -602,11 +590,7 @@ class _BottomTopScreenState extends State<Inventory>
                     //how to show the listsby sequence of expire time?
                     var remainDays = DateTime.fromMillisecondsSinceEpoch(item.expiryDate).difference(DateTime.now()).inDays;
                     var progressPercentage = 1.0 - (remainDays / DateTime.fromMillisecondsSinceEpoch(item.expiryDate).difference(DateTime.fromMillisecondsSinceEpoch(item.buyDate)).inDays);
-                    progressPercentage = progressPercentage > 1.0 ? 1.0 : progressPercentage;
-                    print(remainDays);
-                    print(progressPercentage);
-                    print(DateTime.fromMillisecondsSinceEpoch(item.expiryDate));
-                   
+                    progressPercentage = progressPercentage > 1.0 ? 1.0 : progressPercentage;                  
 
                     var category = item.category;
 
@@ -1077,7 +1061,7 @@ class _BottomTopScreenState extends State<Inventory>
                                           int day = selectedDate.day;
                                           int timestamp = selectedDate
                                               .millisecondsSinceEpoch;
-                                          print("timestamp$timestamp");
+                                       
                                           expireTimeStamp = timestamp;
                                           food.expiryDate = expireTimeStamp;
                                           expireTimeController.text =
@@ -1181,9 +1165,9 @@ class _BottomTopScreenState extends State<Inventory>
                 }
                
               }       
-              await getAllItems('foods').then((value) => print("##################$value#################"));
+              await getAllItems('foods');
             } on FormatException {
-              print('Format Error!');
+              logger.e('Format Error!');
             }
           
             nameController.clear();

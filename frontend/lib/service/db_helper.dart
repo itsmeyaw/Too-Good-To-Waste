@@ -239,7 +239,6 @@ class DBHelper {
 
     List<Map<String, dynamic>> maps = await dbHelper
         .query('foods', where: 'state = ?', whereArgs: ['wasted']);
-    print('########################3$maps########################');
 
     return maps;
   }
@@ -373,7 +372,7 @@ class DBHelper {
     await dbHelper.rawUpdate(
         'UPDATE foods SET consume_state = ?, state = ? WHERE id = ?',
         [1.0, 'wasted', id]);
-    print('###############update##################');
+
   }
 
   Future<void> updateFoodConsumed(String id, String status) async {
@@ -382,15 +381,14 @@ class DBHelper {
     await dbHelper.rawUpdate(
         'UPDATE foods SET consume_state = ?, state = ? WHERE id = ?',
         [1.0, status, id]);
-    print('###############update##################');
+
   }
 
   Future<void> updateFoodExpiring(String id) async {
     Database dbHelper = await db;
 
     await dbHelper.rawUpdate(
-        'UPDATE foods SET state = ? WHERE name = ?', ['expiring', id]);
-    print('###############update##################');
+        'UPDATE foods SET state = ? WHERE id = ?', ['expiring', id]);
   }
 
   //Define method to delete food

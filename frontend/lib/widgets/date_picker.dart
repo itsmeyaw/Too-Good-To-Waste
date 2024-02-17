@@ -59,12 +59,10 @@ class _DataPickerState extends State<DataPicker> {
                 if (value != selectedDate) {
                   setState(() {
                     selectedDate = value;
-                    print(
-                        '################################$selectedDate##########################################');
+                  
                     int timestamp = selectedDate.millisecondsSinceEpoch;
                     expireDate = timestamp;
-                    print(
-                        '###################################$expireDate@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+        
                     getdatePicker(expireDate);
                     // Navigator.pop(context)
                     //記錄下用戶選擇的時間 ------> 存入數據庫

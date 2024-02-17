@@ -6,6 +6,7 @@ import 'package:tooGoodToWaste/dto/user_item_detail_model.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import 'package:tooGoodToWaste/service/shared_items_service.dart';
+import 'package:tooGoodToWaste/service/user_location_service.dart';
 import 'package:tooGoodToWaste/widgets/user_location_aware_widget.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
 
@@ -255,7 +256,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
                 showExpiredDialog(widget.foodDetail.name, widget.foodDetail.category);
               }
             } catch (e) {
-              print(e);
+              logger.e(e);
             }
           },
           tooltip: 'Publish Item',
