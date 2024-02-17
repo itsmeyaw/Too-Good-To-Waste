@@ -147,7 +147,7 @@ class _HomeState extends State<Home> {
                                     initialCameraPosition: CameraPosition(
                                       target: LatLng(userLocation.latitude,
                                           userLocation.longitude),
-                                      zoom: 15.0 - radius / 5,
+                                      zoom: 13.0 - radius / 4,
                                     ),
                                 markers: createMarkers(sharedItems),)),
                           );
