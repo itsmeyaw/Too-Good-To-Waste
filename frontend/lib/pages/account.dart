@@ -263,8 +263,7 @@ class PostPageWidget extends StatelessWidget {
         future: sharedItemService.getSharedItemOfUser(userId),
         builder: (BuildContext context,
             AsyncSnapshot<Iterable<SharedItem>> sharedItemsSnapshot) {
-          if (sharedItemsSnapshot.connectionState == ConnectionState.active &&
-              !sharedItemsSnapshot.hasData) {
+          if (!sharedItemsSnapshot.hasData) {
             return const CircularProgressIndicator();
           }
 
