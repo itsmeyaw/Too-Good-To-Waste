@@ -5,7 +5,7 @@ part 'user_item_model.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class UserItem {
-  String id;
+  String? id;
   String name;
   String category;
   int boughtTime;
@@ -30,7 +30,7 @@ UserItem(
 );
 
   //Convert a Food into a Map. The keys must correspond to the names
-  //of the columns in the databse.
+  //of the columns in the database.
   Map<String, dynamic> toMap() {
     return {
       'id': id,

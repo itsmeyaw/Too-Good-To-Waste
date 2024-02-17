@@ -10,12 +10,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:mime/mime.dart';
 import 'package:rive/rive.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import 'package:tooGoodToWaste/dto/item_allergies_enum.dart';
 import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import 'package:tooGoodToWaste/pages/home.dart';
+import 'package:tooGoodToWaste/service/ai_service.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'dart:async';
@@ -36,6 +38,8 @@ import 'package:tooGoodToWaste/service/user_item_service.dart';
 
 import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
 
+Logger logger = Logger();
+
 class Inventory extends StatefulWidget {
   const Inventory({super.key});
 
@@ -52,6 +56,7 @@ class _BottomTopScreenState extends State<Inventory>
   TextEditingController quanNumController = TextEditingController();
   TextEditingController quanNumAndTypeController = TextEditingController();
   TextEditingController categoryController = TextEditingController();
+  AiService aiService = AiService();
 
   // camera related
   late String imagePath;
@@ -325,54 +330,29 @@ class _BottomTopScreenState extends State<Inventory>
     }
   }
 
-  Future pickImage(bool isCamera) async {
+  Future<void> pickImage(bool isCamera) async {
     XFile? image;
+
     if (isCamera == true) {
-      image = await ImagePicker().pickImage(source: ImageSource.camera);
+      image = await ImagePicker().pickImage(source: ImageSource.camera, requestFullMetadata: true);
     } else {
-      image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      image = await ImagePicker().pickImage(source: ImageSource.gallery, requestFullMetadata: true);
     }
+
     if (image == null) return;
-    CroppedFile? croppedFile = await ImageCropper().cropImage(
-      sourcePath: image.path,
-      aspectRatioPresets: Platform.isAndroid
-          ? [
-              CropAspectRatioPreset.square,
-              CropAspectRatioPreset.ratio3x2,
-              CropAspectRatioPreset.original,
-              CropAspectRatioPreset.ratio4x3,
-              CropAspectRatioPreset.ratio16x9
-            ]
-          : [
-              CropAspectRatioPreset.original,
-              CropAspectRatioPreset.square,
-              CropAspectRatioPreset.ratio3x2,
-              CropAspectRatioPreset.ratio4x3,
-              CropAspectRatioPreset.ratio5x3,
-              CropAspectRatioPreset.ratio5x4,
-              CropAspectRatioPreset.ratio7x5,
-              CropAspectRatioPreset.ratio16x9
-            ],
-      uiSettings: [
-        AndroidUiSettings(
-            toolbarTitle: 'Cropper',
-            toolbarColor: Colors.deepOrange,
-            toolbarWidgetColor: Colors.white,
-            initAspectRatio: CropAspectRatioPreset.original,
-            lockAspectRatio: false),
-        IOSUiSettings(
-          title: 'Cropper',
-        ),
-        WebUiSettings(context: context),
-      ],
-    );
-    if (croppedFile != null) {
-      setState(() {
-        imageFile = File(croppedFile.path);
-        imageData = base64Encode(imageFile.readAsBytesSync());
-      });
+
+    List<int> pickedImageData = await image.readAsBytes();
+    String? mime = lookupMimeType(image.path);
+
+    logger.d('Successfully obtained image data ${image.name} (mime: $mime) (data: ${base64Encode(pickedImageData)})');
+
+    if (mime != null) {
+      List<UserItem> items = await aiService.readReceipt(mime, base64Encode(pickedImageData));
+
+      // TODO @Xiyue: Process the returned items
+    } else {
+      logger.e('Cannot determine mime');
     }
-    doUpload();
   }
 
   //upload picture request related
@@ -1281,7 +1261,7 @@ class _BottomTopScreenState extends State<Inventory>
               food.quantityNum = double.parse(quanNumController.text);
               food.consumeState = 0.0;
               food.state = 'good';
-              logger.f( 'food: $food');
+              logger.d( 'food: $food');
               //var quantityNum = int.parse(quanNumController.text);
               //接上InputPage裏DateTime時間組件，再轉化成timestamp存進數據庫
               //var expiretime = int.parse(expireTimeController.text);
