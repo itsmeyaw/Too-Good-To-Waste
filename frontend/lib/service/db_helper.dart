@@ -380,8 +380,8 @@ class DBHelper {
     Database dbHelper = await db;
 
     await dbHelper.rawUpdate(
-        'UPDATE foods SET quantity_num = ?, consume_state = ?, state = ? WHERE id = ?',
-        [0.0, 1.0, status, id]);
+        'UPDATE foods SET consume_state = ?, state = ? WHERE id = ?',
+        [1.0, status, id]);
     print('###############update##################');
   }
 

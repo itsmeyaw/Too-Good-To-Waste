@@ -182,9 +182,9 @@ class _BottomTopScreenState extends State<Inventory>
     });
   }
 
-  Future<void> deleteItem(String value) async {
+  Future<void> deleteItem(String id) async {
     //items = await getItemName();
-    await dbhelper.deleteFood(value);
+    await dbhelper.deleteFood(id);
   }
 
   Future<void> updateFoodState(String id, String attribute) async {
@@ -606,27 +606,30 @@ class _BottomTopScreenState extends State<Inventory>
                     print(remainDays);
                     print(progressPercentage);
                     print(DateTime.fromMillisecondsSinceEpoch(item.expiryDate));
-                    var foodNum = item.quantityNum;
-                    var foodType = item.quantityType;
+                   
 
                     var category = item.category;
 
+                    User? currentUser = FirebaseAuth.instance.currentUser;
+                    if (currentUser == null) {
+                      throw Exception('Please login first.');
+                    } else {
+                        return buildItem(currentUser.uid, item.id!, item, remainDays, index, progressPercentage);
+                    }
                    
-                    return buildItem(item.id!, item.name, remainDays, foodNum, foodType, index,
-                        category, progressPercentage);
+                 
 
                   }));
         });
   }
 
-  Widget buildItem(String id, String text, int expire, double foodNum, String foodType,
-      int index, String category, double progressPercentage) {
+  Widget buildItem(String userId, String itemId, UserItem userItem, int remainDays, int index, double progressPercentage) {
     String? categoryIconImagePath;
     Color progressColor;
-    if (GlobalCateIconMap[category] == null) {
+    if (GlobalCateIconMap[userItem.category] == null) {
       categoryIconImagePath = GlobalCateIconMap["Others"];
     } else {
-      categoryIconImagePath = GlobalCateIconMap[category];
+      categoryIconImagePath = GlobalCateIconMap[userItem.category];
     }
     if (progressPercentage > 0.0 && progressPercentage < 0.49) {
       progressColor = Colors.green;
@@ -638,12 +641,25 @@ class _BottomTopScreenState extends State<Inventory>
       progressColor = Colors.black;
     }
     //test = food name, 
-    updateFoodDB(text, index, attribute) async {
+    updateFoodDB(index, attribute) async {
 
-      await updateFoodState(id, attribute);
+      await updateFoodState(itemId, attribute);
+
+      UserItemService userItemService = UserItemService();            
+      await userItemService.updateUserItem(userId, itemId, UserItem(
+        id: itemId,
+        name: userItem.name,
+        category: userItem.category,
+        buyDate: userItem.buyDate,
+        expiryDate: userItem.expiryDate,
+        quantityType: userItem.quantityType,
+        quantityNum: userItem.quantityNum,
+        consumeState: 1.0,
+        state: attribute,
+      ));
+
       items.removeAt(index);
-      print(items);
-      print(await getAllItems('foods'));
+  
     }
 
     return Card(
@@ -653,7 +669,7 @@ class _BottomTopScreenState extends State<Inventory>
       ),
       margin: const EdgeInsets.all(10),
       color:
-          expire > 3 ? Colors.white : const Color.fromRGBO(238, 162, 164, 0.8),
+          remainDays > 3 ? Colors.white : const Color.fromRGBO(238, 162, 164, 0.8),
       child: Slidable(
         key: const ValueKey(0),
         startActionPane: ActionPane(
@@ -661,23 +677,15 @@ class _BottomTopScreenState extends State<Inventory>
           motion: const ScrollMotion(),
 
           // A pane can dismiss the Slidable.
-          dismissible: DismissiblePane(onDismissed: () {
-            updateFoodDB(text, index, 'wasted');
+          dismissible: DismissiblePane(onDismissed: ()  {
+            updateFoodDB(index, 'wasted');
           }),
 
           // All actions are defined in the children parameter.
           children: [
             // A SlidableAction can have an icon and/or a label.
             SlidableAction(
-              onPressed: (BuildContext context) async {
-
-                updateFoodDB(text, index, 'wasted');
-                // ignore: list_remove_unrelated_type
-                //items is supposed to be [] right?
-                //items.remove(text);
-                //  await Provider.of<BottomTopScreen>(context, listen: false).remove(items[0]);
-          
-              },
+              onPressed: (context) => {},
               backgroundColor: const Color(0xFFFE4A49),
               foregroundColor: Colors.white,
               icon: Icons.delete,
@@ -690,15 +698,13 @@ class _BottomTopScreenState extends State<Inventory>
         endActionPane: ActionPane(
           motion: const ScrollMotion(),
           dismissible: DismissiblePane(onDismissed: () {
-            updateFoodDB(text, index, 'consumed');
+            updateFoodDB(index, 'consumed');
           }),
           children: [
             SlidableAction(
               // An action can be bigger than the others.
               flex: 2,
-              onPressed: (BuildContext context) async {
-                updateFoodDB(text, index, 'consumed');
-              },
+              onPressed: (context) => {},
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
               icon: Icons.archive,
@@ -723,7 +729,7 @@ class _BottomTopScreenState extends State<Inventory>
             ),
           ),
           title: Text(
-            text,
+            userItem.name,
             style: const TextStyle(fontSize: 25),
           ),
           subtitle: Row(
@@ -741,27 +747,32 @@ class _BottomTopScreenState extends State<Inventory>
                 flex: 4,
                 child: Padding(
                     padding: const EdgeInsets.only(left: 10.0),
-                    child: Text("$expire Days Left",
+                    child: Text("$remainDays Days Left",
                         style: TextStyle(
-                            color: expire > 3 ? Colors.orange : Colors.black))),
+                            color: remainDays > 3 ? Colors.orange : Colors.black))),
               )
             ],
           ),
           // subtitle: Text("Expired in $expire days", style: TextStyle(fontStyle: FontStyle.italic),),
-          trailing: Text("$foodNum $foodType",
+          trailing: Text("${userItem.quantityNum} ${userItem.quantityType}",
               style: const TextStyle(
                 fontFamily: 'Roboto',
                 fontSize: 24,
               )),
           onTap: () {
-            pushItemDetailScreen(id, text);
+            pushItemDetailScreen(itemId, userItem.name);
           },
           onLongPress: () async {
             //長按卡片刪除
-            await deleteItem(text);
-            items.removeAt(index);
-            print(
-                '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%${await getAllItems('foods')}%%%%%%%%%%%%%%%%%%%%%%%%');
+            await deleteItem(itemId);
+
+            UserItemService userItemService = UserItemService();         
+            await userItemService.deleteUserItem(userId, itemId);
+            setState(() {
+              items.removeAt(index);
+            });
+            logger.d('Deleted item $itemId');
+    
           },
         ),
       ),
