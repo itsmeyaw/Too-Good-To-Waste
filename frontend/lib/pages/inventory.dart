@@ -347,12 +347,12 @@ class _BottomTopScreenState extends State<Inventory>
     logger.d('Successfully obtained image data ${image.name} (mime: $mime) (data: ${base64Encode(pickedImageData)})');
 
     if (mime != null) {
-      aiService.readReceipt(mime, base64Encode(pickedImageData));
+      List<UserItem> items = await aiService.readReceipt(mime, base64Encode(pickedImageData));
+
+      // TODO @Xiyue: Process the returned items
     } else {
       logger.e('Cannot determine mime');
     }
-
-    // TODO @Xiyue: Process the image here
   }
 
   //upload picture request related
