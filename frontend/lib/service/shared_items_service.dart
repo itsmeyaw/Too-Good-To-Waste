@@ -73,7 +73,9 @@ class SharedItemService {
         .collection(COLLECTION)
         .where('user', isEqualTo: userId)
         .get()
-        .then((querySnapshot) =>
-            querySnapshot.docs.map((doc) => SharedItem.fromJson(doc.data())));
+        .then((querySnapshot) {
+      logger.d("Got ${querySnapshot.size} shared items of user $userId");
+      return querySnapshot.docs.map((doc) => SharedItem.fromJson(doc.data()));
+    });
   }
 }
