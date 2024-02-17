@@ -124,7 +124,7 @@ class _BottomTopScreenState extends State<Inventory>
     //print(await dbhelper.queryAll("foods"));
   }
 
-  Future<void> inserDB(UserItem food) async {
+  Future<void> insertDB(UserItem food) async {
     //Insert a new UserValue instance
     await dbhelper.insertFood(food);
   }
@@ -672,11 +672,12 @@ class _BottomTopScreenState extends State<Inventory>
     //test = food name, 
     updateFoodDB(text, index, attribute) async {
 
-          await updateFoodState(id, attribute);
-          items.removeAt(index);
-          print(items);
-          print(await getAllItems('foods'));
-        }
+      await updateFoodState(id, attribute);
+      items.removeAt(index);
+      print(items);
+      print(await getAllItems('foods'));
+    }
+
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(
@@ -1137,15 +1138,16 @@ class _BottomTopScreenState extends State<Inventory>
               if (currentUser == null) {
                 throw Exception('You should Login first!');
               } else {
+                var id = await userItemService.addUserItem(currentUser.uid, food);
                 
-                await addItemAndAssignId(userItemService, currentUser.uid, food);
-
-                if(food.id == null) {
-                  throw Exception('Failed to insert food into local database');
+                if(id == null) {
+                  logger.w('Failed to insert food into local database');
                 } else {
                   logger.d(food);
-                    //insert new data into local sqlite database
-                  await inserDB(food);
+                  setState(() {
+                    food.id = id;
+                  });  
+                  await insertDB(food);
                   UserItem newItemData = UserItem(
                     id: food.id,
                     name: food.name,
@@ -1160,11 +1162,8 @@ class _BottomTopScreenState extends State<Inventory>
                   await userItemService.updateUserItem(currentUser.uid, food.id!, newItemData);
                 }
                
-              }
-                     
+              }       
               await getAllItems('foods').then((value) => print("##################$value#################"));
-
-
             } on FormatException {
               print('Format Error!');
             }

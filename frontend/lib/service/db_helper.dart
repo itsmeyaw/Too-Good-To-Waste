@@ -130,13 +130,13 @@ class DBHelper {
     return foodsname;
   }
 
-  Future<String> getOneFoodValue(String name, String value) async {
+  Future<String> getOneFoodValue(String id, String value) async {
     //Get a reference to the database.
     Database dbHelper = await db;
     //Query table for all the foods.
 
     final List<Map<String, dynamic>> maps = await dbHelper.query('foods',
-        columns: [value], where: '"name" = ?', whereArgs: [name]);
+        columns: [value], where: '"id" = ?', whereArgs: [id]);
 
     //Convert the List<Map<String, dynamic> into a String
     var foodname = maps[0][value];

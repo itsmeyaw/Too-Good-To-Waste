@@ -47,8 +47,13 @@ class _FrameState extends State<Frame> {
         }
         //update uservalue negative
 
-        String category = await dbHelper.getOneFoodValue(foodName, 'category');
-        showExpiredDialog(foodName, category);
+        if (foods[i].id != null) {
+          throw Exception('Failed to fetch this expired food id from local database');
+        } else {
+          String category = await dbHelper.getOneFoodValue(foods[i].id!, 'category');
+          showExpiredDialog(foodName, category);
+        }
+        
         print(
             '###########################$foodName is wasted###########################');
       }
@@ -65,8 +70,13 @@ class _FrameState extends State<Frame> {
       if (remainDays < 2 && foodState == 'good' && remainDays > 0) {
         //pop up a toast
         await dbHelper.updateFoodExpiring(foodName);
-        String category = await dbHelper.getOneFoodValue(foodName, 'category');
-        showExpiringDialog(foodName, category);
+
+        if (foods[i].id != null) {
+          throw Exception('Failed to fetch this expiring food id from local database');
+        } else {
+          String category = await dbHelper.getOneFoodValue(foods[i].id!, 'category');
+          showExpiringDialog(foodName, category);
+        }
         print(
             '###########################$foodName is expiring!!!###########################');
       }
