@@ -22,7 +22,6 @@ import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'dart:async';
 
-
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:tooGoodToWaste/widgets/allergies_picker.dart';
@@ -78,6 +77,7 @@ class _BottomTopScreenState extends State<Inventory>
     categoryController.dispose();
     super.dispose();
   }
+
   //FocusNode focusNode1 = FocusNode();
   //FocusNode focusNode2 = FocusNode();
   //FocusScopeNode? focusScopeNode;
@@ -86,11 +86,21 @@ class _BottomTopScreenState extends State<Inventory>
   bool showSuggestList = false;
   List<UserItem> items = [];
   List<String> itemsWaste = [];
+
   //List<String> items = ['eggs','milk','butter];
 
   //Create Databse Object
   DBHelper dbhelper = DBHelper();
-  UserItem food = UserItem(id: '', name: '', category: '', buyDate: -1, expiryDate: -1, quantityType: '', quantityNum: 0.0, consumeState: 0.0, state: 'good');
+  UserItem food = UserItem(
+      id: '',
+      name: '',
+      category: ItemCategory.Others,
+      buyDate: -1,
+      expiryDate: -1,
+      quantityType: '',
+      quantityNum: 0.0,
+      consumeState: 0.0,
+      state: 'good');
 
   Future<void> insertDB(UserItem food) async {
     //Insert a new UserValue instance
@@ -98,7 +108,6 @@ class _BottomTopScreenState extends State<Inventory>
   }
 
   Future<List<dynamic>> getAllItems(String dbname) async {
-
     //get all foods name as a list of string
     List<dynamic> items = await dbhelper.queryAll(dbname);
 
@@ -106,14 +115,12 @@ class _BottomTopScreenState extends State<Inventory>
   }
 
   Future<List<String>> getItemName() async {
- 
     List<String> items = await dbhelper.getAllUncosumedFoodStringValues('name');
 
     return items;
   }
 
   Future<List<String>> getItemCategory() async {
-
     List<String> category =
         await dbhelper.getAllUncosumedFoodStringValues('category');
 
@@ -123,7 +130,8 @@ class _BottomTopScreenState extends State<Inventory>
   //
   Future<List<double>> getItemQuanNum() async {
     //get all foods quantity number as a list of integers
-    List<double> num = await dbhelper.getAllUncosumedFoodDoubleValues('quantity_num');
+    List<double> num =
+        await dbhelper.getAllUncosumedFoodDoubleValues('quantity_num');
 
     return num;
   }
@@ -183,8 +191,7 @@ class _BottomTopScreenState extends State<Inventory>
   Future<void> updateFoodState(String id, String attribute) async {
     var updatedFood = await dbhelper.queryOne('foods', id);
     if (attribute == 'consumed') {
-       await dbhelper.updateFoodConsumed(id, 'consumed');
-
+      await dbhelper.updateFoodConsumed(id, 'consumed');
     } else {
       await dbhelper.updateFoodWaste(id);
     }
@@ -194,9 +201,11 @@ class _BottomTopScreenState extends State<Inventory>
     XFile? image;
 
     if (isCamera == true) {
-      image = await ImagePicker().pickImage(source: ImageSource.camera, requestFullMetadata: true);
+      image = await ImagePicker()
+          .pickImage(source: ImageSource.camera, requestFullMetadata: true);
     } else {
-      image = await ImagePicker().pickImage(source: ImageSource.gallery, requestFullMetadata: true);
+      image = await ImagePicker()
+          .pickImage(source: ImageSource.gallery, requestFullMetadata: true);
     }
 
     if (image == null) return;
@@ -204,10 +213,12 @@ class _BottomTopScreenState extends State<Inventory>
     List<int> pickedImageData = await image.readAsBytes();
     String? mime = lookupMimeType(image.path);
 
-    logger.d('Successfully obtained image data ${image.name} (mime: $mime) (data: ${base64Encode(pickedImageData)})');
+    logger.d(
+        'Successfully obtained image data ${image.name} (mime: $mime) (data: ${base64Encode(pickedImageData)})');
 
     if (mime != null) {
-      List<UserItem> items = await aiService.readReceipt(mime, base64Encode(pickedImageData));
+      List<UserItem> items =
+          await aiService.readReceipt(mime, base64Encode(pickedImageData));
 
       // TODO @Xiyue: Process the returned items
     } else {
@@ -217,6 +228,7 @@ class _BottomTopScreenState extends State<Inventory>
 
   var txt = TextEditingController();
   late TooltipBehavior _tooltipBehavior;
+
   //late bool _isLoading;
   late TabController _tabController;
 
@@ -265,8 +277,7 @@ class _BottomTopScreenState extends State<Inventory>
                     ),
                     hintText: "Search"),
               ),
-              Expanded(
-                  child: buildList()),
+              Expanded(child: buildList()),
             ],
           ),
           Container(
@@ -379,35 +390,35 @@ class _BottomTopScreenState extends State<Inventory>
           ),
         ],
       ),
-      floatingActionButton:
-          ExpandableFab(
-              distance: 112.0,
-              toClose: toClose,
-              children: [
-                FloatingActionButton(
-                  tooltip: "Add item",
-                  onPressed: () {
-                    // clear out txt buffer before entering new screen
-                    txt.value = const TextEditingValue();
-                    //pushAddItemPage();
-                    pushAddItemScreen();
-                    setState(() {
-                      toClose = true;
-                    });
-                  },
-                  child: const Icon(Icons.add),
-                ),
-                FloatingActionButton(
-                  onPressed: () => pickImage(false),
-                  heroTag: null,
-                  child: const Icon(Icons.photo_album),
-                ),
-                FloatingActionButton(
-                  onPressed: () => pickImage(true),
-                  heroTag: null,
-                  child: const Icon(Icons.camera_alt),
-                ),
-              ],),
+      floatingActionButton: ExpandableFab(
+        distance: 112.0,
+        toClose: toClose,
+        children: [
+          FloatingActionButton(
+            tooltip: "Add item",
+            onPressed: () {
+              // clear out txt buffer before entering new screen
+              txt.value = const TextEditingValue();
+              //pushAddItemPage();
+              pushAddItemScreen();
+              setState(() {
+                toClose = true;
+              });
+            },
+            child: const Icon(Icons.add),
+          ),
+          FloatingActionButton(
+            onPressed: () => pickImage(false),
+            heroTag: null,
+            child: const Icon(Icons.photo_album),
+          ),
+          FloatingActionButton(
+            onPressed: () => pickImage(true),
+            heroTag: null,
+            child: const Icon(Icons.camera_alt),
+          ),
+        ],
+      ),
     );
   }
 
@@ -460,7 +471,7 @@ class _BottomTopScreenState extends State<Inventory>
           List<double> num = snapshot.requireData[1];
           List<String> type = snapshot.requireData[2];
           List<String> categoryies = snapshot.requireData[3];
- 
+
           return ListTileTheme(
               contentPadding: const EdgeInsets.all(15),
               textColor: Colors.black54,
@@ -554,9 +565,7 @@ class _BottomTopScreenState extends State<Inventory>
   Widget buildList() {
     //items = await getItemName();
     return FutureBuilder(
-        future: Future.wait([
-          getAllItems('foods')
-        ]),
+        future: Future.wait([getAllItems('foods')]),
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
           if (!snapshot.hasData) {
             return const Text('Loading...'); // still loading
@@ -588,9 +597,18 @@ class _BottomTopScreenState extends State<Inventory>
 
                     //var expires = getItemExpiringTime();
                     //how to show the listsby sequence of expire time?
-                    var remainDays = DateTime.fromMillisecondsSinceEpoch(item.expiryDate).difference(DateTime.now()).inDays;
-                    var progressPercentage = 1.0 - (remainDays / DateTime.fromMillisecondsSinceEpoch(item.expiryDate).difference(DateTime.fromMillisecondsSinceEpoch(item.buyDate)).inDays);
-                    progressPercentage = progressPercentage > 1.0 ? 1.0 : progressPercentage;                  
+                    var remainDays =
+                        DateTime.fromMillisecondsSinceEpoch(item.expiryDate)
+                            .difference(DateTime.now())
+                            .inDays;
+                    var progressPercentage = 1.0 -
+                        (remainDays /
+                            DateTime.fromMillisecondsSinceEpoch(item.expiryDate)
+                                .difference(DateTime.fromMillisecondsSinceEpoch(
+                                    item.buyDate))
+                                .inDays);
+                    progressPercentage =
+                        progressPercentage > 1.0 ? 1.0 : progressPercentage;
 
                     var category = item.category;
 
@@ -598,11 +616,9 @@ class _BottomTopScreenState extends State<Inventory>
                     if (currentUser == null) {
                       throw Exception('Please login first.');
                     } else {
-                        return buildItem(currentUser.uid, item.id!, item, remainDays, index, progressPercentage);
+                      return buildItem(currentUser.uid, item.id!, item,
+                          remainDays, index, progressPercentage);
                     }
-                   
-                 
-
                   }));
         });
   }
@@ -611,31 +627,28 @@ class _BottomTopScreenState extends State<Inventory>
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     AlertDialog dialog = AlertDialog(
-      title: const Text("Hey!", 
+      title: const Text("Hey!",
           textAlign: TextAlign.center,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 30,
-          )
-        ),
+          )),
       content: Container(
-        width: 3 * width / 5,
-        height: height / 8,
-        padding: const EdgeInsets.all(10.0),
-        child: 
-          Text('Are you sure you want to delete this item?',
+          width: 3 * width / 5,
+          height: height / 8,
+          padding: const EdgeInsets.all(10.0),
+          child: Text('Are you sure you want to delete this item?',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
-              ))
-      ),
+              ))),
       actions: [
         TextButton(
           onPressed: () async {
             await deleteItem(itemId);
 
-            UserItemService userItemService = UserItemService();         
+            UserItemService userItemService = UserItemService();
             await userItemService.deleteUserItem(userId, itemId);
             logger.d('Deleted item $itemId');
 
@@ -644,7 +657,6 @@ class _BottomTopScreenState extends State<Inventory>
               // Navigator.of(context).pushNamedAndRemoveUntil('/', ModalRoute.withName('/'));
               Navigator.of(context, rootNavigator: true).pop();
             });
-           
           },
           child: const Text('Yes'),
         ),
@@ -657,8 +669,8 @@ class _BottomTopScreenState extends State<Inventory>
         });
   }
 
-
-  Widget buildItem(String userId, String itemId, UserItem userItem, int remainDays, int index, double progressPercentage) {
+  Widget buildItem(String userId, String itemId, UserItem userItem,
+      int remainDays, int index, double progressPercentage) {
     String? categoryIconImagePath;
     Color progressColor;
     if (GlobalCateIconMap[userItem.category] == null) {
@@ -675,26 +687,27 @@ class _BottomTopScreenState extends State<Inventory>
     } else {
       progressColor = Colors.black;
     }
-    //test = food name, 
+    //test = food name,
     updateFoodDB(index, attribute) async {
-
       await updateFoodState(itemId, attribute);
 
-      UserItemService userItemService = UserItemService();            
-      await userItemService.updateUserItem(userId, itemId, UserItem(
-        id: itemId,
-        name: userItem.name,
-        category: userItem.category,
-        buyDate: userItem.buyDate,
-        expiryDate: userItem.expiryDate,
-        quantityType: userItem.quantityType,
-        quantityNum: userItem.quantityNum,
-        consumeState: 1.0,
-        state: attribute,
-      ));
+      UserItemService userItemService = UserItemService();
+      await userItemService.updateUserItem(
+          userId,
+          itemId,
+          UserItem(
+            id: itemId,
+            name: userItem.name,
+            category: userItem.category,
+            buyDate: userItem.buyDate,
+            expiryDate: userItem.expiryDate,
+            quantityType: userItem.quantityType,
+            quantityNum: userItem.quantityNum,
+            consumeState: 1.0,
+            state: attribute,
+          ));
 
       items.removeAt(index);
-  
     }
 
     return Card(
@@ -703,8 +716,9 @@ class _BottomTopScreenState extends State<Inventory>
         borderRadius: BorderRadius.circular(10),
       ),
       margin: const EdgeInsets.all(10),
-      color:
-          remainDays > 3 ? Colors.white : const Color.fromRGBO(238, 162, 164, 0.8),
+      color: remainDays > 3
+          ? Colors.white
+          : const Color.fromRGBO(238, 162, 164, 0.8),
       child: Slidable(
         key: const ValueKey(0),
         startActionPane: ActionPane(
@@ -712,7 +726,7 @@ class _BottomTopScreenState extends State<Inventory>
           motion: const ScrollMotion(),
 
           // A pane can dismiss the Slidable.
-          dismissible: DismissiblePane(onDismissed: ()  {
+          dismissible: DismissiblePane(onDismissed: () {
             updateFoodDB(index, 'wasted');
           }),
 
@@ -784,7 +798,9 @@ class _BottomTopScreenState extends State<Inventory>
                     padding: const EdgeInsets.only(left: 10.0),
                     child: Text("$remainDays Days Left",
                         style: TextStyle(
-                            color: remainDays > 3 ? Colors.orange : Colors.black))),
+                            color: remainDays > 3
+                                ? Colors.orange
+                                : Colors.black))),
               )
             ],
           ),
@@ -803,15 +819,13 @@ class _BottomTopScreenState extends State<Inventory>
 
             // await deleteItem(itemId);
 
-            // UserItemService userItemService = UserItemService();         
+            // UserItemService userItemService = UserItemService();
             // await userItemService.deleteUserItem(userId, itemId);
             // setState(() {
             //   items.removeAt(index);
-                
-                            
+
             // });
             // logger.d('Deleted item $itemId');
-    
           },
         ),
       ),
@@ -838,8 +852,7 @@ class _BottomTopScreenState extends State<Inventory>
         quantitytype: quantype,
         quantitynum: quannum,
         consumestate: consumeprogress,
-        state: state
-      );
+        state: state);
 
     //navigate to the item detail page
     Navigator.push(
@@ -856,20 +869,20 @@ class _BottomTopScreenState extends State<Inventory>
 
   Widget heightSpacer(double myHeight) => SizedBox(height: myHeight);
 
-   Future<dto_user.TGTWUser> getUserFromDatabase(String uid) async {
-      Logger logger = Logger();
+  Future<dto_user.TGTWUser> getUserFromDatabase(String uid) async {
+    Logger logger = Logger();
 
-      return FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .get()
-          .then((DocumentSnapshot doc) {
-        logger.d('Got data ${doc.data()}');
-        return dto_user.TGTWUser.fromJson(doc.data() as Map<String, dynamic>);
-      });
-    }
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get()
+        .then((DocumentSnapshot doc) {
+      logger.d('Got data ${doc.data()}');
+      return dto_user.TGTWUser.fromJson(doc.data() as Map<String, dynamic>);
+    });
+  }
 
-    Future<void> _showCategoryDialog() async {
+  Future<void> _showCategoryDialog() async {
     final ItemCategory? selectedCategory = await showDialog<ItemCategory>(
         context: context,
         builder: (context) => CategoryPicker(initialCategory: category));
@@ -909,17 +922,16 @@ class _BottomTopScreenState extends State<Inventory>
       return Scaffold(
         appBar: AppBar(
           leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            nameController.clear();
-            categoryController.clear();
-            quanNumController.clear();
-            quanTypeController.clear();
-            expireTimeController.clear();
-            quanNumAndTypeController.clear();
-            Navigator.of(context).pop(false);
-          }
-        ),
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                nameController.clear();
+                categoryController.clear();
+                quanNumController.clear();
+                quanTypeController.clear();
+                expireTimeController.clear();
+                quanNumAndTypeController.clear();
+                Navigator.of(context).pop(false);
+              }),
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: const Text('Add an Item'),
         ),
@@ -948,7 +960,7 @@ class _BottomTopScreenState extends State<Inventory>
                 onTap: () {
                   FocusScope.of(context).requestFocus(FocusNode());
                   _showCategoryDialog();
-                },    
+                },
                 controller: categoryController,
               ),
               heightSpacer(5),
@@ -1048,9 +1060,7 @@ class _BottomTopScreenState extends State<Inventory>
                                           .height *
                                       0.25,
                                   color: Colors.white,
-                                  child: 
-                                
-                                  CupertinoDatePicker(
+                                  child: CupertinoDatePicker(
                                     mode: CupertinoDatePickerMode.date,
                                     onDateTimeChanged: (value) {
                                       if (value != selectedDate) {
@@ -1061,7 +1071,7 @@ class _BottomTopScreenState extends State<Inventory>
                                           int day = selectedDate.day;
                                           int timestamp = selectedDate
                                               .millisecondsSinceEpoch;
-                                       
+
                                           expireTimeStamp = timestamp;
                                           food.expiryDate = expireTimeStamp;
                                           expireTimeController.text =
@@ -1112,16 +1122,15 @@ class _BottomTopScreenState extends State<Inventory>
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () async {
             try {
-            
               food.name = nameController.text;
-              food.category = categoryController.text;
+              food.category = ItemCategory.parse(categoryController.text);
               food.buyDate = timeNow;
               //food[3] = expireTimeStamp;
               food.quantityType = quanTypeController.text;
               food.quantityNum = double.parse(quanNumController.text);
               food.consumeState = 0.0;
               food.state = 'good';
-              logger.d( 'food: $food');
+              logger.d('food: $food');
               //var quantityNum = int.parse(quanNumController.text);
               //接上InputPage裏DateTime時間組件，再轉化成timestamp存進數據庫
               //var expiretime = int.parse(expireTimeController.text);
@@ -1133,43 +1142,43 @@ class _BottomTopScreenState extends State<Inventory>
               addItemExpi(remainExpireDays);
               addItemName(food.name);
 
-               //insert new data into cloud firebase first and get the auto-generated id
+              //insert new data into cloud firebase first and get the auto-generated id
               UserItemService userItemService = UserItemService();
               User? currentUser = FirebaseAuth.instance.currentUser;
 
               if (currentUser == null) {
                 throw Exception('You should Login first!');
               } else {
-                var id = await userItemService.addUserItem(currentUser.uid, food);
-                
-                if(id == null) {
+                var id =
+                    await userItemService.addUserItem(currentUser.uid, food);
+
+                if (id == null) {
                   logger.w('Failed to insert food into local database');
                 } else {
                   logger.d(food);
-                
+
                   food.id = id;
-                  
+
                   await insertDB(food);
                   UserItem newItemData = UserItem(
-                    id: food.id,
-                    name: food.name,
-                    category: food.category,
-                    buyDate: food.buyDate,
-                    expiryDate: food.expiryDate,
-                    quantityType: food.quantityType,
-                    quantityNum: food.quantityNum,
-                    consumeState: food.consumeState,
-                    state: food.state
-                  );
-                  await userItemService.updateUserItem(currentUser.uid, food.id!, newItemData);
+                      id: food.id,
+                      name: food.name,
+                      category: food.category,
+                      buyDate: food.buyDate,
+                      expiryDate: food.expiryDate,
+                      quantityType: food.quantityType,
+                      quantityNum: food.quantityNum,
+                      consumeState: food.consumeState,
+                      state: food.state);
+                  await userItemService.updateUserItem(
+                      currentUser.uid, food.id!, newItemData);
                 }
-               
-              }       
+              }
               await getAllItems('foods');
             } on FormatException {
               logger.e('Format Error!');
             }
-          
+
             nameController.clear();
             categoryController.clear();
             quanNumController.clear();

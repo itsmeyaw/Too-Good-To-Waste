@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import '../dto/user_item_model.dart';
 
 class DBHelper {
@@ -59,7 +60,7 @@ class DBHelper {
         return UserItem(
           id: maps[i]['id'],
           name: maps[i]['name'],
-          category: maps[i]['category'],
+          category: ItemCategory.parse(maps[i]['category']),
           buyDate: maps[i]['buy_date'],
           expiryDate: maps[i]['expiry_date'],
           quantityType: maps[i]['quantity_type'],
@@ -189,7 +190,7 @@ class DBHelper {
       return UserItem(
         id: maps[i]['id'],
         name: maps[i]['name'],
-        category: maps[i]['category'],
+        category: ItemCategory.parse(maps[i]['category']),
         buyDate: maps[i]['buy_date'],
         expiryDate: maps[i]['expiry_date'],
         quantityNum: maps[i]['quantity_num'],
@@ -317,7 +318,7 @@ class DBHelper {
       return UserItem(
         id: maps[i]['id'],
         name: maps[i]['name'],
-        category: maps[i]['category'],
+        category: ItemCategory.parse(maps[i]['category']),
         buyDate: maps[i]['buy_date'],
         expiryDate: maps[i]['expiry_date'],
         quantityNum: maps[i]['quantity_num'],
@@ -342,7 +343,7 @@ class DBHelper {
       return UserItem(
         id: maps[i]['id'],
         name: maps[i]['name'],
-        category: maps[i]['category'],
+        category: ItemCategory.parse(maps[i]['category']),
         buyDate: maps[i]['buy_date'],
         expiryDate: maps[i]['expiry_date'],
         quantityNum: maps[i]['quantity_num'],

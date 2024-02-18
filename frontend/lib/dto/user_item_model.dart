@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:flutter/material.dart';
+import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 
 part 'user_item_model.g.dart';
 
@@ -7,7 +7,7 @@ part 'user_item_model.g.dart';
 class UserItem {
   String? id;
   String name;
-  String category;
+  ItemCategory category;
   int buyDate;
   int expiryDate;
   String quantityType;
@@ -35,7 +35,7 @@ UserItem(
     return {
       'id': id,
       'name': name,
-      'category': category,
+      'category': category.name,
       'buy_date': buyDate,
       'expiry_date': expiryDate,
       'quantity_type': quantityType,
@@ -49,7 +49,7 @@ UserItem(
   //each food when using the print statement
   @override
   String toString() {
-    return 'UserItem{id: $id, name: $name, category: $category, buy_date: $buyDate, expiry_date: $expiryDate, quantity_type: $quantityType, quantity_num: $quantityNum, state: $state, consume_state: $consumeState}';
+    return 'UserItem{id: $id, name: $name, category: ${category.name}, buy_date: $buyDate, expiry_date: $expiryDate, quantity_type: $quantityType, quantity_num: $quantityNum, state: $state, consume_state: $consumeState}';
   }
 
   factory UserItem.fromJson(Map<String, dynamic> json) =>
