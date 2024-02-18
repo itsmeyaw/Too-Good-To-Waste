@@ -836,6 +836,7 @@ class _BottomTopScreenState extends State<Inventory>
     String quantype = await dbhelper.getOneFoodValue(id, 'quantity_type');
     double quannum = await dbhelper.getOneFoodDoubleValue(id, 'quantity_num');
     int expitime = await dbhelper.getOneFoodIntValue(id, 'expiry_date');
+    int buytime = await dbhelper.getOneFoodIntValue(id, 'buy_date');
     String state = await dbhelper.getOneFoodValue(id, 'state');
     var expireDate = DateTime.fromMillisecondsSinceEpoch(expitime);
     var remainDays = expireDate.difference(timeNowDate).inDays;
@@ -849,6 +850,8 @@ class _BottomTopScreenState extends State<Inventory>
         name: text,
         category: category,
         remainDays: remainDays,
+        buyDate: buytime,
+        expiryDate: expitime,
         quantitytype: quantype,
         quantitynum: quannum,
         consumestate: consumeprogress,

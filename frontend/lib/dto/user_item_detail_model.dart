@@ -11,6 +11,8 @@ class UserItemDetail {
   String quantitytype;
   double quantitynum;
   int remainDays;
+  int buyDate;
+  int expiryDate;
   double consumestate;
   String state;
 
@@ -23,6 +25,8 @@ UserItemDetail(
     required this.quantitynum,
     required this.consumestate,
     required this.remainDays,
+    required this.buyDate,
+    required this.expiryDate,
     required this.state
   }
 );
@@ -37,6 +41,8 @@ UserItemDetail(
       'quantitytype': quantitytype,
       'quantitynum': quantitynum,
       'remainDays': remainDays,
+      'buy_date': buyDate,
+      'expiry_date': expiryDate,
       'consumestate': consumestate,
       'state': state,
     };
@@ -46,6 +52,6 @@ UserItemDetail(
   //each food when using the print statement
   @override
   String toString() {
-    return 'UserItemDetail{id: $id, name: $name, category: $category, quantitytype: $quantitytype, quantitynum: $quantitynum, remainDays: $remainDays, consumestate: $consumestate}, state: $state';
+    return 'UserItemDetail{id: $id, name: $name, category: $category, quantitytype: $quantitytype, quantitynum: $quantitynum, buy_date: $buyDate, expiry_date: $expiryDate, remainDays: $remainDays, consumestate: $consumestate}, state: $state';
   }
 }

@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:tooGoodToWaste/dto/item_category_enum.dart';
@@ -8,6 +11,7 @@ import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import 'package:tooGoodToWaste/service/shared_items_service.dart';
 import 'package:tooGoodToWaste/service/user_location_service.dart';
+import 'package:tooGoodToWaste/widgets/category_picker.dart';
 import 'package:tooGoodToWaste/widgets/user_location_aware_widget.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
 
@@ -197,7 +201,6 @@ class _ItemDetailPage extends State<itemDetailPage> {
     );
   }
 
-
      return Scaffold(
         appBar: AppBar(
               backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -207,49 +210,27 @@ class _ItemDetailPage extends State<itemDetailPage> {
             mainAxisAlignment: MainAxisAlignment.center,
            
             children: <Widget>[
-              //name
-              //quantity number and quantity type
-              Positioned(
-                top: MediaQuery.of(context).size.height * 0.05,
-                right: 0,
-                child: const SwitchButton(),
-              ),
               Expanded(
-                child: Stack(
-                  children: [
-                   
+                child:
                     DetailsList(
                       quantitynum: widget.foodDetail.quantitynum,
                       quantitytype: widget.foodDetail.quantitytype,
                       category: widget.foodDetail.category,
                       remainDays: widget.foodDetail.remainDays,
                       imagePth: categoryIconImagePath,
+                      buyDate: DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.buyDate),
+                      expiryDate: DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.expiryDate),
                     ),
-                    
+                    ),
                   ],
                 ),
               ),
-              SizedBox(
-                height: 5,
-                child: LinearProgressIndicator(
-                  backgroundColor: Colors.grey[200],
-                  valueColor: const AlwaysStoppedAnimation(Colors.blue),
-                  value: widget.foodDetail.consumestate,
-                ),
-              ),
-            ],
-          ),
-
-        ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () async {
             try {
       
               //check if the state is still good
               if(widget.foodDetail.state == 'good'){
-                // add a new item to Shared_Item_Collection
-                // add the user_id attribute to the shared_item
-                // add the location attribute to the shared_item
                 
                 showLocationDialog();
                 // Navigator.pop(context);
@@ -310,112 +291,423 @@ class _SwitchExampleState extends State<SwitchButton> {
   }
 }
 
-class DetailsList extends StatelessWidget {
-  const DetailsList({super.key, required this.quantitynum, required this.quantitytype, required this.category, required this.remainDays, required this.imagePth});
+class DetailsList extends StatefulWidget {
+  const DetailsList({super.key, required this.buyDate, required this.expiryDate, required this.quantitynum, required this.quantitytype, required this.category, required this.remainDays, required this.imagePth});
 
   final double quantitynum;
   final String quantitytype;
+  final DateTime buyDate;
+  final DateTime expiryDate;
   final String category;
   final int remainDays;
   final String imagePth;
 
   @override
+  _DetailsListState createState() => _DetailsListState();
+
+}
+
+class _DetailsListState extends State<DetailsList> {
+  late TextEditingController quantityNumController;
+  late TextEditingController quantityTypeController;
+  late TextEditingController categoryController;
+  late TextEditingController remainDaysController;
+  late TextEditingController quanNumAndTypeController;
+  late TextEditingController expireTimeController;
+  late TextEditingController buyTimeController;
+
+  late String currentQuantityNum;
+  late String currentQuantityType;
+  late String currentCategory;
+  late String currentRemainDays;
+  late DateTime currentBuyDate;
+  late DateTime currentExpiryDate;
+
+  @override
+  void initState() {
+    super.initState();
+    currentCategory = widget.category;
+    currentQuantityNum = widget.quantitynum.toString();
+    currentQuantityType = widget.quantitytype;
+    currentRemainDays = widget.remainDays.toString();
+    currentBuyDate = widget.buyDate;
+    currentExpiryDate = widget.expiryDate;
+    quantityTypeController = TextEditingController(text: widget.quantitytype);
+    categoryController = TextEditingController(text: widget.category);
+    remainDaysController = TextEditingController(text: widget.remainDays.toString());
+    expireTimeController = TextEditingController(text: "${widget.expiryDate.year}-${widget.expiryDate.month}-${widget.expiryDate.day}");
+    buyTimeController = TextEditingController(text: "${widget.buyDate.year}-${widget.buyDate.month}-${widget.buyDate.day}");
+    quantityNumController = TextEditingController(text: widget.quantitynum.toString());
+    quanNumAndTypeController = TextEditingController(text: "${widget.quantitynum} ${widget.quantitytype}");
+  }
+
+  Future<void> _showCategoryDialog() async {
+    final ItemCategory? selectedCategory = await showDialog<ItemCategory>(
+        context: context,
+        builder: (context) => CategoryPicker(initialCategory: ItemCategory.parse(widget.category)));
+
+    if (selectedCategory != null) {
+      setState(() {
+        categoryController.text = selectedCategory.name;
+      });
+    }
+    // return selectedCategory;
+  }
+
+
+  @override
   Widget build(BuildContext context) {
-    return Center(
+    final nums = List.generate(10, (index) => index);
+    int quanNum = 0;
+    int quanSmallNum = 0;
+    var quanType = "";
+    List<Widget> numList = List.generate(10, (index) => Text("$index"));
+    final quanTypes = ["g", "kg", "piece", "bag", "bottle", "num"];
+    List<Widget> quanTypeList =
+      List<Widget>.generate(6, (index) => Text(quanTypes[index]));
+
+    DateTime selectedBuyDate = widget.buyDate;
+    DateTime selectedExpiryDate= widget.expiryDate;
+
+    bool _isEditMode = false;
+
+    void _toggleEditMode() {
+      _isEditMode = !_isEditMode;
+      if (!_isEditMode) {
+        // Save changes
+        currentCategory = categoryController.text;
+        currentQuantityNum = quantityNumController.text;
+        currentQuantityType = quantityTypeController.text;
+        currentRemainDays = remainDaysController.text;
+        currentBuyDate = DateTime.parse(buyTimeController.text);
+        currentExpiryDate = DateTime.parse(expireTimeController.text);
+      }
+  }
+
+    return Stack(
+                  children: [
+                    Positioned(
+                      top: 0.0,
+                      right: 0.0,
+                      child: 
+                      // const SwitchButton(),
+                        IconButton(
+                          icon: Icon(_isEditMode ? Icons.done : Icons.edit),
+                          onPressed: () {
+                            setState(() {
+                              _toggleEditMode();
+                            });
+                          },
+                        ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(top: 20, bottom: 40),
+                      child:
+    Center(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
             Expanded(
               child: Card(
-                child: ListTile(
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                  leading: Container(
-                    padding: const EdgeInsets.only(right: 12.0),
-                    decoration: const BoxDecoration(
-                        border: Border(right: BorderSide(width: 1.0))),
-                    child: Image(
-                      image: AssetImage(imagePth),
-                      width: 32,
-                      height: 32,
+                child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[   
+                    const Text(
+                      'Storage Detail',
+                      style: TextStyle(fontSize: 25),
                     ),
-                  ),
-                  title: const Text(
-                    'Storage Now:',
-                    style: TextStyle(fontSize: 25),
-                  ),
+                    SizedBox(height: 5), 
                   // subtitle: Text("Expired in $expire days", style: TextStyle(fontStyle: FontStyle.italic),),
-                  trailing: Text("$quantitynum $quantitytype",
-                      style: const TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: 24,
-                      )),
+                 Container(
+                    width: 300,
+                    child:
+                     TextField(   
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Quantity',
+                    ),
+                    enabled: _isEditMode,
+                    controller: quanNumAndTypeController,
+                    style: const TextStyle(
+                      fontFamily: 'Roboto',
+                      fontSize: 24,
+                    ),
+                    onTap: () {
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  showCupertinoModalPopup(
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                            height: 200,
+                            color: Colors.white,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: CupertinoPicker(
+                                    itemExtent: 24.0,
+                                    onSelectedItemChanged: (value) {
+                                      setState(() {
+                                        quanNum = nums[value];
+                                        quantityNumController.text =
+                                            "$quanNum.$quanSmallNum";
+                                        quanNumAndTypeController.text =
+                                            "$quanNum.$quanSmallNum $quanType";
+                                      });
+                                    },
+                                    children: numList,
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: CupertinoPicker(
+                                    itemExtent: 24.0,
+                                    onSelectedItemChanged: (value) {
+                                      setState(() {
+                                        quanSmallNum = nums[value];
+                                        quantityNumController.text =
+                                            "$quanNum.$quanSmallNum";
+                                        quanNumAndTypeController.text =
+                                            "$quanNum.$quanSmallNum $quanType";
+                                      });
+                                    },
+                                    children: numList,
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: CupertinoPicker(
+                                    itemExtent: 24.0,
+                                    onSelectedItemChanged: (value) {
+                                      setState(() {
+                                        quantityTypeController.text =
+                                            quanTypes[value];
+                                        quanType = quanTypes[value];
+                                        quanNumAndTypeController.text =
+                                            "$quanNum.$quanSmallNum $quanType";
+                                      });
+                                    },
+                                    children: quanTypeList,
+                                  ),
+                                )
+                              ],
+                            ));
+                      });
+                    },
+                  ),
+                  ),
+                  ],
                ),
+                ),
               ),
             ),
             const Divider(),
             Expanded(
               child: Card(
-               child: ListTile(
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                  leading: Container(
-                    padding: const EdgeInsets.only(right: 12.0),
-                    decoration: const BoxDecoration(
-                        border: Border(right: BorderSide(width: 1.0))),
-                    child: Image(
-                      image: AssetImage(imagePth),
-                      width: 32,
-                      height: 32,
+               child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[   
+                    const Text(
+                      'Category',
+                      style: TextStyle(fontSize: 25),
                     ),
-                  ),
-                  title: const Text(
-                    'Category:',
-                    style: TextStyle(fontSize: 25),
-                  ),
+                    SizedBox(height: 10),
                   // subtitle: Text("Expired in $expire days", style: TextStyle(fontStyle: FontStyle.italic),),
-                  trailing: Text(category,
+                  Container(
+                    width: 300,
+                    child: TextField(
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Category',
+                      ),
+                      enabled: _isEditMode,
+                      controller: categoryController,
                       style: const TextStyle(
                         fontFamily: 'Roboto',
                         fontSize: 24,
-                      )),
+                      ),
+                      onTap: () {
+                        FocusScope.of(context).requestFocus(FocusNode());
+                        _showCategoryDialog();
+                      },
+                    ),
+                  ),
+                ],
+               ),
                ),
               ),
             ),
             const Divider(),
             Expanded(
-              child: Card(
-               child: ListTile(
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                  leading: Container(
-                    padding: const EdgeInsets.only(right: 12.0),
-                    decoration: const BoxDecoration(
-                        border: Border(right: BorderSide(width: 1.0))),
-                    child: Image(
-                      image: AssetImage(imagePth),
-                      width: 32,
-                      height: 32,
+               child: Card(
+               child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[   
+                    const Text(
+                      'Bought in',
+                      style: TextStyle(fontSize: 25),
                     ),
-                  ),
-                  title: const Text(
-                    'Expires in:',
-                    style: TextStyle(fontSize: 25),
-                  ),
-                  // subtitle: Text("Expired in $expire days", style: TextStyle(fontStyle: FontStyle.italic),),
-                  trailing: Text("$remainDays Days",
+                    SizedBox(height: 5),
+                  Container(
+                    width: 300,
+                    child: TextField(
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Purchase date',
+                      ),
+                      enabled: _isEditMode,
+                      controller: buyTimeController,
                       style: const TextStyle(
                         fontFamily: 'Roboto',
                         fontSize: 24,
-                      )),
+                      ),
+                      onTap: () {
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  showCupertinoModalPopup(
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                            height: 200,
+                            color: Colors.white,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                    child: Container(
+                                  height: MediaQuery.of(context)
+                                          .copyWith()
+                                          .size
+                                          .height *
+                                      0.25,
+                                  color: Colors.white,
+                                  child: CupertinoDatePicker(
+                                    mode: CupertinoDatePickerMode.date,
+                                    onDateTimeChanged: (value) {
+                                      if (value != selectedBuyDate) {
+                                        setState(() {
+                                          selectedBuyDate = value;
+                                          int year = selectedBuyDate.year;
+                                          int month = selectedBuyDate.month;
+                                          int day = selectedBuyDate.day;
+                                          int timestamp = selectedBuyDate
+                                              .millisecondsSinceEpoch;
+
+                                          int expireTimeStamp = timestamp;
+                                          
+                                          buyTimeController.text =
+                                              "$year-$month-$day";
+                                          // Navigator.pop(context)
+                                          //記錄下用戶選擇的時間 ------> 存入數據庫
+                                        });
+                                      }
+                                    },
+                                    initialDateTime: DateTime.now(),
+                                    minimumYear: 2000,
+                                    maximumYear: 2025,
+                                  ),
+                                ))
+                              ],
+                            ));
+                      });
+                    },
+                    ),
+                    ),
+
+                  ], 
                ),
               ),
+            ),
+            ),
+            const Divider(),
+            Expanded(
+               child: Card(
+               child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[   
+                    const Text(
+                      'Expires in',
+                      style: TextStyle(fontSize: 25),
+                    ),
+                    SizedBox(height: 5),
+                  Container(
+                    width: 300,
+                    child: TextField(
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Expiration date',
+                      ),
+                      enabled: _isEditMode,
+                      controller: expireTimeController,
+                      style: const TextStyle(
+                        fontFamily: 'Roboto',
+                        fontSize: 24,
+                      ),
+                      onTap: () {
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  showCupertinoModalPopup(
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                            height: 200,
+                            color: Colors.white,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                    child: Container(
+                                  height: MediaQuery.of(context)
+                                          .copyWith()
+                                          .size
+                                          .height *
+                                      0.25,
+                                  color: Colors.white,
+                                  child: CupertinoDatePicker(
+                                    mode: CupertinoDatePickerMode.date,
+                                    onDateTimeChanged: (value) {
+                                      if (value != selectedExpiryDate) {
+                                        setState(() {
+                                          selectedExpiryDate = value;
+                                          int year = selectedExpiryDate.year;
+                                          int month = selectedExpiryDate.month;
+                                          int day = selectedExpiryDate.day;
+                                          int timestamp = selectedExpiryDate
+                                              .millisecondsSinceEpoch;
+
+                                          int expireTimeStamp = timestamp;
+                                          
+                                          expireTimeController.text =
+                                              "$year-$month-$day";
+                                          // Navigator.pop(context)
+                                          //記錄下用戶選擇的時間 ------> 存入數據庫
+                                        });
+                                      }
+                                    },
+                                    initialDateTime: DateTime.now(),
+                                    minimumYear: 2000,
+                                    maximumYear: 2025,
+                                  ),
+                                ))
+                              ],
+                            ));
+                      });
+                    },
+                    ),
+                    ),
+
+                  ], 
+               ),
+              ),
+            ),
             ),
           ],
         ),
       ),
-    );
+    )
+                    ),]
+              );
   }
 }
 
