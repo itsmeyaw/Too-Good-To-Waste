@@ -53,6 +53,13 @@ class SharedItemService {
     }).toList();
   }
 
+  Future<SharedItem?> getSharedItem(String sharedItemId) async {
+    return db.collection(COLLECTION).doc(sharedItemId).get().then((querySnapshot) =>
+        querySnapshot.exists
+            ? SharedItem.fromJson(querySnapshot.data() as Map<String, dynamic>)
+            : null);
+  }
+
   Stream<List<DocumentSnapshot>> getSharedItemsWithinRadius(
       {required GeoPoint userLocation,
       required double radiusInKm,
