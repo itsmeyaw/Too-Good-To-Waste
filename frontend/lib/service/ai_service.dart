@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:logger/logger.dart';
+import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import 'package:tooGoodToWaste/dto/user_item_model.dart';
 
 Logger logger = Logger();
@@ -49,7 +50,7 @@ class AiService {
         items.add(UserItem(
             id: null,
             name: item["item"],
-            category: item["category"],
+            category: ItemCategory.parse(item["category"]),
             buyDate: DateTime.parse(item["buy_date"]).millisecondsSinceEpoch,
             expiryDate: DateTime.parse(item["suggested_expiry_date"]).millisecondsSinceEpoch,
             quantityType: item["amount_unit"],

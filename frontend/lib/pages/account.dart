@@ -3,6 +3,7 @@ import 'package:tooGoodToWaste/Pages/post_page.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:tooGoodToWaste/pages/message_thread_list.dart';
 import 'package:tooGoodToWaste/service/shared_items_service.dart';
 import 'package:tooGoodToWaste/service/user_service.dart';
 
@@ -222,16 +223,9 @@ class AccountSettingPage extends StatelessWidget {
                       ]),
                     ),
                     Container(
-                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
                       height: MediaQuery.of(context).size.height,
-                      child: ListView(children: const [
-                        SizedBox(
-                          height: 10,
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                      ]),
+                      child: const MessageThreadList()
                     ),
                     Container(
                       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
