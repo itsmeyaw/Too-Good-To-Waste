@@ -6,16 +6,11 @@ import './message_model.dart';
 part 'chatroom_model.g.dart';
 
 @immutable
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class Chatroom {
-  final String initiator;
-  final String receiver;
-  final List<Message> messages;
+  final String partnerId;
 
-  const Chatroom(
-      {required this.initiator,
-      required this.receiver,
-      required this.messages});
+  const Chatroom({required this.partnerId});
 
   factory Chatroom.fromJson(Map<String, dynamic> json) =>
       _$ChatroomFromJson(json);
