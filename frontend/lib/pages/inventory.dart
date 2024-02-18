@@ -185,7 +185,7 @@ class _BottomTopScreenState extends State<Inventory>
   }
 
   Future<void> updateFoodState(String id, String attribute) async {
-    var updatedFood = await dbhelper.queryOne('foods', id);
+    // var updatedFood = await dbhelper.queryOne('foods', id);
     if (attribute == 'consumed') {
       await dbhelper.updateFoodConsumed(id, 'consumed');
     } else {
@@ -673,10 +673,10 @@ class _BottomTopScreenState extends State<Inventory>
       int remainDays, int index, double progressPercentage) {
     String? categoryIconImagePath;
     Color progressColor;
-    if (GlobalCateIconMap[userItem.category] == null) {
+    if (GlobalCateIconMap[userItem.category.name] == null) {
       categoryIconImagePath = GlobalCateIconMap["Others"];
     } else {
-      categoryIconImagePath = GlobalCateIconMap[userItem.category];
+      categoryIconImagePath = GlobalCateIconMap[userItem.category.name];
     }
     if (progressPercentage > 0.0 && progressPercentage < 0.49) {
       progressColor = Colors.green;

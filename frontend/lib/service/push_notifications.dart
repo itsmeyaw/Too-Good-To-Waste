@@ -45,18 +45,41 @@ class PushNotificationsManager {
     // const iOS = IOSInitializationSettings();
     const AndroidInitializationSettings android = AndroidInitializationSettings('@drawable/ic_launcher');
     
+    var InitializationSettingsIOS = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+      onDidReceiveLocalNotification: (int id, String? title, String? body, String? payload) async {
+      
+      }
+    );
+
     const settings = InitializationSettings(android: android);
 
     await _flutterLocalNotificationsPlugin.initialize(
       settings, 
-      onDidReceiveNotificationResponse: (payload){
-        final message = RemoteMessage.fromMap(jsonDecode(payload.toString()));
-        handleMessage(message);
+      onDidReceiveNotificationResponse: (NotificationResponse response) async {
+        
       }
     );
 
     final platform = _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
     await platform?.createNotificationChannel(_androidChannel);
+  }
+
+  notificationDetails(){
+    return const NotificationDetails(
+      android: AndroidNotificationDetails(
+        'high_importance_channel', 
+        'Expired Food Alert!', 
+        importance: Importance.high,
+        priority: Priority.high,
+      ),
+    );
+  }
+
+  Future showNotification({int id = 0, String? title, String? body, String? payload}) async {
+    return _flutterLocalNotificationsPlugin.show(id, title, body, await notificationDetails());
   }
 
   Future initPushNotifications() async {
@@ -99,10 +122,10 @@ class PushNotificationsManager {
 
     await _firebaseMessaging.requestPermission();
     final fCMToken = await _firebaseMessaging.getToken();
-    logger.d("fCMToken: $fCMToken");
+    // logger.d("fCMToken: $fCMToken");
 
     FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
-    initNotifications();
+    initPushNotifications();
     initLocalNotifications();
 
 

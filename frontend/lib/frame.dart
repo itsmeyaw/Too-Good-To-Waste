@@ -7,6 +7,7 @@ import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'dart:async';
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import 'package:logger/logger.dart';
+import 'package:tooGoodToWaste/service/push_notifications.dart';
 
 class Frame extends StatefulWidget {
   const Frame({super.key});
@@ -24,7 +25,7 @@ class _FrameState extends State<Frame> {
   DateTime timeNowDate = DateTime.now();
   int timeNow = DateTime.now().millisecondsSinceEpoch;
   // Navigation Bar related
-  AnimationController? animationController;
+  Timer? timer;
 
   String imagePath(String category) {
     String imagePath = "assets/category/$category.png";
@@ -52,7 +53,8 @@ class _FrameState extends State<Frame> {
             await dbHelper.updateFoodWaste(foodID);
           }
           String category = await dbHelper.getOneFoodValue(foodID, 'category');
-          showExpiredDialog(foodName, category);
+          //showExpiredDialog(foodName, category);
+          pushLocalNotification('Expired Food Alert!', foodName, 'is already expired');
         }
    
         logger.e('###########################$foodName is wasted###########################');
@@ -74,12 +76,22 @@ class _FrameState extends State<Frame> {
         } else {
           await dbHelper.updateFoodExpiring(foodID);
           String category = await dbHelper.getOneFoodValue(foodID, 'category');
-          showExpiringDialog(foodName, category);
+          //showExpiringDialog(foodName, category);
+          pushLocalNotification('Expiring Food Alert!', foodName, 'will expire in one day!');
         }
         logger.e(
             '###########################$foodName is expiring!!!###########################');
       }
     }
+  }
+
+  //title: 'Expiring Food Alert!'
+  pushLocalNotification(String title, String foodName, String text) {
+    //push local notification
+    PushNotificationsManager().showNotification(
+        title: title,
+        body: 'Your $foodName $text!',
+      );
   }
 
   //toast contains 'Alert! Your ***  will expire in two days'
@@ -91,13 +103,15 @@ class _FrameState extends State<Frame> {
     } else {
       categoryIconImagePath = GlobalCateIconMap[category];
     }
+
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+   
     AlertDialog dialog = AlertDialog(
       title: const Text("Alert!", textAlign: TextAlign.center),
       content: Container(
         width: 3 * width / 5,
-        height: height / 2,
+        height: height / 3,
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
@@ -111,7 +125,14 @@ class _FrameState extends State<Frame> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+          onPressed: () {
+            if(mounted) {
+             
+              Navigator.of(context, rootNavigator: true).pop();
+            } else {
+              logger.e('This page is not mounted');
+            }
+          },
           child: const Text('OK'),
         ),
       ],
@@ -132,13 +153,15 @@ class _FrameState extends State<Frame> {
     } else {
       categoryIconImagePath = GlobalCateIconMap[category];
     }
-    double width = MediaQuery.of(context).size.width;
+
+    double  width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+   
     AlertDialog dialog = AlertDialog(
       title: const Text("Alert!", textAlign: TextAlign.center),
       content: Container(
         width: 3 * width / 5,
-        height: height / 2,
+        height: height / 3,
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
@@ -152,7 +175,14 @@ class _FrameState extends State<Frame> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+          onPressed: () {
+            if(mounted) {
+             
+              Navigator.of(context, rootNavigator: true).pop();
+            } else {
+              logger.e('This page is not mounted');
+            }
+          },
           child: const Text('OK'),
         ),
       ],
@@ -178,6 +208,28 @@ class _FrameState extends State<Frame> {
     }
   }
 
+  startTimer() async {
+    const oneDay = Duration(minutes: 1);
+    //insertItem();
+    Timer timer = Timer.periodic(oneDay, (Timer timer) {
+      autocheckWaste();
+      //pop up  a propmt
+      logger.d("Repeat task every day");  // This statement will be printed after every one second
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    startTimer();
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -191,16 +243,6 @@ class _FrameState extends State<Frame> {
         ),
         bottomNavigationBar: NavigationBar(
             onDestinationSelected: (int index) {
-              setState(() {
-                currentPage = index;
-                const oneDay = Duration(minutes: 1);
-                //insertItem();
-                Timer.periodic(oneDay, (Timer timer) {
-                  autocheckWaste();
-                  //pop up  a propmt
-                  logger.d("Repeat task every day");  // This statement will be printed after every one second
-                }); 
-              });
             },
             selectedIndex: currentPage,
             destinations: const <Widget>[
