@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:tooGoodToWaste/dto/chatroom_model.dart';
 import 'package:tooGoodToWaste/service/user_service.dart';
 import '../dto/shared_item_model.dart';
 import '../dto/user_model.dart';
+import 'chatroom.dart';
 
 class PostPage extends StatefulWidget {
   final SharedItem postData;
@@ -65,7 +67,9 @@ class _PostPageState extends State<PostPage> {
                       TGTWUser user = userSnapshot.data!;
 
                       return FilledButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => ChatroomPage(secondUserId: widget.postData.user, sharedItem: widget.postData,)));
+                          },
                           child: FractionallySizedBox(
                               widthFactor: 1,
                               child: Text(
