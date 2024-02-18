@@ -243,6 +243,9 @@ class _FrameState extends State<Frame> {
         ),
         bottomNavigationBar: NavigationBar(
             onDestinationSelected: (int index) {
+              setState(() {
+                currentPage = index;
+              });
             },
             selectedIndex: currentPage,
             destinations: const <Widget>[
