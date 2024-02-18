@@ -63,6 +63,8 @@ dependencies:
   firebase_database: ^10.4.5
   cloud_functions: ^4.6.5
   mime: ^1.0.5
+  firebase_core: ^2.25.4
+  uuid: ^4.3.3
 
 dev_dependencies:
   flutter_test:
