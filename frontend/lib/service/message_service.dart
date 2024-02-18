@@ -43,6 +43,16 @@ class MessageService {
     return chatroomSnapshot.exists;
   }
 
+  Stream<List<String>> getMessageThreadStream() {
+    return db
+        .collection(COLLECTION)
+        .doc(user.uid)
+        .collection(SUB_COLLECTION)
+        .snapshots()
+        .map<List<String>>(
+            (QuerySnapshot event) => event.docs.map((doc) => doc.id).toList());
+  }
+
   Stream<List<Message>> getMessageStream(String secondUserId) {
     CollectionReference ref = db
         .collection(COLLECTION)
