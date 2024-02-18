@@ -19,7 +19,7 @@ class _FrameState extends State<Frame> {
   bool b = false;
   final Logger logger = Logger();
 
-  // Create Database Object
+   // Create Database Object
   DBHelper dbHelper = DBHelper();
   DateTime timeNowDate = DateTime.now();
   int timeNow = DateTime.now().millisecondsSinceEpoch;

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:convert';
 
@@ -16,19 +17,13 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import 'package:tooGoodToWaste/dto/item_allergies_enum.dart';
 import 'package:tooGoodToWaste/dto/item_category_enum.dart';
-import 'package:tooGoodToWaste/pages/home.dart';
 import 'package:tooGoodToWaste/service/ai_service.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'dart:async';
-
 import 'package:image_picker/image_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
-import 'package:tooGoodToWaste/widgets/allergies_picker.dart';
 import 'package:tooGoodToWaste/widgets/category_picker.dart';
-import 'package:tooGoodToWaste/widgets/date_picker.dart';
 import 'package:tooGoodToWaste/widgets/expandableFab.dart';
-import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'itemDetail.dart';
 import '../dto/user_item_detail_model.dart';
@@ -41,6 +36,7 @@ Logger logger = Logger();
 
 class Inventory extends StatefulWidget {
   const Inventory({super.key});
+  static const route = '/inventory';
 
   @override
   State<StatefulWidget> createState() => _BottomTopScreenState();
@@ -247,10 +243,14 @@ class _BottomTopScreenState extends State<Inventory>
 
   @override
   Widget build(BuildContext context) {
-    DateTime dateToday = DateTime.now();
-    String date = dateToday.toString().substring(0, 10);
+     final message = ModalRoute.of(context)!.settings.arguments;
+    if (message == null) {
+      logger.d('No message');
+    } else {  
+       logger.d('Title: $message');
+    }
+    
 
-    Color color = Theme.of(context).primaryColor;
     bool toClose = false;
 
     return Scaffold(

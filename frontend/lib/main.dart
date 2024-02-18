@@ -8,6 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:tooGoodToWaste/frame.dart';
 import 'package:tooGoodToWaste/pages/login_signup.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
+import 'package:tooGoodToWaste/service/push_notifications.dart';
+
+final navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,11 +20,16 @@ Future<void> main() async {
   FirebaseFirestore.instance.settings = const Settings(
     persistenceEnabled: true,
   );
+  await PushNotificationsManager().initNotifications();
+
+ 
   runApp(const TooGoodToWaste());
 }
 
 class TooGoodToWaste extends StatelessWidget {
   const TooGoodToWaste({super.key});
+
+  
 
   @override
   Widget build(BuildContext context) {
