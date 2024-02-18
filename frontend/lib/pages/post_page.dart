@@ -38,13 +38,19 @@ class _PostPageState extends State<PostPage> {
                 child: SizedBox(
                     height: 200,
                     child: GoogleMap(
-                        onMapCreated: (event) {},
-                        initialCameraPosition: CameraPosition(
-                          target: LatLng(
-                              widget.postData.location.latitude,
-                              widget.postData.location.longitude),
-                          zoom: 15.0,
-                        ))),
+                      onMapCreated: (event) {},
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(widget.postData.location.latitude,
+                            widget.postData.location.longitude),
+                        zoom: 15.0,
+                      ),
+                      markers: <Marker>{
+                        Marker(
+                            markerId: MarkerId(widget.postData.id!),
+                            position: LatLng(widget.postData.location.latitude,
+                                widget.postData.location.longitude))
+                      },
+                    )),
               ),
               const SizedBox(
                 height: 20,
@@ -68,7 +74,13 @@ class _PostPageState extends State<PostPage> {
 
                       return FilledButton(
                           onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => ChatroomPage(secondUserId: widget.postData.user, sharedItem: widget.postData,)));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ChatroomPage(
+                                          secondUserId: widget.postData.user,
+                                          sharedItem: widget.postData,
+                                        )));
                           },
                           child: FractionallySizedBox(
                               widthFactor: 1,
