@@ -113,14 +113,18 @@ class _ChatroomPageState extends State<ChatroomPage> {
                       width: 10,
                     ),
                     IconButton(
-                        onPressed: () async {
-                          if (_messageValidator(_messageController.value.text) == null) {
-                            await messageService.sendMessage(
+                        onPressed: () {
+                          setState(() {
+                            if (!_formKey.currentState!.validate()) {
+                              return;
+                            }
+
+                            messageService.sendMessage(
                                 widget.secondUserId,
                                 _messageController.value.text,
                                 alreadySendItem ? null : widget.sharedItem?.id);
                             alreadySendItem = true;
-                          }
+                          });
                         },
                         icon: const Icon(Icons.send)),
                   ],
