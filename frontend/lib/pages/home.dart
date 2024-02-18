@@ -52,14 +52,15 @@ class _HomeState extends State<Home> {
   Future<void> _showCategoryDialog() async {
     final ItemCategory? selectedCategory = await showDialog<ItemCategory>(
         context: context,
-        builder: (context) => CategoryPicker(initialCategory: category));
+        builder: (context) => CategoryPicker(
+              initialCategory: category,
+              isClear: true,
+            ));
 
-    if (selectedCategory != null) {
-      setState(() {
-        _resetSharedItems();
-        category = selectedCategory;
-      });
-    }
+    setState(() {
+      _resetSharedItems();
+      category = selectedCategory;
+    });
   }
 
   Future<void> _showAllergyDialog() async {
@@ -159,7 +160,9 @@ class _HomeState extends State<Home> {
                             child: SizedBox(
                               height: 200,
                               child: Container(
-                                color: Theme.of(context).colorScheme.secondaryContainer,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .secondaryContainer,
                                 child: const Center(
                                   child: CircularProgressIndicator(),
                                 ),
@@ -242,8 +245,7 @@ class _HomeState extends State<Home> {
 
                           if (sharedItems.isEmpty) {
                             return const Center(
-                                child: Text("There is no item in your area")
-                            );
+                                child: Text("There is no item in your area"));
                           }
 
                           return Expanded(
@@ -261,14 +263,14 @@ class _HomeState extends State<Home> {
                               return const Divider();
                             },
                           ));
-                        } else if (sharedItemSnapshot.connectionState == ConnectionState.active) {
+                        } else if (sharedItemSnapshot.connectionState ==
+                            ConnectionState.active) {
                           return const Center(
                             child: CircularProgressIndicator(),
                           );
                         } else {
                           return const Center(
-                            child: Text("There is no item in your area")
-                          );
+                              child: Text("There is no item in your area"));
                         }
                       }))
         ],

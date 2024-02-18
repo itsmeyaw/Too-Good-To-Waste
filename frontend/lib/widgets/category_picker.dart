@@ -3,8 +3,9 @@ import '../dto/item_category_enum.dart';
 
 class CategoryPicker extends StatefulWidget {
   final ItemCategory? initialCategory;
+  final bool isClear;
 
-  const CategoryPicker({super.key, this.initialCategory});
+  const CategoryPicker({super.key, this.initialCategory, this.isClear = false});
 
   @override
   State<StatefulWidget> createState() => _CategoryPickerState();
@@ -44,7 +45,7 @@ class _CategoryPickerState extends State<CategoryPicker> {
       actions: [
         TextButton(
             onPressed: () => Navigator.pop(context, null),
-            child: const Text('Cancel')),
+            child: widget.isClear ? const Text('Clear') : const Text('Close')),
         TextButton(
             onPressed: () => Navigator.pop(context, _chosenCategory),
             child: const Text('OK'))
