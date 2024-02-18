@@ -88,7 +88,7 @@ class DBHelper {
         return UserItem(
           id: maps[0]['id'],
           name: maps[0]['name'],
-          category: maps[0]['category'],
+          category: ItemCategory.parse(maps[0]['category']),
           buyDate: maps[0]['buy_date'],
           expiryDate: maps[0]['expiry_date'],
           quantityNum: maps[0]['quantity_num'],
