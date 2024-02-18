@@ -8,14 +8,12 @@ part of 'message_model.dart';
 
 Message _$MessageFromJson(Map<String, dynamic> json) => Message(
       message: json['message'] as String,
-      initiator: TGTWUser.fromJson(json['initiator'] as Map<String, dynamic>),
-      receiver: TGTWUser.fromJson(json['receiver'] as Map<String, dynamic>),
+      sender: json['sender'] as String,
       timestamp: DateTime.parse(json['timestamp'] as String),
     );
 
 Map<String, dynamic> _$MessageToJson(Message instance) => <String, dynamic>{
       'message': instance.message,
-      'initiator': instance.initiator,
-      'receiver': instance.receiver,
+      'sender': instance.sender,
       'timestamp': instance.timestamp.toIso8601String(),
     };
