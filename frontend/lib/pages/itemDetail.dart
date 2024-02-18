@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
 import 'package:tooGoodToWaste/dto/user_item_detail_model.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
@@ -151,7 +152,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
                               getUserFromDatabase(currentUser.uid).then((dto_user.TGTWUser userData) {
                                 SharedItem sharedItem = SharedItem(
                                   name: widget.foodDetail.name,
-                                  category: widget.foodDetail.category,
+                                  category: ItemCategory.parse(widget.foodDetail.category),
                                   amount:  UserItemAmount(
                                     nominal: widget.foodDetail.quantitynum,
                                     unit: widget.foodDetail.quantitytype

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:logger/logger.dart';
 import 'package:dart_geohash/dart_geohash.dart';
+import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
 
 class SharedItemService {
@@ -42,7 +43,8 @@ class SharedItemService {
       if (e.exists) {
         logger.d(
             'Converting shared item data: ${e.data() as Map<String, dynamic>}');
-        final SharedItem sharedItem = SharedItem.fromJson(e.data() as Map<String, dynamic>);
+        final SharedItem sharedItem =
+            SharedItem.fromJson(e.data() as Map<String, dynamic>);
         sharedItem.id = e.id;
         return sharedItem;
       } else {
@@ -55,19 +57,30 @@ class SharedItemService {
       {required GeoPoint userLocation,
       required double radiusInKm,
       required String userId,
-      String? category}) {
+      ItemCategory? category}) {
     logger.d('Start querying for shared item');
 
     var collection = db.collection(COLLECTION);
     if (category != null) {
-      collection.where("category", isEqualTo: category);
+      String categoryString = category.name;
+      logger.d("Adding category filter: $categoryString");
+      return geo
+          .collection(
+              collectionRef:
+                  collection.where("category", isEqualTo: categoryString))
+          .within(
+              center:
+                  GeoFirePoint(userLocation.latitude, userLocation.longitude),
+              radius: radiusInKm,
+              field: "location",
+              strictMode: true);
+    } else {
+      return geo.collection(collectionRef: collection).within(
+          center: GeoFirePoint(userLocation.latitude, userLocation.longitude),
+          radius: radiusInKm,
+          field: "location",
+          strictMode: true);
     }
-
-    return geo.collection(collectionRef: collection).within(
-        center: GeoFirePoint(userLocation.latitude, userLocation.longitude),
-        radius: radiusInKm,
-        field: "location",
-        strictMode: true);
   }
 
   Future<Iterable<SharedItem>> getSharedItemOfUser(String userId) {

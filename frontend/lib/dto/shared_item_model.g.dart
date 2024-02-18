@@ -13,7 +13,7 @@ SharedItem _$SharedItemFromJson(Map<String, dynamic> json) => SharedItem(
       expireDate: json['expire_date'] as int,
       itemRef: json['item_ref'] as String,
       name: json['name'] as String,
-      category: json['category'] as String,
+      category: $enumDecode(_$ItemCategoryEnumMap, json['category']),
       user: json['user'] as String,
     )
       ..location = const GeoFirePointConverter()
@@ -28,7 +28,17 @@ Map<String, dynamic> _$SharedItemToJson(SharedItem instance) =>
       'expire_date': instance.expireDate,
       'item_ref': instance.itemRef,
       'name': instance.name,
-      'category': instance.category,
+      'category': _$ItemCategoryEnumMap[instance.category]!,
       'user': instance.user,
       'location': const GeoFirePointConverter().toJson(instance.location),
     };
+
+const _$ItemCategoryEnumMap = {
+  ItemCategory.Vegetable: 'Vegetable',
+  ItemCategory.Meat: 'Meat',
+  ItemCategory.Fruit: 'Fruit',
+  ItemCategory.Diaries: 'Diaries',
+  ItemCategory.Seafood: 'Seafood',
+  ItemCategory.Egg: 'Egg',
+  ItemCategory.Others: 'Others',
+};

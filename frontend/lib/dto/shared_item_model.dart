@@ -1,5 +1,6 @@
 import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import 'package:tooGoodToWaste/util/geo_fire_point_converter.dart';
 
 import './user_item_amount_model.dart';
@@ -14,7 +15,7 @@ class SharedItem {
   final int expireDate;
   final String itemRef;
   final String name;
-  final String category;
+  final ItemCategory category;
   final String user;
 
   @GeoFirePointConverter()

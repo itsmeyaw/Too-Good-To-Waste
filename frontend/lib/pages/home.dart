@@ -90,7 +90,7 @@ class _HomeState extends State<Home> {
           position: LatLng(
               sharedItem.location.latitude, sharedItem.location.longitude)));
     }
-    
+
     return markers;
   }
 
@@ -118,7 +118,8 @@ class _HomeState extends State<Home> {
                       stream: sharedItemService.getSharedItemsWithinRadius(
                           userLocation: userLocation,
                           radiusInKm: radius,
-                          userId: userId),
+                          userId: userId,
+                          category: category),
                       builder: (BuildContext context,
                           AsyncSnapshot<List<DocumentSnapshot>>
                               sharedItemSnapshot) {
@@ -144,16 +145,26 @@ class _HomeState extends State<Home> {
                             child: SizedBox(
                                 height: 200,
                                 child: GoogleMap(
-                                    initialCameraPosition: CameraPosition(
-                                      target: LatLng(userLocation.latitude,
-                                          userLocation.longitude),
-                                      zoom: 13.0 - radius / 4,
-                                    ),
-                                markers: createMarkers(sharedItems),)),
+                                  initialCameraPosition: CameraPosition(
+                                    target: LatLng(userLocation.latitude,
+                                        userLocation.longitude),
+                                    zoom: 13.0 - radius / 4,
+                                  ),
+                                  markers: createMarkers(sharedItems),
+                                )),
                           );
                         } else {
-                          return const Center(
-                            child: CircularProgressIndicator(),
+                          return FractionallySizedBox(
+                            widthFactor: 1.0,
+                            child: SizedBox(
+                              height: 200,
+                              child: Container(
+                                color: Theme.of(context).colorScheme.secondaryContainer,
+                                child: const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ),
+                            ),
                           );
                         }
                       })),
@@ -207,7 +218,8 @@ class _HomeState extends State<Home> {
                       stream: sharedItemService.getSharedItemsWithinRadius(
                           userLocation: userLocation,
                           radiusInKm: radius,
-                          userId: userId),
+                          userId: userId,
+                          category: category),
                       builder: (BuildContext context,
                           AsyncSnapshot<List<DocumentSnapshot>>
                               sharedItemSnapshot) {
@@ -228,6 +240,12 @@ class _HomeState extends State<Home> {
                             }
                           }
 
+                          if (sharedItems.isEmpty) {
+                            return const Center(
+                                child: Text("There is no item in your area")
+                            );
+                          }
+
                           return Expanded(
                               child: ListView.separated(
                             itemCount: sharedItems.length,
@@ -243,9 +261,13 @@ class _HomeState extends State<Home> {
                               return const Divider();
                             },
                           ));
-                        } else {
+                        } else if (sharedItemSnapshot.connectionState == ConnectionState.active) {
                           return const Center(
                             child: CircularProgressIndicator(),
+                          );
+                        } else {
+                          return const Center(
+                            child: Text("There is no item in your area")
                           );
                         }
                       }))
@@ -299,35 +321,6 @@ class _RadiusPickerState extends State<RadiusPicker> {
             onPressed: () => Navigator.pop(context, _range),
             child: const Text('OK'))
       ],
-    );
-  }
-}
-
-class SearchBar extends StatelessWidget {
-  const SearchBar({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const SingleChildScrollView(
-      child: Row(
-        children: <Widget>[
-          Chip(
-            avatar: Icon(Icons.tune, size: 16),
-            label: Text('Type'),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-          Chip(
-            avatar: Icon(Icons.location_pin, size: 16),
-            label: Text('Range'),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-          Chip(avatar: Icon(Icons.warning), label: Text('Allergies'))
-        ],
-      ),
     );
   }
 }
