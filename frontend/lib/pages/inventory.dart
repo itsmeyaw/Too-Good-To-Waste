@@ -393,7 +393,7 @@ class _BottomTopScreenState extends State<Inventory>
                         const SizedBox(
                           height: 20,
                         ),
-                        const Text('Period: Jan 2024 - Dec 2024'),
+                        const Text('Period: Jan 2023 - Jan 2024'),
                         const SizedBox(
                           height: 10,
                         ),
