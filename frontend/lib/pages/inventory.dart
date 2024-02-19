@@ -263,11 +263,14 @@ class _BottomTopScreenState extends State<Inventory>
           }
       }
       //TODO: Loading widget...
-      var duration = const Duration(seconds: 2);
-      sleep(duration);
-      setState(() {
-        buildList();
+      const duration = Duration(seconds: 2);
+      Future.delayed(duration, () {
+        // After the duration, trigger buildList() method
+        setState(() {
+          buildList();
+        });
       });
+      
     } else {
       logger.e('Cannot determine mime');
     }
@@ -283,12 +286,7 @@ class _BottomTopScreenState extends State<Inventory>
   @override
   void initState() {
     _tooltipBehavior = TooltipBehavior(enable: true);
-    //_controller = TabController(length: 3, vsync: this);
-    //Future.delayed(Duration(seconds: 3)).then((value) {
-    //setState(() {
-    //_isLoading = false;
-    //});
-    //});
+ 
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _fetchWasteNum();
@@ -308,7 +306,7 @@ class _BottomTopScreenState extends State<Inventory>
   Widget build(BuildContext context) {
      final message = ModalRoute.of(context)!.settings.arguments;
     if (message == null) {
-      logger.d('No message');
+      // logger.d('No Cloud Message');
     } else {  
        logger.d('Title: $message');
     }
@@ -431,7 +429,7 @@ class _BottomTopScreenState extends State<Inventory>
                 child: AnimatedTextKit(
                   animatedTexts: [
                     TypewriterAnimatedText(
-                      'Nothing expired yet, keep it on!',
+                      'Nothing wasted yet, keep it on!',
                       textStyle: const TextStyle(
                         fontSize: 32.0,
                         fontWeight: FontWeight.bold,
@@ -503,14 +501,20 @@ class _BottomTopScreenState extends State<Inventory>
   }
 
   Widget buildWasteList() {
+    String? categoryIconImagePath;
+
+    if (GlobalCateIconMap[category] == null) {
+      categoryIconImagePath = GlobalCateIconMap["Others"];
+    } else {
+      categoryIconImagePath = GlobalCateIconMap[category];
+    }
+
     return FutureBuilder(
         future: Future.wait([
           getWasteItemString('name'),
-          //getWasteItemInt('expiry_date'),
           getWasteItemDouble('quantity_num'),
           getWasteItemString('quantity_type'),
           getWasteItemString('category'),
-          //getWasteItemInt('buy_date'),
         ]),
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
           if (!snapshot.hasData) {
@@ -518,48 +522,87 @@ class _BottomTopScreenState extends State<Inventory>
           }
           // alternatively use snapshot.connectionState != ConnectionState.done
           if (snapshot.hasError) return const Text('Something went wrong.');
-          List<String> itemsWaste = snapshot.requireData[0];
-          if (itemsWaste.isEmpty) {
-            return const Center(
-              child: Text(
-                "Nothing yet...",
-                style: TextStyle(
-                  fontSize: 20,
-                ),
-              ),
-            );
-          }
-
-          //List<dynamic> foodItems = getFoodItems(snapshot.requireData);
-
-          //final List<DateTime> expires = List<DateTime>.from(foodItems[1]);
+          List<String> itemsWasteName = snapshot.requireData[0];
           List<double> num = snapshot.requireData[1];
           List<String> type = snapshot.requireData[2];
           List<String> categoryies = snapshot.requireData[3];
 
-          return ListTileTheme(
-              contentPadding: const EdgeInsets.all(15),
-              textColor: Colors.black54,
-              style: ListTileStyle.list,
-              dense: true,
-              child: ListView.builder(
-                  itemCount: itemsWaste.length,
-                  itemBuilder: (context, index) {
-                    var item = itemsWaste[index];
-                    //var progressPercentage = remainDays / (expires[index].difference(boughtTime[index]).inDays);
-                    var foodNum = num[index];
-                    var foodType = type[index];
+          return 
+             Container(
+  width: MediaQuery.of(context).size.width,
+  height: MediaQuery.of(context).size.height,
+  padding: const EdgeInsets.all(10.0),
+  child: Column(
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
+    children: [
+      Flexible(
+        flex: 1,
+        child: AnimatedTextKit(
+          animatedTexts: [
+            TypewriterAnimatedText(
+              'Oh No! You have wasted ${itemsWasteName.length} items already......We provide this trick to help you recylcle it!',
+              textStyle: const TextStyle(
+                fontSize: 32.0,
+                fontWeight: FontWeight.bold,
+              ),
+              speed: const Duration(milliseconds: 100),
+            ),
+          ],
+          totalRepeatCount: 4,
+          pause: const Duration(milliseconds: 100000),
+          displayFullTextOnTap: true,
+          stopPauseOnTap: true,
+        ),
+      ),
+      Flexible(
+        flex: 1,
+        child: ListTileTheme(
+          contentPadding: const EdgeInsets.all(15),
+          textColor: Colors.black54,
+          style: ListTileStyle.list,
+          dense: true,
+          child: ListView.builder(
+            shrinkWrap: true, // Add shrinkWrap: true to allow the ListView to scroll properly within the Column
+            itemCount: itemsWaste.length,
+            itemBuilder: (context, index) {
+              var item = itemsWasteName[index];
+              var foodNum = num[index];
+              var foodType = type[index];
+              var category = categoryies[index];
 
-                    var category = categoryies[index];
+              return ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                  vertical: 10.0,
+                ),
+                leading: Container(
+                  padding: const EdgeInsets.only(right: 12.0),
+                  child: Image(
+                    image: AssetImage(GlobalCateIconMap[category]!),
+                    width: 32,
+                    height: 32,
+                  ),
+                ),
+                title: Text(
+                  item,
+                  style: const TextStyle(fontSize: 25),
+                ),
+                trailing: Text(
+                  "$foodNum $foodType",
+                  style: const TextStyle(
+                    fontFamily: 'Roboto',
+                    fontSize: 24,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    ],
+  ),
+);
 
-                    return buildWasteItem(
-                        item,
-                        //remainDays,
-                        foodNum,
-                        foodType,
-                        category);
-                    //progressPercentage);
-                  }));
         });
   }
 
@@ -571,60 +614,31 @@ class _BottomTopScreenState extends State<Inventory>
     } else {
       categoryIconImagePath = GlobalCateIconMap[category];
     }
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
-      padding: const EdgeInsets.all(10.0),
-      child: Column(children: [
-        Flexible(
-          flex: 1,
-          child: AnimatedTextKit(
-            animatedTexts: [
-              TypewriterAnimatedText(
-                'Oh No! You have wasted $num $type $item already......We provide this trick to help you recylcle it!',
-                textStyle: const TextStyle(
-                  fontSize: 32.0,
-                  fontWeight: FontWeight.bold,
-                ),
-                speed: const Duration(milliseconds: 100),
-              ),
-            ],
-            totalRepeatCount: 4,
-            pause: const Duration(milliseconds: 100000),
-            displayFullTextOnTap: true,
-            stopPauseOnTap: true,
+    return Card(
+      child:
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20.0, vertical: 10.0),
+          leading: Container(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: Image(
+              image: AssetImage(categoryIconImagePath!),
+              width: 32,
+              height: 32,
+            ),
           ),
+          title: Text(
+            item,
+            style: const TextStyle(fontSize: 25),
+          ),
+          // subtitle: Text("Expired in $expire days", style: TextStyle(fontStyle: FontStyle.italic),),
+          trailing: Text("$num $type",
+              style: const TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 24,
+              )),
         ),
-        Flexible(
-            flex: 1,
-            child: Column(
-              children: [
-                ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20.0, vertical: 10.0),
-                  leading: Container(
-                    padding: const EdgeInsets.only(right: 12.0),
-                    child: Image(
-                      image: AssetImage(categoryIconImagePath!),
-                      width: 32,
-                      height: 32,
-                    ),
-                  ),
-                  title: Text(
-                    item,
-                    style: const TextStyle(fontSize: 25),
-                  ),
-                  // subtitle: Text("Expired in $expire days", style: TextStyle(fontStyle: FontStyle.italic),),
-                  trailing: Text("$num $type",
-                      style: const TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: 24,
-                      )),
-                ),
-              ],
-            )),
-      ]),
-    );
+      ); 
   }
 
   Widget buildList() {
@@ -658,10 +672,6 @@ class _BottomTopScreenState extends State<Inventory>
                   itemCount: items.length,
                   itemBuilder: (context, index) {
                     var item = items[index];
-                    //how to show the quantity tyoe and quantity number?
-
-                    //var expires = getItemExpiringTime();
-                    //how to show the listsby sequence of expire time?
                     var remainDays =
                         DateTime.fromMillisecondsSinceEpoch(item.expiryDate)
                             .difference(DateTime.now())
@@ -771,8 +781,7 @@ class _BottomTopScreenState extends State<Inventory>
             consumeState: 1.0,
             state: attribute,
           ));
-        //TODO!
-        // setState(() {
+        
         items.removeAt(index);
       // });
       
@@ -788,15 +797,21 @@ class _BottomTopScreenState extends State<Inventory>
           ? Colors.white
           : const Color.fromRGBO(238, 162, 164, 0.8),
       child: Slidable(
-        key: const ValueKey(0),
+        //key: const ValueKey(0),
+        key: UniqueKey(),
         startActionPane: ActionPane(
           // A motion is a widget used to control how the pane animates.
           motion: const ScrollMotion(),
 
           // A pane can dismiss the Slidable.
-          dismissible: DismissiblePane(onDismissed: () {
-            updateFoodDB(index, 'wasted');
-          }),
+          dismissible: DismissiblePane(
+            onDismissed: () {
+              updateFoodDB(index, 'wasted');
+
+              // setState(() {
+              //   buildWasteList();
+              // });
+            }),
 
           // All actions are defined in the children parameter.
           children: [
@@ -1017,7 +1032,6 @@ class _BottomTopScreenState extends State<Inventory>
                   prefixIcon: Icon(Icons.fastfood),
                   hintText: 'e.g. Eggs',
                 ),
-                autofocus: true,
                 controller: nameController,
                 onSubmitted: (value) {},
               ),
