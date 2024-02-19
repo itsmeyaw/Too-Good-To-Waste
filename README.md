@@ -82,7 +82,7 @@ flutter run
     <img height="390" src="resources/notification.png" width="180"/>
 - AI Import ([Video](https://www.youtube.com/shorts/V8854hzOuY8))
 
-## A Vision for the Future
+## Vision for the Future
 
 We, the Too Good To Waste Team, believe in 
 a world without food waste. We know, that it is a long 
