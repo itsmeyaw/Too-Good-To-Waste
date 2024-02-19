@@ -123,6 +123,7 @@ class _ChatroomPageState extends State<ChatroomPage> {
                                 widget.secondUserId,
                                 _messageController.value.text,
                                 alreadySendItem ? null : widget.sharedItem?.id);
+                            _messageController.text = "";
                             alreadySendItem = true;
                           });
                         },
