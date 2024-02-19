@@ -364,7 +364,7 @@ class _DetailsListState extends State<DetailsList> {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 20,
+                fontSize: 17,
               ))),
       actions: [
         TextButton(
@@ -471,12 +471,12 @@ class _DetailsListState extends State<DetailsList> {
                         children: <Widget>[   
                           const Text(
                             'Storage Detail',
-                            style: TextStyle(fontSize: 25),
+                            style: TextStyle(fontSize: 20),
                           ),
                           SizedBox(height: 5), 
                         // subtitle: Text("Expired in $expire days", style: TextStyle(fontStyle: FontStyle.italic),),
                       Container(
-                          width: 300,
+                          width: 250,
                           child:
                           TextField(   
                           decoration: const InputDecoration(
@@ -487,7 +487,7 @@ class _DetailsListState extends State<DetailsList> {
                           controller: quanNumAndTypeController,
                           style: const TextStyle(
                             fontFamily: 'Roboto',
-                            fontSize: 24,
+                            fontSize: 20,
                           ),
                           onTap: () {
                         FocusScope.of(context).requestFocus(FocusNode());
@@ -567,12 +567,12 @@ class _DetailsListState extends State<DetailsList> {
                         children: <Widget>[   
                           const Text(
                             'Category',
-                            style: TextStyle(fontSize: 25),
+                            style: TextStyle(fontSize: 20),
                           ),
-                          SizedBox(height: 10),
+                          SizedBox(height: 5),
                         // subtitle: Text("Expired in $expire days", style: TextStyle(fontStyle: FontStyle.italic),),
                         Container(
-                          width: 300,
+                          width: 250,
                           child: TextField(
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
@@ -582,7 +582,7 @@ class _DetailsListState extends State<DetailsList> {
                             controller: categoryController,
                             style: const TextStyle(
                               fontFamily: 'Roboto',
-                              fontSize: 24,
+                              fontSize: 20,
                             ),
                             onTap: () {
                               FocusScope.of(context).requestFocus(FocusNode());
@@ -604,11 +604,11 @@ class _DetailsListState extends State<DetailsList> {
                         children: <Widget>[   
                           const Text(
                             'Bought in',
-                            style: TextStyle(fontSize: 25),
+                            style: TextStyle(fontSize: 20),
                           ),
                           SizedBox(height: 5),
                         Container(
-                          width: 300,
+                          width: 250,
                           child: TextField(
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
@@ -685,11 +685,11 @@ class _DetailsListState extends State<DetailsList> {
                         children: <Widget>[   
                           const Text(
                             'Expires in',
-                            style: TextStyle(fontSize: 25),
+                            style: TextStyle(fontSize: 20),
                           ),
                           SizedBox(height: 5),
                         Container(
-                          width: 300,
+                          width: 250,
                           child: TextField(
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),

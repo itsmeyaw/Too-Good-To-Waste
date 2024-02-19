@@ -193,6 +193,19 @@ class _BottomTopScreenState extends State<Inventory>
     }
   }
 
+  bool isCategoryInEnum(String category) {
+    return ItemCategory.values.map((e) => 
+      e.toString().split('.').last.toLowerCase())
+      .contains(category);
+  }
+
+  String capitalizeFirstLetter(String category) {
+  if (category.isEmpty) return category; // Return input if it's empty
+  
+  // Capitalize the first letter and keep the rest unchanged
+  return '${category[0].toUpperCase()}${category.substring(1)}';
+}
+
   Future<void> pickImage(bool isCamera) async {
     XFile? image;
 
@@ -216,7 +229,45 @@ class _BottomTopScreenState extends State<Inventory>
       List<UserItem> items =
           await aiService.readReceipt(mime, base64Encode(pickedImageData));
 
-      // TODO @Xiyue: Process the returned items
+      UserItemService userItemService = UserItemService();
+      User? currentUser = FirebaseAuth.instance.currentUser;
+       if (currentUser == null) {
+          throw Exception('You should Login first!');
+        } else {
+          for (final item in items) {
+
+            if (item.name == null) {
+              logger.e('Item name is null');
+              continue;
+            } else if (isCategoryInEnum(item.category.name)){
+              logger.e('Item category is not recognised');
+              continue;
+            } else {
+              //insert new data into cloud firebase first and get the auto-generated id 
+              item.category = ItemCategory.parse(capitalizeFirstLetter(item.category.name));     
+                var id =
+                    await userItemService.addUserItem(currentUser.uid, item);
+
+                if (id == null) {
+                  logger.w('Failed to insert food into local database');
+                } else {
+                  logger.d(item);
+
+                  item.id = id;
+
+                  await insertDB(item);
+                  await userItemService.updateUserItem(
+                      currentUser.uid, item.id!, item);
+                }
+            }
+          }
+      }
+      //TODO: Loading widget...
+      var duration = const Duration(seconds: 2);
+      sleep(duration);
+      setState(() {
+        buildList();
+      });
     } else {
       logger.e('Cannot determine mime');
     }
@@ -655,7 +706,7 @@ class _BottomTopScreenState extends State<Inventory>
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 20,
+                fontSize: 17,
               ))),
       actions: [
         TextButton(
@@ -796,7 +847,7 @@ class _BottomTopScreenState extends State<Inventory>
           ),
           title: Text(
             userItem.name,
-            style: const TextStyle(fontSize: 25),
+            style: const TextStyle(fontSize: 18),
           ),
           subtitle: Row(
             children: <Widget>[
@@ -1153,11 +1204,6 @@ class _BottomTopScreenState extends State<Inventory>
               food.consumeState = 0.0;
               food.state = 'good';
               logger.d('food: $food');
-              //var quantityNum = int.parse(quanNumController.text);
-              //接上InputPage裏DateTime時間組件，再轉化成timestamp存進數據庫
-              //var expiretime = int.parse(expireTimeController.text);
-
-              //food[3]是可以直接傳入數據庫的int timestamp
               DateTime expireDays =
                   DateTime.fromMillisecondsSinceEpoch(food.expiryDate);
               var remainExpireDays = expireDays.difference(timeNowDate).inDays;
@@ -1182,18 +1228,8 @@ class _BottomTopScreenState extends State<Inventory>
                   food.id = id;
 
                   await insertDB(food);
-                  UserItem newItemData = UserItem(
-                      id: food.id,
-                      name: food.name,
-                      category: food.category,
-                      buyDate: food.buyDate,
-                      expiryDate: food.expiryDate,
-                      quantityType: food.quantityType,
-                      quantityNum: food.quantityNum,
-                      consumeState: food.consumeState,
-                      state: food.state);
                   await userItemService.updateUserItem(
-                      currentUser.uid, food.id!, newItemData);
+                      currentUser.uid, food.id!, food);
                 }
               }
               await getAllItems('foods');
