@@ -227,6 +227,7 @@ class _BottomTopScreenState extends State<Inventory>
 
   //late bool _isLoading;
   late TabController _tabController;
+  int wasteNum = 0;
 
   @override
   void initState() {
@@ -239,7 +240,18 @@ class _BottomTopScreenState extends State<Inventory>
     //});
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _fetchWasteNum();
   }
+
+  void _fetchWasteNum() async {
+  // Fetch wasteNum asynchronously
+    int length = await getWasteItemString('name').then((value) => value.length);
+    setState(() {
+      wasteNum = length; // Set the value of wasteNum
+    });
+  }
+
+   
 
   @override
   Widget build(BuildContext context) {
@@ -249,7 +261,6 @@ class _BottomTopScreenState extends State<Inventory>
     } else {  
        logger.d('Title: $message');
     }
-    
 
     bool toClose = false;
 
@@ -262,7 +273,7 @@ class _BottomTopScreenState extends State<Inventory>
             tabs: const [
               Tab(icon: Icon(Icons.storefront_outlined), text: "Current"),
               Tab(icon: Icon(Icons.bar_chart), text: "Statistic"),
-              Tab(icon: Icon(Icons.calendar_today), text: "Plan"),
+              Tab(icon: Icon(Icons.recycling), text: "Recycle"),
             ],
           )),
       body: TabBarView(
@@ -354,7 +365,8 @@ class _BottomTopScreenState extends State<Inventory>
               )),
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
+            children: wasteNum == 0
+            ? [
               Flexible(
                 flex: 2,
                 child: GestureDetector(
@@ -386,6 +398,8 @@ class _BottomTopScreenState extends State<Inventory>
                 flex: 1,
                 child: Container(),
               ),
+            ] : [
+              Expanded(child: buildWasteList()),
             ],
           ),
         ],
@@ -425,9 +439,9 @@ class _BottomTopScreenState extends State<Inventory>
   Future<List<String>> getWasteItemString(String value) async {
     List<Map<String, dynamic>> items = await dbhelper.getAllWastedFoodList();
 
-    List<String> WasteName =
+    List<String> WastesName =
         List<String>.generate(items.length, (i) => items[i][value]);
-    return WasteName;
+    return WastesName;
   }
 
   Future<List<double>> getWasteItemDouble(String value) async {
@@ -516,7 +530,7 @@ class _BottomTopScreenState extends State<Inventory>
           child: AnimatedTextKit(
             animatedTexts: [
               TypewriterAnimatedText(
-                'Oh No! You have wasted $num $type $item already...',
+                'Oh No! You have wasted $num $type $item already......We provide this trick to help you recylcle it!',
                 textStyle: const TextStyle(
                   fontSize: 32.0,
                   fontWeight: FontWeight.bold,
@@ -706,8 +720,11 @@ class _BottomTopScreenState extends State<Inventory>
             consumeState: 1.0,
             state: attribute,
           ));
-
-      items.removeAt(index);
+        //TODO!
+        // setState(() {
+        items.removeAt(index);
+      // });
+      
     }
 
     return Card(
@@ -1218,31 +1235,6 @@ class _BottomTopScreenState extends State<Inventory>
       icon: const Icon(Icons.calendar_today),
       label: Text("+ $value days"),
     );
-  }
-
-  /// opens edit item screen
-  void pushEditItemScreen(index) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: const Text('Edit item..'),
-        ),
-        body: TextField(
-          autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'e.g. Eggs',
-            border: OutlineInputBorder(),
-          ),
-          controller: txt,
-          onSubmitted: (value) {
-            editItem(index, value);
-            Navigator.pop(context);
-            buildList();
-          },
-        ),
-      );
-    }));
   }
 
   // input textfield

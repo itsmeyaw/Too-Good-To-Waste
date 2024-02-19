@@ -72,7 +72,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
       title: const Text("Alert!", textAlign: TextAlign.center),
       content: Container(
         width: 3 * width / 5,
-        height: height / 3,
+        height: height / 2.5,
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
