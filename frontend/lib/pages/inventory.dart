@@ -263,11 +263,14 @@ class _BottomTopScreenState extends State<Inventory>
           }
       }
       //TODO: Loading widget...
-      var duration = const Duration(seconds: 2);
-      sleep(duration);
-      setState(() {
-        buildList();
+      const duration = Duration(seconds: 2);
+      Future.delayed(duration, () {
+        // After the duration, trigger buildList() method
+        setState(() {
+          buildList();
+        });
       });
+      
     } else {
       logger.e('Cannot determine mime');
     }
@@ -283,12 +286,7 @@ class _BottomTopScreenState extends State<Inventory>
   @override
   void initState() {
     _tooltipBehavior = TooltipBehavior(enable: true);
-    //_controller = TabController(length: 3, vsync: this);
-    //Future.delayed(Duration(seconds: 3)).then((value) {
-    //setState(() {
-    //_isLoading = false;
-    //});
-    //});
+ 
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _fetchWasteNum();
@@ -431,7 +429,7 @@ class _BottomTopScreenState extends State<Inventory>
                 child: AnimatedTextKit(
                   animatedTexts: [
                     TypewriterAnimatedText(
-                      'Nothing expired yet, keep it on!',
+                      'Nothing wasted yet, keep it on!',
                       textStyle: const TextStyle(
                         fontSize: 32.0,
                         fontWeight: FontWeight.bold,
@@ -783,8 +781,7 @@ class _BottomTopScreenState extends State<Inventory>
             consumeState: 1.0,
             state: attribute,
           ));
-        //TODO!
-        // setState(() {
+        
         items.removeAt(index);
       // });
       
