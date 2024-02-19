@@ -3,6 +3,7 @@ import 'package:tooGoodToWaste/Pages/post_page.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:tooGoodToWaste/dto/user_name_model.dart';
 import 'package:tooGoodToWaste/pages/message_thread_list.dart';
 import 'package:tooGoodToWaste/service/shared_items_service.dart';
 import 'package:tooGoodToWaste/service/user_service.dart';
@@ -30,17 +31,162 @@ class _MyAccountPageState extends State<AccountPage> {
   }
 }
 
-class AccountSettingPage extends StatelessWidget {
+class AccountSettingPage extends StatefulWidget {
   final User user;
 
   const AccountSettingPage({super.key, required this.user});
+
+  @override
+  _AccountSettingPageState createState() => _AccountSettingPageState();
+}
+
+class _AccountSettingPageState extends State<AccountSettingPage> {
+  late TextEditingController nameController;
+  late TextEditingController emailController;
+  late TextEditingController phoneNumberController;
+  late TextEditingController address1Controller;
+  late TextEditingController address2Controller;
+  late TextEditingController cityController;
+  late TextEditingController zipCodeController;
+  late TextEditingController countryController;
+
+  late TextEditingController allergiesController;
+
+  late String currentName;
+  late String currentEmail;
+  late String currentPhoneNumber;
+  late String currentAddress1;
+  late String currentAddress2;
+  late String currentCity;
+  late String currentZipCode;
+  late String currentCountry;
+  late String currentAllergies;
+
+  late TGTWUser userData;
+
+  Future<void> getCurrentUserData() async {
+    UserService userService = UserService();
+
+    TGTWUser userData =
+        await userService.getUserData(widget.user.uid);
+
+    setState(() {
+      userData = userData;
+    });
+  
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    userData = TGTWUser(
+      name: UserName(first: '', last: ''),
+      rating: 0,
+      phoneNumber: '',
+      address: UserAddress(
+          city: '', country: '', line1: '', line2: '', zipCode: ''),
+      allergies: [],
+      chatroomIds: [],
+      goodPoints: 0,
+      reducedCarbonKg: 0,
+    );
+    getCurrentUserData(); 
+
+    currentName = widget.user.displayName ?? '';
+    currentEmail = widget.user.email ?? '';
+    currentPhoneNumber = widget.user.phoneNumber ?? '';
+    currentAddress1 = userData.address.line1;
+    currentAddress2 = userData.address.line2;
+    currentCity = userData.address.city;
+    currentZipCode = userData.address.zipCode;
+    currentCountry = userData.address.country;
+    currentAllergies = userData.allergies.join(', ');
+
+    
+
+    // nameController = TextEditingController(text: '${userData.name.first} ${userData.name.last}');
+    // emailController = TextEditingController(text: widget.user.email ?? '');
+    // phoneNumberController = TextEditingController(text: userData.phoneNumber);
+    // address1Controller = TextEditingController(text: userData.address.line1);
+    // address2Controller = TextEditingController(text:  userData.address.line2);
+    // cityController = TextEditingController(text: userData.address.city);
+    // zipCodeController = TextEditingController(text: userData.address.zipCode);
+    // countryController = TextEditingController(text: userData.address.country);
+    // allergiesController = TextEditingController(text: currentAllergies);
+  }
+
+  showUpdateDialog() {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    AlertDialog dialog = AlertDialog(
+      title: const Text("Hey!",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 30,
+          )),
+      content: Container(
+          width: 3 * width / 5,
+          height: height / 8,
+          padding: const EdgeInsets.all(10.0),
+          child: Text('Are you sure you want to update your information?',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 17,
+              ))),
+      actions: [
+        TextButton(
+          onPressed: () async {
+            await updateUser();
+            Navigator.of(context, rootNavigator: true).pop();
+          },
+          child: const Text('Yes!'),
+        ),
+      ],
+    );
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return dialog;
+        });
+  }
+
+  Future<void> updateUser() async {
+    final UserService userService = UserService();
+    
+    TGTWUser newUser = TGTWUser(
+      name: UserName(
+          first: nameController.text.split(' ')[0],
+          last: nameController.text.split(' ')[1]),
+      rating: 0,
+      phoneNumber: phoneNumberController.text,
+      address: UserAddress(
+          city: cityController.text,
+          country: countryController.text,
+          line1: address1Controller.text,
+          line2: address2Controller.text,
+          zipCode: zipCodeController.text),
+      allergies: allergiesController.text.split(','),
+      chatroomIds: [],
+      goodPoints: 0,
+      reducedCarbonKg: 0,
+    );
+
+    // await userService.updateUserData(widget.user.uid, newUser);
+  
+     Navigator.pop(context);
+  }
+
+  bool isEditMode = false;
 
   @override
   Widget build(BuildContext context) {
     final UserService userService = UserService();
 
     return FutureBuilder(
-        future: userService.getUserData(user.uid),
+        future: userService.getUserData(widget.user.uid),
         builder:
             (BuildContext context, AsyncSnapshot<TGTWUser> userDataSnapshot) {
           if (userDataSnapshot.connectionState == ConnectionState.waiting) {
@@ -53,9 +199,20 @@ class AccountSettingPage extends StatelessWidget {
             );
           }
 
-          TGTWUser userData = userDataSnapshot.requireData;
+          userData = userDataSnapshot.requireData;
 
-          return DefaultTabController(
+          nameController = TextEditingController(text: '${userData.name.first} ${userData.name.last}');
+          emailController = TextEditingController(text: widget.user.email ?? '');
+          phoneNumberController = TextEditingController(text: userData.phoneNumber);
+          address1Controller = TextEditingController(text: userData.address.line1);
+          address2Controller = TextEditingController(text:  userData.address.line2);
+          cityController = TextEditingController(text: userData.address.city);
+          zipCodeController = TextEditingController(text: userData.address.zipCode);
+          countryController = TextEditingController(text: userData.address.country);
+          allergiesController = TextEditingController(text: currentAllergies);
+
+          return 
+          DefaultTabController(
               length: 3,
               child: Scaffold(
                 appBar: AppBar(
@@ -78,7 +235,38 @@ class AccountSettingPage extends StatelessWidget {
                     ],
                   ),
                 ),
-                body: TabBarView(
+                body: Stack(
+      children: [
+        Positioned(
+            top: 0.0,
+            right: 0.0,
+            child: 
+            // const SwitchButton(),
+              IconButton(
+                icon: Icon(isEditMode ? Icons.done : Icons.edit),
+                onPressed: () {
+                  setState(() {
+                    isEditMode = !isEditMode;
+                    if (!isEditMode) {
+                      // Save changes
+                      currentAddress1 = address1Controller.text;
+                      currentAddress2 = address2Controller.text;
+                      currentName = nameController.text;
+                      currentEmail = emailController.text;
+                      currentPhoneNumber = phoneNumberController.text;
+                      currentCity = cityController.text;
+                      currentZipCode = zipCodeController.text;
+                      currentCountry = countryController.text;
+                      currentAllergies = allergiesController.text;                  
+                      showUpdateDialog();
+                      // updateFood();
+                    }
+                  });
+                },
+              ),
+          ),
+          
+                TabBarView(
                   children: [
                     Container(
                       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
@@ -94,29 +282,51 @@ class AccountSettingPage extends StatelessWidget {
                         const SizedBox(
                           height: 10,
                         ),
-                        const Text('Name'),
-                        RichText(
-                            text: TextSpan(
-                          text: '${userData.name.first} ${userData.name.last}',
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        )),
+                        
+                         TextField(   
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Name',
+                          ),
+                          enabled: isEditMode,
+                          controller: nameController,
+                          style: const TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: 20,
+                          ),
+                         ),
                         const SizedBox(
                           height: 10,
                         ),
-                        const Text('E-Mail'),
-                        Text(
-                          '${user.email}',
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
+                       
+                        TextField(   
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Email',
+                          ),
+                          enabled: isEditMode,
+                          controller: emailController,
+                          style: const TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: 20,
+                          ),
+                         ),
                         const SizedBox(
                           height: 10,
                         ),
-                        const Text('Phone Number'),
-                        RichText(
-                            text: TextSpan(
-                          text: userData.phoneNumber,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        )),
+                      
+                       TextField(   
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Phone Number',
+                          ),
+                          enabled: isEditMode,
+                          controller: nameController,
+                          style: const TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: 20,
+                          ),
+                         ),
                         const SizedBox(
                           height: 20,
                         ),
@@ -127,43 +337,83 @@ class AccountSettingPage extends StatelessWidget {
                         const SizedBox(
                           height: 10,
                         ),
-                        const Text('Address Line 1'),
-                        Text(
-                          userData.address.line1,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
+                       
+                        TextField(   
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Address Line 1',
+                          ),
+                          enabled: isEditMode,
+                          controller: address1Controller,
+                          style: const TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: 20,
+                          ),
+                         ),
                         const SizedBox(
                           height: 10,
                         ),
-                        const Text('Address Line 2'),
-                        Text(
-                          userData.address.line2,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
+                     
+                       TextField(   
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Address Line 2',
+                          ),
+                          enabled: isEditMode,
+                          controller: address2Controller,
+                          style: const TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: 20,
+                          ),
+                         ),
                         const SizedBox(
                           height: 10,
                         ),
-                        const Text('City'),
-                        Text(
-                          userData.address.city,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
+                       
+                        TextField(   
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'City',
+                          ),
+                          enabled: isEditMode,
+                          controller: cityController,
+                          style: const TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: 20,
+                          ),
+                         ),
                         const SizedBox(
                           height: 10,
                         ),
-                        const Text('Zip Code'),
-                        Text(
-                          userData.address.zipCode,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
+                      
+                        TextField(   
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Zip Code',
+                          ),
+                          enabled: isEditMode,
+                          controller: zipCodeController,
+                          style: const TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: 20,
+                          ),
+                         ),
                         const SizedBox(
                           height: 10,
                         ),
-                        const Text('Country'),
-                        Text(
-                          userData.address.country,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
+                     
+                        TextField(   
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Country',
+                          ),
+                          enabled: isEditMode,
+                          controller: countryController,
+                          style: const TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: 20,
+                          ),
+                         ),
                         const SizedBox(
                           height: 20,
                         ),
@@ -175,10 +425,12 @@ class AccountSettingPage extends StatelessWidget {
                           height: 10,
                         ),
                         const Text('Allergies'),
+                        
                         Text(
                           userData.allergies.isEmpty
                               ? 'No allergies listed'
                               : userData.allergies.join(', '),
+                          
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                         const SizedBox(
@@ -234,10 +486,13 @@ class AccountSettingPage extends StatelessWidget {
                     )
                   ],
                 ),
-              ));
-        });
+              ]))
+          );
+            });
+        }
+
   }
-}
+
 
 class PostPageWidget extends StatelessWidget {
   final SharedItemService sharedItemService = SharedItemService();

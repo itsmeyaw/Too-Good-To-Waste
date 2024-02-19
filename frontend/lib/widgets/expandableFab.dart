@@ -40,6 +40,11 @@ class _ExpandableFabState extends State<ExpandableFab>
       reverseCurve: Curves.easeOutQuad,
       parent: _controller,
     );
+
+    if (widget.toClose) {
+      _controller.reverse();
+      _open = false;
+    }
   }
 
   @override

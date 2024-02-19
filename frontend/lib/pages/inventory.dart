@@ -351,8 +351,6 @@ class _BottomTopScreenState extends State<Inventory>
     } else {  
        logger.d('Title: $message');
     }
-
-
     
     return Scaffold(
       appBar: AppBar(
@@ -933,16 +931,6 @@ class _BottomTopScreenState extends State<Inventory>
           onLongPress: () async {
             //長按卡片刪除
             showDeleteDialog(userItem.name, userId, itemId, index);
-
-            // await deleteItem(itemId);
-
-            // UserItemService userItemService = UserItemService();
-            // await userItemService.deleteUserItem(userId, itemId);
-            // setState(() {
-            //   items.removeAt(index);
-
-            // });
-            // logger.d('Deleted item $itemId');
           },
         ),
       ),
