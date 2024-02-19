@@ -39,7 +39,7 @@ class _MessageThreadListState extends State<MessageThreadList> {
                             AsyncSnapshot<TGTWUser> userSnapshot) {
                           if (userSnapshot.hasData &&
                               userSnapshot.data != null) {
-                            return InkWell(
+                            return ListTile(
                               onTap: () {
                                 Navigator.push(
                                     context,
@@ -49,13 +49,12 @@ class _MessageThreadListState extends State<MessageThreadList> {
                                                 secondUserId:
                                                     secondUsers[index])));
                               },
-                              child: ListTile(
-                                title: Text(
-                                    "${userSnapshot.data!.name.first} ${userSnapshot.data!.name.last}"),
-                              ),
+                              title: Text(
+                                  "${userSnapshot.data!.name.first} ${userSnapshot.data!.name.last}"),
+                              trailing: const Icon(Icons.keyboard_arrow_right),
                             );
                           } else {
-                            return const CircularProgressIndicator();
+                            return Container();
                           }
                         });
                   },
@@ -65,7 +64,7 @@ class _MessageThreadListState extends State<MessageThreadList> {
                   itemCount: secondUsers.length);
             }
           }
-          return Container();
+          return const CircularProgressIndicator();
         });
   }
 }

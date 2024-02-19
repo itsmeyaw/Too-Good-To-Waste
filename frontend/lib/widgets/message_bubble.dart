@@ -30,7 +30,7 @@ class MessageBubble extends StatelessWidget {
                 borderRadius: const BorderRadius.all(Radius.circular(10)),
                 color: isPrimary
                     ? const Color.fromRGBO(189, 189, 189, 1.0)
-                    : Theme.of(context).cardColor,
+                    : const Color.fromRGBO(200, 230, 201, 1.0),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
