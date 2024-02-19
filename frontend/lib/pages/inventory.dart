@@ -501,108 +501,55 @@ class _BottomTopScreenState extends State<Inventory>
   }
 
   Widget buildWasteList() {
-    String? categoryIconImagePath;
-
-    if (GlobalCateIconMap[category] == null) {
-      categoryIconImagePath = GlobalCateIconMap["Others"];
-    } else {
-      categoryIconImagePath = GlobalCateIconMap[category];
-    }
-
-    return FutureBuilder(
+   return FutureBuilder(
         future: Future.wait([
           getWasteItemString('name'),
           getWasteItemDouble('quantity_num'),
           getWasteItemString('quantity_type'),
           getWasteItemString('category'),
+
         ]),
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
           if (!snapshot.hasData) {
             return const Text('Loading...'); // still loading
           }
-          // alternatively use snapshot.connectionState != ConnectionState.done
+  
           if (snapshot.hasError) return const Text('Something went wrong.');
-          List<String> itemsWasteName = snapshot.requireData[0];
+          List<String> itemsWaste = snapshot.requireData[0];
+          if (itemsWaste.isEmpty) {
+            return const Center(
+              child: Text(
+                "Nothing yet...",
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+            );
+          }
           List<double> num = snapshot.requireData[1];
           List<String> type = snapshot.requireData[2];
           List<String> categoryies = snapshot.requireData[3];
 
-          return 
-             Container(
-  width: MediaQuery.of(context).size.width,
-  height: MediaQuery.of(context).size.height,
-  padding: const EdgeInsets.all(10.0),
-  child: Column(
-    mainAxisAlignment: MainAxisAlignment.spaceAround,
-    children: [
-      Flexible(
-        flex: 1,
-        child: AnimatedTextKit(
-          animatedTexts: [
-            TypewriterAnimatedText(
-              'Oh No! You have wasted ${itemsWasteName.length} items already......We provide this trick to help you recylcle it!',
-              textStyle: const TextStyle(
-                fontSize: 32.0,
-                fontWeight: FontWeight.bold,
-              ),
-              speed: const Duration(milliseconds: 100),
-            ),
-          ],
-          totalRepeatCount: 4,
-          pause: const Duration(milliseconds: 100000),
-          displayFullTextOnTap: true,
-          stopPauseOnTap: true,
-        ),
-      ),
-      Flexible(
-        flex: 1,
-        child: ListTileTheme(
-          contentPadding: const EdgeInsets.all(15),
-          textColor: Colors.black54,
-          style: ListTileStyle.list,
-          dense: true,
-          child: ListView.builder(
-            shrinkWrap: true, // Add shrinkWrap: true to allow the ListView to scroll properly within the Column
-            itemCount: itemsWaste.length,
-            itemBuilder: (context, index) {
-              var item = itemsWasteName[index];
-              var foodNum = num[index];
-              var foodType = type[index];
-              var category = categoryies[index];
+          return ListTileTheme(
+              contentPadding: const EdgeInsets.all(15),
+              textColor: Colors.black54,
+              style: ListTileStyle.list,
+              dense: true,
+              child: ListView.builder(
+                  itemCount: itemsWaste.length,
+                  itemBuilder: (context, index) {
+                    var item = itemsWaste[index];
+                   var foodNum = num[index];
+                    var foodType = type[index];
 
-              return ListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20.0,
-                  vertical: 10.0,
-                ),
-                leading: Container(
-                  padding: const EdgeInsets.only(right: 12.0),
-                  child: Image(
-                    image: AssetImage(GlobalCateIconMap[category]!),
-                    width: 32,
-                    height: 32,
-                  ),
-                ),
-                title: Text(
-                  item,
-                  style: const TextStyle(fontSize: 25),
-                ),
-                trailing: Text(
-                  "$foodNum $foodType",
-                  style: const TextStyle(
-                    fontFamily: 'Roboto',
-                    fontSize: 24,
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ),
-    ],
-  ),
-);
+                    var category = categoryies[index];
 
+                    return buildWasteItem(
+                        item,          
+                        foodNum,
+                        foodType,
+                        category);
+                  }));
         });
   }
 
@@ -614,31 +561,63 @@ class _BottomTopScreenState extends State<Inventory>
     } else {
       categoryIconImagePath = GlobalCateIconMap[category];
     }
-    return Card(
-      child:
-        ListTile(
-          contentPadding: const EdgeInsets.symmetric(
-              horizontal: 20.0, vertical: 10.0),
-          leading: Container(
-            padding: const EdgeInsets.only(right: 12.0),
-            child: Image(
-              image: AssetImage(categoryIconImagePath!),
-              width: 32,
-              height: 32,
-            ),
+   return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      padding: const EdgeInsets.all(10.0),
+      child: Column(children: [
+        Flexible(
+          flex: 1,
+          child: AnimatedTextKit(
+            animatedTexts: [
+              TypewriterAnimatedText(
+                'Oh No! You have wasted $num $type $item already...We provide this trick to help you reuse these Food Scraps !',
+                textStyle: const TextStyle(
+                  fontSize: 25.0,
+                  fontWeight: FontWeight.bold,
+                ),
+                speed: const Duration(milliseconds: 100),
+              ),
+            ],
+            totalRepeatCount: 4,
+            pause: const Duration(milliseconds: 100000),
+            displayFullTextOnTap: true,
+            stopPauseOnTap: true,
           ),
-          title: Text(
-            item,
-            style: const TextStyle(fontSize: 25),
-          ),
-          // subtitle: Text("Expired in $expire days", style: TextStyle(fontStyle: FontStyle.italic),),
-          trailing: Text("$num $type",
-              style: const TextStyle(
-                fontFamily: 'Roboto',
-                fontSize: 24,
-              )),
         ),
-      ); 
+        Flexible(
+            flex: 1,
+            child: Column(
+              children: [
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 10.0),
+                  leading: Container(
+                    padding: const EdgeInsets.only(right: 12.0),
+                    child: Image(
+                      image: AssetImage(categoryIconImagePath!),
+                      width: 32,
+                      height: 32,
+                    ),
+                  ),
+                  title: Text(
+                    item,
+                    style: const TextStyle(fontSize: 17),
+                  ),
+                  trailing: Text("$num $type",
+                      style: const TextStyle(
+                        fontFamily: 'Roboto',
+                        fontSize: 24,
+                      )),
+                ),
+              ],
+            )),
+            Flexible(
+              flex: 1,
+              child:  Image.asset('assets/images/foodWaste.png'),
+            )
+      ]),
+    );
   }
 
   Widget buildList() {
@@ -783,6 +762,10 @@ class _BottomTopScreenState extends State<Inventory>
           ));
         
         items.removeAt(index);
+
+        setState(() {
+          buildWasteList();
+        });
       // });
       
     }

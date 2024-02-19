@@ -102,6 +102,7 @@ flutter:
     - assets/images/backyard.png
     - assets/images/tree.png
     - assets/images/sharedItem.png
+    - assets/images/foodWaste.png
     - assets/achievements/initialization.png
     - assets/achievements/first_encounter.png
     - assets/achievements/nesting.png
