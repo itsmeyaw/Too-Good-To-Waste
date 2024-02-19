@@ -1,7 +1,7 @@
 # Too Good To Waste
 
 It seems trivial to throw some rotten food into the trash. 
-But if 7 billions people do it for 365 days, we get a global food waste 
+But if 7 billions people do it for 365 days, we have a global food waste 
 problem. The UN Environment Programme mentioned in 2021 that
 the global food waste estimated to contribute in the production of 8-10% preventable global 
 greenhouse gasses [[1]](https://www.unep.org/resources/report/unep-food-waste-index-report-2021) .
@@ -67,16 +67,19 @@ flutter run
 
 - Home page with shared items list
 
-    <img height="390" src="resources/Screenshot_20240219_220554.png" width="180"/>
+    <img height="390" src="resources/home.png" width="180"/>
 - Detailed information about shared item
 
-    <img height="390" src="resources/Screenshot_20240219_221617.png" width="180"/>
+    <img height="390" src="resources/shared_item_details.png" width="180"/>
 - User shared items
     
-    <img height="390" src="resources/Screenshot_20240219_220145.png" width="180"/>
+    <img height="390" src="resources/user_shared_items.png" width="180"/>
 - Messaging another user
 
-    <img height="390" src="resources/Screenshot_20240219_221243.png" width="180"/>
+    <img height="390" src="resources/message.png" width="180"/>
+- Notification of soon-expiring item
+
+    <img height="390" src="resources/notification.png" width="180"/>
 - AI Import ([Video](https://www.youtube.com/shorts/V8854hzOuY8))
 
 ## A Vision for the Future
