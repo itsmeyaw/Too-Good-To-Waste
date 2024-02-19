@@ -42,9 +42,7 @@ has excellent integration with the Flutter system.
 
 Below is the Diagram of the architecture.
 
-<center>
-<img height="449" src="resources/architecture.png" width="884"/>
-</center>
+![](resources/architecture.png)
 
 ## Deployment
 
