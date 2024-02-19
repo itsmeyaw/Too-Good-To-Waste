@@ -22,6 +22,7 @@ import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'dart:async';
 import 'package:image_picker/image_picker.dart';
+import 'package:tooGoodToWaste/service/shared_items_service.dart';
 import 'package:tooGoodToWaste/widgets/category_picker.dart';
 import 'package:tooGoodToWaste/widgets/expandableFab.dart';
 import 'dart:io';
@@ -283,6 +284,11 @@ class _BottomTopScreenState extends State<Inventory>
   late TabController _tabController;
   int wasteNum = 0;
 
+  double wastedPercentage = 0.0;
+  double sharedPercentage = 0.0;
+  double expiringPercentage = 0.0;
+  double goodPercentage = 0.0;
+
   @override
   void initState() {
     _tooltipBehavior = TooltipBehavior(enable: true);
@@ -290,6 +296,7 @@ class _BottomTopScreenState extends State<Inventory>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _fetchWasteNum();
+    calculatePieChart();
   }
 
   void _fetchWasteNum() async {
@@ -300,7 +307,41 @@ class _BottomTopScreenState extends State<Inventory>
     });
   }
 
+  void calculatePieChart()  {
+
+    SharedItemService sharedItemService = SharedItemService();
+
+    User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        throw Exception('User is null but want to get statistic. Please login first.');
+        
+      } else {
+          sharedItemService.getSharedItemOfUser(currentUser.uid).then((value) async {
+            int sharedNum = value.length;
+            int wastedNum = await getWasteItemString('name').then((value) => value.length);
+            int totalNum = await dbhelper.queryAll('foods').then((value) => value.length + sharedNum);
+            int expiringNum = await dbhelper.queryAllGoodFood('expiring').then((value) => value.length);
+            double wastedPerc = (wastedNum / totalNum) * 100;
+            double sharedPerc= (sharedNum / totalNum) * 100;
+            double expiringPerc = (expiringNum / totalNum) * 100;
+            double goodPerc = 100 - wastedPerc - sharedPerc - expiringPerc;
+            logger.d('Wasted: $wastedPerc, Shared: $sharedPerc, Expiring: $expiringPerc, Good: $goodPerc');
+            
+            setState(() {
+              wastedPercentage = wastedPerc;
+              sharedPercentage = sharedPerc;
+              expiringPercentage = expiringPerc;
+              goodPercentage = goodPerc;
+            });
+            
+          });
+
+        }
    
+  }
+
+  bool isExpanded = false; // State variable to control animation
+  bool toClose = false;
 
   @override
   Widget build(BuildContext context) {
@@ -311,8 +352,8 @@ class _BottomTopScreenState extends State<Inventory>
        logger.d('Title: $message');
     }
 
-    bool toClose = false;
 
+    
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -358,42 +399,52 @@ class _BottomTopScreenState extends State<Inventory>
                         const SizedBox(
                           height: 5,
                         ),
-                        const Text('Month: January'),
+                        const Text('Month: Feb 2024'),
                         const SizedBox(
                           height: 10,
                         ),
-                        SizedBox(
-                            height: 200,
+                        AnimatedContainer(
+                          duration: Duration(seconds: 1),
+                          curve: Curves.easeInOut,
+                          height: isExpanded ? 220 : 150,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 SizedBox(
                                   width: 200,
-                                  child: PieChart(PieChartData(sections: [
-                                    PieChartSectionData(
-                                        value: 10,
-                                        title: 'Wasted',
-                                        color: Colors.red),
-                                    PieChartSectionData(
-                                        value: 50,
-                                        title: 'Used',
-                                        color: Colors.blue),
-                                    PieChartSectionData(
-                                        value: 25,
-                                        title: 'Shared',
-                                        color: Colors.green),
-                                    PieChartSectionData(
-                                        value: 10,
-                                        title: 'Almost Expired',
-                                        color: Colors.yellow)
+                                  child: GestureDetector(
+                                    onTap: () { setState(() {
+                                      isExpanded = !isExpanded;
+                                    });
+                                    },
+                                  child:
+                                  PieChart(
+                                    PieChartData(
+                                    sections: [
+                                      PieChartSectionData(
+                                          value: wastedPercentage,
+                                          title: 'Wasted',
+                                          color: Colors.red),
+                                      PieChartSectionData(
+                                          value: goodPercentage,
+                                          title: 'Used',
+                                          color: Colors.blue),
+                                      PieChartSectionData(
+                                          value: sharedPercentage,
+                                          title: 'Shared',
+                                          color: Colors.green),
+                                      PieChartSectionData(
+                                          value: expiringPercentage,
+                                          title: 'Almost Expired',
+                                          color: Colors.yellow)
                                   ])),
-                                )
+                                )),
                               ],
                             )),
                         const SizedBox(
                           height: 20,
                         ),
-                        const Text('Period: Jan 2023 - Jan 2024'),
+                        const Text('Period: Jan 2024 - Feb 2024'),
                         const SizedBox(
                           height: 10,
                         ),
@@ -1399,45 +1450,45 @@ class _LineChart extends StatelessWidget {
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
-      fontSize: 10,
+      fontSize: 8,
     );
     Widget text;
     switch (value.toInt()) {
       case 1:
-        text = const Text('JAN', style: style);
+        text = const Text('31', style: style);
         break;
       case 2:
-        text = const Text('FEB', style: style);
+        text = const Text('2', style: style);
         break;
       case 3:
-        text = const Text('MAR', style: style);
+        text = const Text('5', style: style);
         break;
       case 4:
-        text = const Text('APR', style: style);
+        text = const Text('8', style: style);
         break;
       case 5:
-        text = const Text('MAY', style: style);
+        text = const Text('11', style: style);
         break;
       case 6:
-        text = const Text('JUN', style: style);
+        text = const Text('14', style: style);
         break;
       case 7:
-        text = const Text('JUL', style: style);
+        text = const Text('17', style: style);
         break;
       case 8:
-        text = const Text('AUG', style: style);
+        text = const Text('20', style: style);
         break;
       case 9:
-        text = const Text('SEP', style: style);
+        text = const Text('23', style: style);
         break;
       case 10:
-        text = const Text('OCT', style: style);
+        text = const Text('26', style: style);
         break;
       case 11:
-        text = const Text('NOV', style: style);
+        text = const Text('29', style: style);
         break;
       case 12:
-        text = const Text('DEC', style: style);
+        text = const Text('3', style: style);
         break;
       default:
         text = const Text('');
@@ -1453,7 +1504,7 @@ class _LineChart extends StatelessWidget {
 
   SideTitles get bottomTitles => SideTitles(
         showTitles: true,
-        reservedSize: 32,
+        reservedSize: 36,
         interval: 1,
         getTitlesWidget: bottomTitleWidgets,
       );
@@ -1463,7 +1514,7 @@ class _LineChart extends StatelessWidget {
   LineChartBarData get lineChartBarData2_1 => LineChartBarData(
         isCurved: true,
         curveSmoothness: 0,
-        color: Colors.green,
+        color: Colors.blue,
         barWidth: 1,
         isStrokeCapRound: true,
         dotData: const FlDotData(show: false),
@@ -1487,7 +1538,7 @@ class _LineChart extends StatelessWidget {
   LineChartBarData get lineChartBarData2_2 => LineChartBarData(
         isCurved: true,
         curveSmoothness: 0,
-        color: Colors.blue,
+        color: Colors.green,
         barWidth: 1,
         isStrokeCapRound: true,
         dotData: const FlDotData(show: false),
