@@ -7,7 +7,7 @@ the global food waste estimated to contribute in the production of 8-10% prevent
 greenhouse gasses [[1]](https://www.unep.org/resources/report/unep-food-waste-index-report-2021) .
 In the same report, they showed that household produces the most 
 food waste compared to food services and retails. This problem calls 
-for immediate solution on food waste prevention using considering this problem costs 
+for immediate solution on food waste prevention considering this problem costs 
 the global economy more than US$ 1 trillion per year [[2]](https://champions123.org/sites/default/files/2023-10/2023%20Champions%20Progress%20Report.pdf)
 .
 
