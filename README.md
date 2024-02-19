@@ -40,8 +40,6 @@ blowing the development complexities.
 As for the backend, we use the Firebase as it
 has excellent integration with the Flutter system.
 
-
-
 ## Deployment
 
 ### Firebase
@@ -65,9 +63,21 @@ following command inside `frontend` directory.
 flutter run
 ```
 
-## Screenshots
+## Screenshots and Demos
 
-<iframe width="315" height="560" src="https://www.youtube.com/embed/V8854hzOuY8" title="Too Good To Waste – AI Import" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+- Home page with shared items list
+
+    <img height="390" src="resources/Screenshot_20240219_220554.png" width="180"/>
+- Detailed information about shared item
+
+    <img height="390" src="resources/Screenshot_20240219_221617.png" width="180"/>
+- User shared items
+    
+    <img height="390" src="resources/Screenshot_20240219_220145.png" width="180"/>
+- Messaging another user
+
+    <img height="390" src="resources/Screenshot_20240219_221243.png" width="180"/>
+- AI Import ([Video](https://www.youtube.com/shorts/V8854hzOuY8))
 
 ## A Vision for the Future
 
@@ -76,4 +86,11 @@ a world without food waste. We know, that it is a long
 shot ahead, but we trust in every little step that
 we make today towards a better future.
 
-As the next step, we want 
+As the next step, we want to integrate with the 
+food banks and other organizations that would 
+benefit from this pantries-sharing system.
+
+We also want to create a gamification system
+that gives user in-app achievement for 
+their accomplishment in reducing their own 
+food waste.
