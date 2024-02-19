@@ -55,7 +55,7 @@ class _MessageThreadListState extends State<MessageThreadList> {
                               ),
                             );
                           } else {
-                            return const CircularProgressIndicator();
+                            return Container();
                           }
                         });
                   },
@@ -65,7 +65,7 @@ class _MessageThreadListState extends State<MessageThreadList> {
                   itemCount: secondUsers.length);
             }
           }
-          return Container();
+          return const CircularProgressIndicator();
         });
   }
 }
