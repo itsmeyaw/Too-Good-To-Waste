@@ -32,13 +32,17 @@ Our application has the following features:
 
 ## Architecture
 
-For the system, we use Flutter for our frontend as its offer 
+For the system, we use Flutter for our frontend as it offer 
 seamless development for multiple mobile OSes (Android and iOS). 
 This allows us to reach far more users without 
 blowing the development complexities.
 
 As for the backend, we use the Firebase as it
 has excellent integration with the Flutter system.
+
+Below is the Diagram of the architecture.
+
+![](resources/architecture.png)
 
 ## Deployment
 
