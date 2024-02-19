@@ -59,13 +59,20 @@ The flutter code is included
 in the `frontend` directory. Make sure that you 
 already installed the flutter and configured 
 a virtual device.
-Like other usual Flutter applications, you need to run
+Like other usual Flutter applications, you need to run the 
+following command inside `frontend` directory.
 ```shell
 flutter run
 ```
-inside this directory.
 
-## Application
+## Screenshots
+
+<iframe width="315" height="560"
+src="https://www.youtube.com/embed/V8854hzOuY8"
+title="Too Good To Waste – AI Import"
+frameborder="0"
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+allowfullscreen></iframe>
 
 ## A Vision for the Future
 
