@@ -67,12 +67,7 @@ flutter run
 
 ## Screenshots
 
-<iframe width="315" height="560"
-src="https://www.youtube.com/embed/V8854hzOuY8"
-title="Too Good To Waste – AI Import"
-frameborder="0"
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-allowfullscreen></iframe>
+<iframe width="315" height="560" src="https://www.youtube.com/embed/V8854hzOuY8" title="Too Good To Waste – AI Import" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 ## A Vision for the Future
 
