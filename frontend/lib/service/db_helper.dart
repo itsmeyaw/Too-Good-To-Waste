@@ -363,6 +363,9 @@ class DBHelper {
     await dbHelper.update(
       'foods',
       food.toJson(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+      where: 'id = ?',
+      whereArgs: [food.id],
       //Ensure the food has a matching id
     );
   }

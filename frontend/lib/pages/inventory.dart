@@ -878,8 +878,10 @@ class _BottomTopScreenState extends State<Inventory>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => itemDetailPage(foodDetail: foodDetail),
-      ),
+        builder: (context) => itemDetailPage(foodDetail: foodDetail))
+      ).then((value) {
+        setState(() {});
+      },
     );
   }
 
