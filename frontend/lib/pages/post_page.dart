@@ -43,12 +43,16 @@ class _PostPageState extends State<PostPage> {
                         target: LatLng(widget.postData.location.latitude,
                             widget.postData.location.longitude),
                         zoom: 15.0,
-                      ),
-                      markers: <Marker>{
-                        Marker(
-                            markerId: MarkerId(widget.postData.id!),
-                            position: LatLng(widget.postData.location.latitude,
-                                widget.postData.location.longitude))
+                      ),*
+                      circles: <Circle>{
+                        Circle(
+                            circleId: CircleId(widget.postData.id!),
+                            center: LatLng(widget.postData.location.latitude,
+                                widget.postData.location.longitude),
+                            fillColor: const Color.fromRGBO(79, 195, 247, 0.5),
+                            strokeWidth: 1,
+                            strokeColor: const Color.fromRGBO(79, 195, 247, 1),
+                            radius: 200)
                       },
                     )),
               ),
