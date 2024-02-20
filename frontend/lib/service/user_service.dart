@@ -30,6 +30,22 @@ class UserService {
     });
   }
 
+  Future<bool> updateUserData(String userUid, TGTWUser newUser) async{
+    logger.d(
+        'Updating user $userUid information with data ${newUser.toJson()}');
+    return db
+        .collection(COLLECTION)
+        .doc(userUid)
+        .set(newUser.toJson())
+        .then((_) {
+      logger.d('Successfully updated user $userUid information');
+      return true;
+    }).catchError((err) {
+      logger.e('Got error when updating user $userUid with detail: $err');
+      return false;
+    });
+  }
+
   Future<Iterable<UserItem>> getUserItems(String userUid) async {
     return await db
         .collection(COLLECTION)

@@ -52,7 +52,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
 
   late TextEditingController allergiesController;
 
-  late String currentName;
+  late UserName currentName;
   late String currentEmail;
   late String currentPhoneNumber;
   late String currentAddress1;
@@ -93,7 +93,11 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
     );
     getCurrentUserData(); 
 
-    currentName = widget.user.displayName ?? '';
+    if (widget.user.displayName == null) {
+      currentName = UserName(first: '', last: '');
+    } else {
+      currentName = UserName(first: userData.name.first, last: userData.name.last);
+    }
     currentEmail = widget.user.email ?? '';
     currentPhoneNumber = widget.user.phoneNumber ?? '';
     currentAddress1 = userData.address.line1;
@@ -102,8 +106,6 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
     currentZipCode = userData.address.zipCode;
     currentCountry = userData.address.country;
     currentAllergies = userData.allergies.join(', ');
-
-    
 
     // nameController = TextEditingController(text: '${userData.name.first} ${userData.name.last}');
     // emailController = TextEditingController(text: widget.user.email ?? '');
@@ -157,26 +159,24 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
     final UserService userService = UserService();
     
     TGTWUser newUser = TGTWUser(
-      name: UserName(
-          first: nameController.text.split(' ')[0],
-          last: nameController.text.split(' ')[1]),
+      name: currentName,
       rating: 0,
-      phoneNumber: phoneNumberController.text,
+      phoneNumber: currentPhoneNumber,
       address: UserAddress(
-          city: cityController.text,
-          country: countryController.text,
-          line1: address1Controller.text,
-          line2: address2Controller.text,
-          zipCode: zipCodeController.text),
-      allergies: allergiesController.text.split(','),
+          city: currentCity,
+          country: currentCountry,
+          line1: currentAddress1,
+          line2: currentAddress2,
+          zipCode: currentZipCode),
+      allergies: userData.allergies,
       chatroomIds: [],
       goodPoints: 0,
       reducedCarbonKg: 0,
     );
 
-    // await userService.updateUserData(widget.user.uid, newUser);
+    await userService.updateUserData(widget.user.uid, newUser);
   
-     Navigator.pop(context);
+    //  Navigator.pop(context);
   }
 
   bool isEditMode = false;
@@ -236,10 +236,11 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                   ),
                 ),
                 body: Stack(
+      clipBehavior: Clip.none,
       children: [
         Positioned(
-            top: 0.0,
-            right: 0.0,
+            top: 5.0,
+            right: 10.0,
             child: 
             // const SwitchButton(),
               IconButton(
@@ -251,7 +252,9 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                       // Save changes
                       currentAddress1 = address1Controller.text;
                       currentAddress2 = address2Controller.text;
-                      currentName = nameController.text;
+                      currentName = UserName(
+                              first: nameController.text.split(' ')[0],
+                              last: nameController.text.split(' ')[1]);
                       currentEmail = emailController.text;
                       currentPhoneNumber = phoneNumberController.text;
                       currentCity = cityController.text;
@@ -259,13 +262,15 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                       currentCountry = countryController.text;
                       currentAllergies = allergiesController.text;                  
                       showUpdateDialog();
-                      // updateFood();
+                     
                     }
                   });
                 },
               ),
           ),
-          
+            Container(
+            padding: EdgeInsets.only(top: 20, bottom: 40),
+            child:
                 TabBarView(
                   children: [
                     Container(
@@ -321,7 +326,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                             labelText: 'Phone Number',
                           ),
                           enabled: isEditMode,
-                          controller: nameController,
+                          controller: phoneNumberController,
                           style: const TextStyle(
                             fontFamily: 'Roboto',
                             fontSize: 20,
@@ -486,6 +491,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                     )
                   ],
                 ),
+              ),
               ]))
           );
             });
