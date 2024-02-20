@@ -154,7 +154,8 @@ class _ItemDetailPage extends State<itemDetailPage> {
                         textAlign: TextAlign.center,
                         style: const TextStyle(fontWeight: FontWeight.bold)),
                     ),
-                    Padding(
+                    Container(
+                      height: 250,
                       padding: const EdgeInsets.all(10.0),
                       child: 
                         // Image.asset('assets/images/food_icons/${foodDetail.category}.png')
