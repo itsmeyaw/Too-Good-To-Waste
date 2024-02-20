@@ -357,7 +357,7 @@ class Post extends StatelessWidget {
                     style: const TextStyle(color: Colors.black),
                   ),
                   Text(
-                    'Distance: ${postData.distance} m',
+                    'Distance: ${postData.distance.toStringAsFixed(2)} m',
                     style: const TextStyle(color: Colors.black),
                   )
                 ],
