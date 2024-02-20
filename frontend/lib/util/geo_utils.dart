@@ -6,11 +6,15 @@ class GeoUtils {
   static const double EARTH_MEAN_RADIUS = 6371.009 * 1000;
 
   static double calculateDistance(GeoPoint p1, GeoPoint p2) {
-    return 2 *
-        EARTH_MEAN_RADIUS *
-        asin(sqrt(pow(sin((p2.latitude - p1.latitude) / 2), 2) +
-            pow(sin((p2.longitude - p2.longitude) / 2), 2) *
-                cos(p1.latitude) *
-                cos(p2.latitude)));
+    final pi1 = p1.latitude * pi / 180;
+    final pi2 = p2.latitude * pi / 180;
+    final deltaPi = (p2.latitude - p1.latitude) * pi / 180;
+    final deltaLambda = (p2.longitude - p2.longitude) * pi / 180;
+
+    final a = pow(sin(deltaPi / 2), 2) +
+              cos(pi1) * cos(pi2) * sin(deltaLambda / 2) * sin(deltaLambda / 2);
+    final c = 2 * atan2(sqrt(a), sqrt(1- a));
+
+    return EARTH_MEAN_RADIUS * c;
   }
 }
