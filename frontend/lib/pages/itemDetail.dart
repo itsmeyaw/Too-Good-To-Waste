@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
@@ -100,6 +101,26 @@ class _ItemDetailPage extends State<itemDetailPage> {
 
   TextEditingController locationController = TextEditingController();
 
+  bool isEmpty = true;
+
+  // Future<void> pickImage() async {
+  //   XFile? image;
+
+  //   image = await ImagePicker()
+  //         .pickImage(source: ImageSource.camera, requestFullMetadata: true);
+
+
+  //   if (image == null) return;
+
+  //   List<int> pickedImageData = await image.readAsBytes();
+  //   setState(() {
+  //     isEmpty = false;
+  //     showLocationDialog();
+  //   });
+    
+  //  }
+   
+
   showLocationDialog(){
     // BuildContext dialogContext;
     Dialog dialog = Dialog(
@@ -137,11 +158,22 @@ class _ItemDetailPage extends State<itemDetailPage> {
                       padding: const EdgeInsets.all(10.0),
                       child: 
                         // Image.asset('assets/images/food_icons/${foodDetail.category}.png')
-                        Image.asset('assets/images/sharedItem.png'),
+                        Image.asset('assets/mock/milk.JPG'),
+                      // isEmpty ? null : Image.asset('assets/images/sharedItem.png') ,
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
+                      child: Row(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () async {
+                          //Extract Location information
+                          // pickImage();
+                        },
+                        // child: const Icon(Icons.camera_alt),
+                        child: const Text('Upload Picture'),
+                      ),
+                      ElevatedButton(
                         onPressed: () async {
                           //Extract Location information
                           locationController.value.text;              
@@ -185,7 +217,9 @@ class _ItemDetailPage extends State<itemDetailPage> {
                         },
                         child: const Text('Yes, I do!'),
                       )
-                    ),
+                  
+                      ],)
+                     ),
                   ]
                   )
               ),

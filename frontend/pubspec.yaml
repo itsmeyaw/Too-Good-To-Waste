@@ -121,6 +121,7 @@ flutter:
     - assets/category/egg.png
     - assets/category/cheese.png
     - assets/category/others.png
+    - assets/mock/milk.JPG
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
