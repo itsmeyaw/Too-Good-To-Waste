@@ -558,7 +558,7 @@ class _DetailsListState extends State<DetailsList> {
                       ),
                     ),
                   ),
-                  const Divider(),
+                  
                   Expanded(
                     child: Card(
                     child: Center(
@@ -595,7 +595,7 @@ class _DetailsListState extends State<DetailsList> {
                     ),
                     ),
                   ),
-                  const Divider(),
+                 
                   Expanded(
                     child: Card(
                     child: Center(
@@ -676,7 +676,6 @@ class _DetailsListState extends State<DetailsList> {
                     ),
                   ),
                   ),
-                  const Divider(),
                   Expanded(
                     child: Card(
                     child: Center(

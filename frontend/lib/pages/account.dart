@@ -19,22 +19,47 @@ class AccountPage extends StatefulWidget {
 
 class _MyAccountPageState extends State<AccountPage> {
   User? currentUser = FirebaseAuth.instance.currentUser;
+  TGTWUser? userData;
   Logger logger = Logger();
+
+  UserService userService = UserService();
+
+  Future<void> asyncMethod()  async {
+    if (currentUser == null) {
+      logger.e('Fetching user data but user is null');
+    } else {
+      TGTWUser userData = await userService.getUserData(currentUser!.uid);
+      setState(() {
+        this.userData = userData;
+      });
+      logger.d('User data: $userData');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    asyncMethod();
+  }
+  
 
   @override
   Widget build(BuildContext context) {
+   
+    
     if (currentUser == null) {
       throw Exception('User is null but accessing account page');
     } else {
-      return AccountSettingPage(user: currentUser!);
+      return AccountSettingPage(user: currentUser!, userData: userData!);
     }
   }
 }
 
 class AccountSettingPage extends StatefulWidget {
   final User user;
+  final TGTWUser userData;
 
-  const AccountSettingPage({super.key, required this.user});
+  const AccountSettingPage({super.key, required this.user, required this.userData});
 
   @override
   _AccountSettingPageState createState() => _AccountSettingPageState();
@@ -62,60 +87,46 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
   late String currentCountry;
   late String currentAllergies;
 
-  late TGTWUser userData;
-
-  Future<void> getCurrentUserData() async {
-    UserService userService = UserService();
-
-    TGTWUser userData =
-        await userService.getUserData(widget.user.uid);
-
-    setState(() {
-      userData = userData;
-    });
-  
-  }
 
   @override
   void initState() {
     super.initState();
 
-    userData = TGTWUser(
-      name: UserName(first: '', last: ''),
-      rating: 0,
-      phoneNumber: '',
-      address: UserAddress(
-          city: '', country: '', line1: '', line2: '', zipCode: ''),
-      allergies: [],
-      chatroomIds: [],
-      goodPoints: 0,
-      reducedCarbonKg: 0,
-    );
-    getCurrentUserData(); 
+    // userData = const TGTWUser(
+    //   name: UserName(first: '', last: ''),
+    //   rating: 0,
+    //   phoneNumber: '',
+    //   address: UserAddress(
+    //       city: '', country: '', line1: '', line2: '', zipCode: ''),
+    //   allergies: [],
+    //   chatroomIds: [],
+    //   goodPoints: 0,
+    //   reducedCarbonKg: 0,
+    // );
 
     if (widget.user.displayName == null) {
       currentName = UserName(first: '', last: '');
     } else {
-      currentName = UserName(first: userData.name.first, last: userData.name.last);
+      currentName = UserName(first: widget.userData.name.first, last:widget.userData.name.last);
     }
     currentEmail = widget.user.email ?? '';
     currentPhoneNumber = widget.user.phoneNumber ?? '';
-    currentAddress1 = userData.address.line1;
-    currentAddress2 = userData.address.line2;
-    currentCity = userData.address.city;
-    currentZipCode = userData.address.zipCode;
-    currentCountry = userData.address.country;
-    currentAllergies = userData.allergies.join(', ');
+    currentAddress1 = widget.userData.address.line1;
+    currentAddress2 = widget.userData.address.line2;
+    currentCity = widget.userData.address.city;
+    currentZipCode = widget.userData.address.zipCode;
+    currentCountry = widget.userData.address.country;
+    currentAllergies = widget.userData.allergies.join(', ');
 
-    // nameController = TextEditingController(text: '${userData.name.first} ${userData.name.last}');
-    // emailController = TextEditingController(text: widget.user.email ?? '');
-    // phoneNumberController = TextEditingController(text: userData.phoneNumber);
-    // address1Controller = TextEditingController(text: userData.address.line1);
-    // address2Controller = TextEditingController(text:  userData.address.line2);
-    // cityController = TextEditingController(text: userData.address.city);
-    // zipCodeController = TextEditingController(text: userData.address.zipCode);
-    // countryController = TextEditingController(text: userData.address.country);
-    // allergiesController = TextEditingController(text: currentAllergies);
+    nameController = TextEditingController(text: '${widget.userData.name.first} ${widget.userData.name.last}');
+    emailController = TextEditingController(text: widget.user.email ?? '');
+    phoneNumberController = TextEditingController(text: widget.userData.phoneNumber);
+    address1Controller = TextEditingController(text: widget.userData.address.line1);
+    address2Controller = TextEditingController(text:  widget.userData.address.line2);
+    cityController = TextEditingController(text: widget.userData.address.city);
+    zipCodeController = TextEditingController(text: widget.userData.address.zipCode);
+    countryController = TextEditingController(text: widget.userData.address.country);
+    allergiesController = TextEditingController(text: currentAllergies);
   }
 
   showUpdateDialog() {
@@ -168,7 +179,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
           line1: currentAddress1,
           line2: currentAddress2,
           zipCode: currentZipCode),
-      allergies: userData.allergies,
+      allergies: widget.userData.allergies,
       chatroomIds: [],
       goodPoints: 0,
       reducedCarbonKg: 0,
@@ -185,32 +196,22 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
   Widget build(BuildContext context) {
     final UserService userService = UserService();
 
-    return FutureBuilder(
-        future: userService.getUserData(widget.user.uid),
-        builder:
-            (BuildContext context, AsyncSnapshot<TGTWUser> userDataSnapshot) {
-          if (userDataSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    // return 
+    // FutureBuilder(
+    //     future: userService.getUserData(widget.user.uid),
+    //     builder:
+    //         (BuildContext context, AsyncSnapshot<TGTWUser> userDataSnapshot) {
+    //       if (userDataSnapshot.connectionState == ConnectionState.waiting) {
+    //         return const Center(child: CircularProgressIndicator());
+    //       }
 
-          if (userDataSnapshot.hasError) {
-            return Center(
-              child: Text('Error: ${userDataSnapshot.error}'),
-            );
-          }
+    //       if (userDataSnapshot.hasError) {
+    //         return Center(
+    //           child: Text('Error: ${userDataSnapshot.error}'),
+    //         );
+    //       }
 
-          userData = userDataSnapshot.requireData;
-
-          nameController = TextEditingController(text: '${userData.name.first} ${userData.name.last}');
-          emailController = TextEditingController(text: widget.user.email ?? '');
-          phoneNumberController = TextEditingController(text: userData.phoneNumber);
-          address1Controller = TextEditingController(text: userData.address.line1);
-          address2Controller = TextEditingController(text:  userData.address.line2);
-          cityController = TextEditingController(text: userData.address.city);
-          zipCodeController = TextEditingController(text: userData.address.zipCode);
-          countryController = TextEditingController(text: userData.address.country);
-          allergiesController = TextEditingController(text: currentAllergies);
-
+        
           return 
           DefaultTabController(
               length: 3,
@@ -432,9 +433,9 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                         const Text('Allergies'),
                         
                         Text(
-                          userData.allergies.isEmpty
+                          widget.userData.allergies.isEmpty
                               ? 'No allergies listed'
-                              : userData.allergies.join(', '),
+                              : widget.userData.allergies.join(', '),
                           
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
@@ -450,7 +451,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                         ),
                         const Text('GoodPoints'),
                         Text(
-                          '${userData.goodPoints}',
+                          '${widget.userData.goodPoints}',
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                         const SizedBox(
@@ -458,7 +459,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                         ),
                         const Text('Carbon Emission Reduced'),
                         Text(
-                          '${userData.reducedCarbonKg} kg',
+                          '${widget.userData.reducedCarbonKg} kg',
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                         const SizedBox(
@@ -494,10 +495,8 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
               ),
               ]))
           );
-            });
+            }
         }
-
-  }
 
 
 class PostPageWidget extends StatelessWidget {

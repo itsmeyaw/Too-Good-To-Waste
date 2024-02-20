@@ -84,7 +84,7 @@ class _BottomTopScreenState extends State<Inventory>
   List<UserItem> items = [];
   List<String> itemsWaste = [];
 
-  //List<String> items = ['eggs','milk','butter];
+ 
 
   //Create Databse Object
   DBHelper dbhelper = DBHelper();
@@ -814,6 +814,7 @@ class _BottomTopScreenState extends State<Inventory>
 
         setState(() {
           buildWasteList();
+          //build();
         });
       // });
       
