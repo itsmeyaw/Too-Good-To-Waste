@@ -43,7 +43,7 @@ class _PostPageState extends State<PostPage> {
                         target: LatLng(widget.postData.location.latitude,
                             widget.postData.location.longitude),
                         zoom: 15.0,
-                      ),*
+                      ),
                       circles: <Circle>{
                         Circle(
                             circleId: CircleId(widget.postData.id!),
