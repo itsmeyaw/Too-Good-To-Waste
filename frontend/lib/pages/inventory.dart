@@ -924,7 +924,7 @@ class _BottomTopScreenState extends State<Inventory>
           trailing: Text("${userItem.quantityNum} ${userItem.quantityType}",
               style: const TextStyle(
                 fontFamily: 'Roboto',
-                fontSize: 24,
+                fontSize: 18,
               )),
           onTap: () {
             pushItemDetailScreen(itemId, userItem.name);

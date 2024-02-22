@@ -36,7 +36,7 @@ class _PostPageState extends State<PostPage> {
               FractionallySizedBox(
                 widthFactor: 1.0,
                 child: SizedBox(
-                    height: 190,
+                    height: 160,
                     child: GoogleMap(
                       onMapCreated: (event) {},
                       initialCameraPosition: CameraPosition(
@@ -69,8 +69,9 @@ class _PostPageState extends State<PostPage> {
               // TODO: Insert User name here
               const Spacer(),
               //Add Mock Picture here
-              Padding(
-                padding: const EdgeInsets.all(0.0),
+              Container(
+                height: 290,
+                padding: EdgeInsets.all(0.0),
                 child: 
                   // Image.asset('assets/images/food_icons/${foodDetail.category}.png')
                   Image.asset('assets/mock/milk.JPG'),

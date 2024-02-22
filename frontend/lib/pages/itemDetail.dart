@@ -163,7 +163,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Row(
+                      child: Column(
                     children: [
                       ElevatedButton(
                         onPressed: () async {
