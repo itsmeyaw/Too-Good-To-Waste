@@ -9,6 +9,7 @@ import 'package:tooGoodToWaste/frame.dart';
 import 'package:tooGoodToWaste/pages/login_signup.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'package:tooGoodToWaste/service/push_notifications.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -29,10 +30,10 @@ Future<void> main() async {
 class TooGoodToWaste extends StatelessWidget {
   const TooGoodToWaste({super.key});
 
-  
-
   @override
   Widget build(BuildContext context) {
+    FirebaseAnalytics.instance.logEvent(name: "Start Application");
+
     return MaterialApp(
       title: 'Too Good To Waste',
       debugShowCheckedModeBanner: false,

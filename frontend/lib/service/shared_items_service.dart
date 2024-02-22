@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:logger/logger.dart';
 import 'package:dart_geohash/dart_geohash.dart';
@@ -12,6 +13,7 @@ class SharedItemService {
 
   final GeoFlutterFire geo = GeoFlutterFire();
   FirebaseFirestore db = FirebaseFirestore.instance;
+  final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
   SharedItemService();
 
@@ -19,6 +21,8 @@ class SharedItemService {
 
   Future<bool> postSharedItem(
       GeoPoint userLocation, SharedItem sharedItem) async {
+    analytics.logEvent(name: "Share Item");
+
     // TODO: Check whether an item with the same ref is already exists, if yes then false
     var collection = db.collection(COLLECTION);
     final GeoFirePoint location = geo.point(
@@ -66,6 +70,7 @@ class SharedItemService {
       required String userId,
       ItemCategory? category}) {
     logger.d('Start querying for shared item');
+    analytics.logEvent(name: "Search Item");
 
     var collection = db.collection(COLLECTION);
     if (category != null) {

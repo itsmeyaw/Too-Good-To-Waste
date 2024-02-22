@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:logger/logger.dart';
 
 import '../dto/user_item_model.dart';
@@ -9,6 +10,7 @@ class UserItemService {
 
   final Logger logger = Logger();
   FirebaseFirestore db = FirebaseFirestore.instance;
+  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
   UserItemService.withCustomFirestore({required this.db});
 
@@ -71,6 +73,7 @@ class UserItemService {
         .add(newItemData.toJson())
         .then((docRef) {
       logger.d('Successfully added item ${docRef.path}');
+      analytics.logEvent(name: 'Add USer Item');
       return docRef.id;
     }).catchError((err) {
       logger.e('Got error when adding item for user $userUid with detail: $err');
