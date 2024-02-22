@@ -9,6 +9,10 @@ class StorageService {
   final String STORAGE_DIRECTORY = 'shared_item_images';
   FirebaseStorage storage = FirebaseStorage.instance;
 
+  /// Upload an image from the given imagePath
+  /// Automatically convert to JPEG with width of 120 to save space
+  /// Return full path in the Firebase storage, which must be saved in the
+  /// sharedItem.imageUrl
   Future<String> uploadImage(String imagePath) async {
     String randomId = const UuidV4().generate();
     File sourceImage = File(imagePath);
