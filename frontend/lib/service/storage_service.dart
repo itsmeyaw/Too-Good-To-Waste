@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
@@ -31,5 +32,9 @@ class StorageService {
     imageRef.putData(encodeJpg(destImageObj), metadata);
 
     return imageRef.fullPath;
+  }
+
+  Future<String> getImageUrlOfSharedItem(String imagePath) {
+    return storage.ref().child(imagePath).getDownloadURL();
   }
 }
