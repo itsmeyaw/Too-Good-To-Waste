@@ -150,7 +150,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
                   children: <Widget>[
                     const Padding(
                       padding: EdgeInsets.all(10.0),
-                      child: Text('Are you sue to share this item?',
+                      child: Text('Are you sure to share this item?',
                         textAlign: TextAlign.center,
                         style: const TextStyle(fontWeight: FontWeight.bold)),
                     ),
@@ -197,6 +197,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
                                   expireDate: widget.foodDetail.remainDays,
                                   user: currentUser.uid,
                                   itemRef: '',
+                                  imageUrl: ''
                                 );
                                 sharedItemService.postSharedItem(userLocation, sharedItem);
 

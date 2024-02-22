@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:logger/logger.dart';
 import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import 'package:tooGoodToWaste/dto/user_item_model.dart';
@@ -9,8 +10,11 @@ Logger logger = Logger();
 
 class AiService {
   FirebaseFunctions functions = FirebaseFunctions.instance;
+  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
   Future<List<UserItem>> readReceipt(String mimeType, String base64Data) async {
+    analytics.logEvent(name: 'Scan Receipt');
+
     HttpsCallable callable = functions.httpsCallable('readReceipt');
 
     try {

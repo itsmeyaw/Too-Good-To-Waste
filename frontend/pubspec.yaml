@@ -67,6 +67,10 @@ dependencies:
   flutter_local_notifications: ^16.3.2
   firebase_core: ^2.25.4
   uuid: ^4.3.3
+  firebase_storage: ^11.6.6
+  firebase_analytics: ^10.8.6
+  firebase_crashlytics: ^3.4.15
+  image: ^4.1.7
 
 dev_dependencies:
   flutter_test:

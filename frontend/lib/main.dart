@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:logger/logger.dart';
 import 'package:tooGoodToWaste/firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:tooGoodToWaste/frame.dart';
 import 'package:tooGoodToWaste/pages/login_signup.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'package:tooGoodToWaste/service/push_notifications.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -22,6 +24,8 @@ Future<void> main() async {
   );
   await PushNotificationsManager().initNotifications();
 
+  // Pass all uncaught "fatal" errors from the framework to Crashlytics
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
  
   runApp(const TooGoodToWaste());
 }
@@ -29,10 +33,10 @@ Future<void> main() async {
 class TooGoodToWaste extends StatelessWidget {
   const TooGoodToWaste({super.key});
 
-  
-
   @override
   Widget build(BuildContext context) {
+    FirebaseAnalytics.instance.logEvent(name: "Start Application");
+
     return MaterialApp(
       title: 'Too Good To Waste',
       debugShowCheckedModeBanner: false,
