@@ -70,6 +70,7 @@ dependencies:
   firebase_storage: ^11.6.6
   firebase_analytics: ^10.8.6
   firebase_crashlytics: ^3.4.15
+  image: ^4.1.7
 
 dev_dependencies:
   flutter_test:
