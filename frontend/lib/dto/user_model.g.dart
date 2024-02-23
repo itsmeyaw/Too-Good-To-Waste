@@ -8,14 +8,11 @@ part of 'user_model.dart';
 
 TGTWUser _$TGTWUserFromJson(Map<String, dynamic> json) => TGTWUser(
       name: UserName.fromJson(json['name'] as Map<String, dynamic>),
-      rating: (json['rating'] as num).toDouble(),
+      rating: (json['rating'] as num?)?.toDouble() ?? 0,
       phoneNumber: json['phone_number'] as String,
       address: UserAddress.fromJson(json['address'] as Map<String, dynamic>),
       allergies:
           (json['allergies'] as List<dynamic>).map((e) => e as String).toList(),
-      chatroomIds: (json['chatroom_ids'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
       goodPoints: json['good_points'] as int,
       reducedCarbonKg: (json['reduced_carbon_kg'] as num).toDouble(),
     );
@@ -26,7 +23,6 @@ Map<String, dynamic> _$TGTWUserToJson(TGTWUser instance) => <String, dynamic>{
       'address': instance.address.toJson(),
       'phone_number': instance.phoneNumber,
       'allergies': instance.allergies,
-      'chatroom_ids': instance.chatroomIds,
       'good_points': instance.goodPoints,
       'reduced_carbon_kg': instance.reducedCarbonKg,
     };

@@ -9,15 +9,18 @@ part 'shared_item_model.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class SharedItem {
+  @JsonKey(includeToJson: false)
   String? id;
   final UserItemAmount amount;
   final int buyDate;
   final int expireDate;
-  final String itemRef;
   final String name;
   final String? imageUrl;
   final ItemCategory category;
   final String user;
+
+  @JsonKey(defaultValue: true)
+  bool isAvailable = true;
 
   @GeoFirePointConverter()
   GeoFirePoint location = GeoFirePoint(0.0, 0.0);
@@ -30,12 +33,11 @@ class SharedItem {
       required this.amount,
       required this.buyDate,
       required this.expireDate,
-      required this.itemRef,
       required this.imageUrl,
       required this.name,
       required this.category,
-      required this.user
-      });
+      required this.user,
+      required this.isAvailable});
 
   factory SharedItem.fromJson(Map<String, dynamic> json) =>
       _$SharedItemFromJson(json);
