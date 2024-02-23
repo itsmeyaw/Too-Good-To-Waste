@@ -15,7 +15,7 @@ SharedItem _$SharedItemFromJson(Map<String, dynamic> json) => SharedItem(
       name: json['name'] as String,
       category: $enumDecode(_$ItemCategoryEnumMap, json['category']),
       user: json['user'] as String,
-      isAvailable: json['is_available'] as bool,
+      isAvailable: json['is_available'] as bool? ?? true,
     )
       ..location = const GeoFirePointConverter()
           .fromJson(json['location'] as Map<String, dynamic>)

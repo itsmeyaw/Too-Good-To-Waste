@@ -18,7 +18,9 @@ class SharedItem {
   final String? imageUrl;
   final ItemCategory category;
   final String user;
-  bool isAvailable;
+
+  @JsonKey(defaultValue: true)
+  bool isAvailable = true;
 
   @GeoFirePointConverter()
   GeoFirePoint location = GeoFirePoint(0.0, 0.0);
