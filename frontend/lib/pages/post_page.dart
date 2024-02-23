@@ -83,7 +83,7 @@ class _PostPageState extends State<PostPage> {
                             'Amount: ${widget.postData.amount.nominal} ${widget.postData.amount.unit}',
                             style: Theme.of(context).textTheme.headlineSmall),
                         Text(
-                          'Shared by: ${postUser.name.first} ${postUser.name.last}',
+                          'Shared by: ${postUser.name.first} ${postUser.name.last} (Rating: ${postUser.rating.toStringAsFixed(1)})',
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         const SizedBox(
