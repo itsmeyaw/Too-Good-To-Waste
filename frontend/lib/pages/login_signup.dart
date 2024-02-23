@@ -7,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
+import 'package:tooGoodToWaste/dto/user_model.dart';
 import 'package:tooGoodToWaste/dto/user_name_model.dart';
 import 'package:tooGoodToWaste/widgets/verifiable_text_field.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -210,7 +210,8 @@ class _LoginPageState extends State<LoginPage> {
                     .then((user) {
                   // On success login
                   logger.d('Successfully logged in with ${user.toString()}');
-                  FirebaseAnalytics.instance.logLogin(loginMethod: "EmailPassword");
+                  FirebaseAnalytics.instance
+                      .logLogin(loginMethod: "EmailPassword");
                 }).catchError((error) {
                   logger.e('Cannot sign in with username and password',
                       error: error);
@@ -514,7 +515,6 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
               onPressed: () {
                 logger.d('Pressed sign up button');
                 setState(() {
-
                   if (!_formKey.currentState!.validate()) {
                     return;
                   }
@@ -531,20 +531,19 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
                       throw Exception('User UID is null');
                     }
 
-                    dto_user.TGTWUser user = dto_user.TGTWUser(
+                    TGTWUser user = TGTWUser(
                         name: UserName(
                             first: _firstNameController.value.text,
                             last: _lastNameController.value.text),
                         rating: 0,
                         phoneNumber: _phoneController.value.text,
-                        address: dto_user.UserAddress(
+                        address: UserAddress(
                             line1: _addressLine1Controller.value.text,
                             line2: _addressLine2Controller.value.text,
                             zipCode: _zipCodeController.value.text,
                             city: _cityController.value.text,
                             country: _countryController.value.text),
                         allergies: const [],
-                        chatroomIds: const [],
                         goodPoints: 0,
                         reducedCarbonKg: 0.0);
 
@@ -555,7 +554,8 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
                   }).then((_) {
                     logger.d(
                         'Successfully created user in database with uid: ${FirebaseAuth.instance.currentUser?.uid}');
-                    FirebaseAnalytics.instance.logSignUp(signUpMethod: "EmailPassword");
+                    FirebaseAnalytics.instance
+                        .logSignUp(signUpMethod: "EmailPassword");
                   }).catchError((e) {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text('${e.message}'),

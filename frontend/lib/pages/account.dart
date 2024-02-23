@@ -105,7 +105,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
     // );
 
     if (widget.user.displayName == null) {
-      currentName = UserName(first: '', last: '');
+      currentName = const UserName(first: '', last: '');
     } else {
       currentName = UserName(first: widget.userData.name.first, last:widget.userData.name.last);
     }
@@ -171,7 +171,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
     
     TGTWUser newUser = TGTWUser(
       name: currentName,
-      rating: 0,
+      rating: widget.userData.rating,
       phoneNumber: currentPhoneNumber,
       address: UserAddress(
           city: currentCity,
@@ -180,9 +180,8 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
           line2: currentAddress2,
           zipCode: currentZipCode),
       allergies: widget.userData.allergies,
-      chatroomIds: [],
-      goodPoints: 0,
-      reducedCarbonKg: 0,
+      goodPoints: widget.userData.goodPoints,
+      reducedCarbonKg: widget.userData.reducedCarbonKg,
     );
 
     await userService.updateUserData(widget.user.uid, newUser);
