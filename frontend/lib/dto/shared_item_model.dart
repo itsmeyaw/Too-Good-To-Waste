@@ -34,7 +34,8 @@ class SharedItem {
       required this.imageUrl,
       required this.name,
       required this.category,
-      required this.user});
+      required this.user
+      });
 
   factory SharedItem.fromJson(Map<String, dynamic> json) =>
       _$SharedItemFromJson(json);

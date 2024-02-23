@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,6 +14,7 @@ import 'package:tooGoodToWaste/dto/user_item_model.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import 'package:tooGoodToWaste/service/shared_items_service.dart';
+import 'package:tooGoodToWaste/service/storage_service.dart';
 import 'package:tooGoodToWaste/service/user_location_service.dart';
 import 'package:tooGoodToWaste/widgets/category_picker.dart';
 import 'package:tooGoodToWaste/widgets/user_location_aware_widget.dart';
@@ -20,6 +23,7 @@ import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tooGoodToWaste/service/user_item_service.dart';
 import '../dto/user_item_amount_model.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class itemDetailPage extends StatefulWidget {
     // Declare a field that holds the food.
@@ -101,28 +105,94 @@ class _ItemDetailPage extends State<itemDetailPage> {
 
   TextEditingController locationController = TextEditingController();
 
-  bool isEmpty = true;
-
-  // Future<void> pickImage() async {
-  //   XFile? image;
-
-  //   image = await ImagePicker()
-  //         .pickImage(source: ImageSource.camera, requestFullMetadata: true);
+  XFile? image;
+  File? imageFile;
+  String imgDownloadUrl = '';
+  final StorageService storageService = StorageService();
 
 
-  //   if (image == null) return;
+  Future<void> pickImage() async {
+   
+    image = await ImagePicker()
+          .pickImage(source: ImageSource.camera, requestFullMetadata: true);
 
-  //   List<int> pickedImageData = await image.readAsBytes();
-  //   setState(() {
-  //     isEmpty = false;
-  //     showLocationDialog();
-  //   });
+
+    if (image == null) {
+      logger.e('Image is null');
+    } else {
+      setState(() {
+        image = image;
+        imageFile = File(image!.path);
+        logger.d('Image path: ${image!.path}');
+        //showLocationDialog();
+      });
+    }
     
-  //  }
+   }
+
+   Future<void> uploadImage(String imagePath) async {
+      await storageService.uploadImage(imagePath);
+      imgDownloadUrl = await storageService.getImageUrlOfSharedItem(imagePath);
+      logger.d('imgDownloadUrl $imgDownloadUrl');
+      setState(() {
+        imgDownloadUrl = imgDownloadUrl;
+      });
+   }
+
+   Future<void> uploadImgToFirebase(XFile image) async {
+
+
+    if (image == null) logger.e('Image is null');
+
+    List<int> pickedImageData = await image.readAsBytes();
+    Reference ref = FirebaseStorage.instance.ref().child('images').child('image.jpg');
+    // While the file names are the same, the references point to different files
+    // assert(ref.name == ref.name);
+    // assert(ref.fullPath != ref.fullPath);
+
+    Uint8List bytes = Uint8List.fromList(pickedImageData);
+    UploadTask uploadTask = ref.putData(bytes);
+
+    // Listen for state changes, errors, and completion of the upload.
+    uploadTask.snapshotEvents.listen((TaskSnapshot taskSnapshot) {
+     switch (taskSnapshot.state) {
+    case TaskState.running:
+      final progress =
+          100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes);
+      logger.f("Upload is $progress% complete.");
+      break;
+    case TaskState.paused:
+      logger.f("Upload is paused.");
+      break;
+    case TaskState.canceled:
+      logger.f("Upload was canceled");
+      break;
+    case TaskState.error:
+      // Handle unsuccessful uploads
+      logger.e('Upload failed');
+      break;
+    case TaskState.success:
+      // Handle successful uploads on complete
+      logger.d('Upload complete');
+      break;
+  }
+});
+
+    uploadTask.whenComplete(() async {
+      String url = await ref.getDownloadURL();
+      logger.d('imgDownloadUrl $url');
+      setState(() {
+        imgDownloadUrl = url;
+      });
+    });
+    
+
+
+   }
    
 
   showLocationDialog(){
-    // BuildContext dialogContext;
+    
     Dialog dialog = Dialog(
 
       shape: RoundedRectangleBorder(
@@ -134,7 +204,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
             loader: (BuildContext context) => FractionallySizedBox(
               widthFactor: 1.0,
               child: SizedBox(
-                height: 400,
+                height: 420,
                 child: Container(
                   color: Theme.of(context).colorScheme.secondaryContainer,
                   child: const Center(
@@ -145,7 +215,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
             ),
             builder: (BuildContext context, GeoPoint userLocation) =>
               SizedBox(
-                height: 400,
+                height: 420,
                 child: Column(
                   children: <Widget>[
                     const Padding(
@@ -158,21 +228,41 @@ class _ItemDetailPage extends State<itemDetailPage> {
                       height: 250,
                       padding: const EdgeInsets.all(10.0),
                       child: 
-                        // Image.asset('assets/images/food_icons/${foodDetail.category}.png')
-                        Image.asset('assets/mock/milk.JPG'),
-                      // isEmpty ? null : Image.asset('assets/images/sharedItem.png') ,
+                        // Image.asset('assets/mock/milk.JPG'),
+                       imageFile == null
+                        ? Image.asset('assets/images/uploadImg.jpeg')
+                        : Image.file(imageFile!),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                     children: [
-                      ElevatedButton(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                           ElevatedButton(
+                            onPressed: () async {
+                              //Extract Location information
+                              pickImage();
+                            },
+                            // child: const Icon(Icons.camera_alt),
+                            child: const Text('Take Photo'),
+                          ),
+                          const SizedBox(width: 7),
+                           ElevatedButton(
                         onPressed: () async {
                           //Extract Location information
-                          // pickImage();
+                          if (image != null) {
+                            // await uploadImage(image!.path);
+                            await uploadImgToFirebase(image!);
+                          } else {
+                            logger.e('Please choose an image first!');
+                          }
                         },
                         // child: const Icon(Icons.camera_alt),
-                        child: const Text('Upload Picture'),
+                        child: const Text('Upload'),
+                      ),
+                        ],
                       ),
                       ElevatedButton(
                         onPressed: () async {
@@ -197,7 +287,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
                                   expireDate: widget.foodDetail.remainDays,
                                   user: currentUser.uid,
                                   itemRef: '',
-                                  imageUrl: ''
+                                  imageUrl: imgDownloadUrl,
                                 );
                                 sharedItemService.postSharedItem(userLocation, sharedItem);
 
@@ -217,7 +307,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
                               });
                              
                         },
-                        child: const Text('Yes, I do!'),
+                        child: const Text('Share Item'),
                       )
                   
                       ],)
