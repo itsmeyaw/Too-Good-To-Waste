@@ -51,6 +51,8 @@ class _PostPageState extends State<PostPage> {
     }
   }
 
+  final StorageService storageService = StorageService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -126,16 +128,16 @@ class _PostPageState extends State<PostPage> {
               ) : const Text('No image provided'),
               const Spacer(),
               //Add Mock Picture here
-              Container(
-                height: 290,
-                padding: EdgeInsets.all(0.0),
-                child: 
-                  Image.memory(
-                    imageFile!,
-                    // You can specify other parameters here as needed
-                  ),
-                  // Image.asset('assets/mock/milk.JPG'),
-              ),
+              // Container(
+              //   height: 290,
+              //   padding: EdgeInsets.all(0.0),
+              //   child: 
+              //     Image.memory(
+              //       imageFile!,
+              //       // You can specify other parameters here as needed
+              //     ),
+              //     // Image.asset('assets/mock/milk.JPG'),
+              // ),
               FutureBuilder(
                   future: userService.getUserData(widget.postData.user),
                   builder: (BuildContext context,

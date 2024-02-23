@@ -14,6 +14,7 @@ import 'package:tooGoodToWaste/dto/user_item_model.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import 'package:tooGoodToWaste/service/shared_items_service.dart';
+import 'package:tooGoodToWaste/service/storage_service.dart';
 import 'package:tooGoodToWaste/service/user_location_service.dart';
 import 'package:tooGoodToWaste/widgets/category_picker.dart';
 import 'package:tooGoodToWaste/widgets/user_location_aware_widget.dart';
@@ -107,6 +108,8 @@ class _ItemDetailPage extends State<itemDetailPage> {
   XFile? image;
   File? imageFile;
   String imgDownloadUrl = '';
+  final StorageService storageService = StorageService();
+
 
   Future<void> pickImage() async {
    
@@ -125,6 +128,15 @@ class _ItemDetailPage extends State<itemDetailPage> {
       });
     }
     
+   }
+
+   Future<void> uploadImage(String imagePath) async {
+      await storageService.uploadImage(imagePath);
+      imgDownloadUrl = await storageService.getImageUrlOfSharedItem(imagePath);
+      logger.d('imgDownloadUrl $imgDownloadUrl');
+      setState(() {
+        imgDownloadUrl = imgDownloadUrl;
+      });
    }
 
    Future<void> uploadImgToFirebase(XFile image) async {
@@ -241,6 +253,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
                         onPressed: () async {
                           //Extract Location information
                           if (image != null) {
+                            // await uploadImage(image!.path);
                             await uploadImgToFirebase(image!);
                           } else {
                             logger.e('Please choose an image first!');
@@ -294,7 +307,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
                               });
                              
                         },
-                        child: const Text('Yes, I do!'),
+                        child: const Text('Share Item'),
                       )
                   
                       ],)

@@ -16,7 +16,6 @@ SharedItem _$SharedItemFromJson(Map<String, dynamic> json) => SharedItem(
       name: json['name'] as String,
       category: $enumDecode(_$ItemCategoryEnumMap, json['category']),
       user: json['user'] as String,
-      imageUrl: json['image_url'] as String,
     )
       ..location = const GeoFirePointConverter()
           .fromJson(json['location'] as Map<String, dynamic>)
@@ -33,7 +32,6 @@ Map<String, dynamic> _$SharedItemToJson(SharedItem instance) =>
       'image_url': instance.imageUrl,
       'category': _$ItemCategoryEnumMap[instance.category]!,
       'user': instance.user,
-      'image_url': instance.imageUrl,
       'location': const GeoFirePointConverter().toJson(instance.location),
     };
 
