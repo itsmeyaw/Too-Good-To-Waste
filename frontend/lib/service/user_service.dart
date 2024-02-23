@@ -15,7 +15,6 @@ class UserService {
   final Logger logger = Logger();
   FirebaseFirestore db = FirebaseFirestore.instance;
   FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-  User? user = FirebaseAuth.instance.currentUser;
 
   UserService();
 
@@ -50,6 +49,7 @@ class UserService {
   /// Rate a user with id @param userId and with the value of @param rating
   /// Rating is 0 - 5;
   Future<void> rateUser(String userId, double rating) async {
+    User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       throw Exception("User is not logged in but want to rate user");
     }
