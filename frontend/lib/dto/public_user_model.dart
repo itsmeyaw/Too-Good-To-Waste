@@ -9,6 +9,7 @@ part 'public_user_model.g.dart';
 @JsonSerializable(explicitToJson: true)
 class PublicUser {
   final UserName name;
+  @JsonKey(defaultValue: 0)
   final double rating;
 
   const PublicUser({required this.name, required this.rating});

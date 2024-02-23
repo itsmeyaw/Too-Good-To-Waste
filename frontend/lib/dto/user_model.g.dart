@@ -8,7 +8,7 @@ part of 'user_model.dart';
 
 TGTWUser _$TGTWUserFromJson(Map<String, dynamic> json) => TGTWUser(
       name: UserName.fromJson(json['name'] as Map<String, dynamic>),
-      rating: (json['rating'] as num).toDouble(),
+      rating: (json['rating'] as num?)?.toDouble() ?? 0,
       phoneNumber: json['phone_number'] as String,
       address: UserAddress.fromJson(json['address'] as Map<String, dynamic>),
       allergies:

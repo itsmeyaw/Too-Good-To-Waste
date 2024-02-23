@@ -8,7 +8,7 @@ part of 'public_user_model.dart';
 
 PublicUser _$PublicUserFromJson(Map<String, dynamic> json) => PublicUser(
       name: UserName.fromJson(json['name'] as Map<String, dynamic>),
-      rating: (json['rating'] as num).toDouble(),
+      rating: (json['rating'] as num?)?.toDouble() ?? 0,
     );
 
 Map<String, dynamic> _$PublicUserToJson(PublicUser instance) =>
