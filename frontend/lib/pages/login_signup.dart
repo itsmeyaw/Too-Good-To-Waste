@@ -10,6 +10,7 @@ import 'package:logger/logger.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart' as dto_user;
 import 'package:tooGoodToWaste/dto/user_name_model.dart';
 import 'package:tooGoodToWaste/widgets/verifiable_text_field.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 // Constants
 const String _SIGN_UP_STATE_KEY = 'SIGN_UP_STEP';
@@ -209,6 +210,7 @@ class _LoginPageState extends State<LoginPage> {
                     .then((user) {
                   // On success login
                   logger.d('Successfully logged in with ${user.toString()}');
+                  FirebaseAnalytics.instance.logLogin(loginMethod: "EmailPassword");
                 }).catchError((error) {
                   logger.e('Cannot sign in with username and password',
                       error: error);
@@ -339,6 +341,21 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
         value: value,
         iOptions: _getIOSOptions(),
         aOptions: _getAndroidOptions());
+  }
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _passwordController.dispose();
+    _addressLine1Controller.dispose();
+    _addressLine2Controller.dispose();
+    _zipCodeController.dispose();
+    _cityController.dispose();
+    _countryController.dispose();
+    super.dispose();
   }
 
   @override
@@ -538,6 +555,7 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
                   }).then((_) {
                     logger.d(
                         'Successfully created user in database with uid: ${FirebaseAuth.instance.currentUser?.uid}');
+                    FirebaseAnalytics.instance.logSignUp(signUpMethod: "EmailPassword");
                   }).catchError((e) {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text('${e.message}'),

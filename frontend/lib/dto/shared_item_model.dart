@@ -15,6 +15,7 @@ class SharedItem {
   final int expireDate;
   final String itemRef;
   final String name;
+  final String? imageUrl;
   final ItemCategory category;
   final String user;
   final String imageUrl;
@@ -31,6 +32,7 @@ class SharedItem {
       required this.buyDate,
       required this.expireDate,
       required this.itemRef,
+      required this.imageUrl,
       required this.name,
       required this.category,
       required this.user

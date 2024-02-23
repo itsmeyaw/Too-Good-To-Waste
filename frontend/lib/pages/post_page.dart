@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tooGoodToWaste/dto/chatroom_model.dart';
 import 'package:tooGoodToWaste/service/user_location_service.dart';
+import 'package:tooGoodToWaste/service/storage_service.dart';
 import 'package:tooGoodToWaste/service/user_service.dart';
 import '../dto/shared_item_model.dart';
 import '../dto/user_model.dart';
@@ -54,14 +55,17 @@ class _PostPageState extends State<PostPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          backgroundColor: Theme
+              .of(context)
+              .colorScheme
+              .inversePrimary,
           title: const Text('Shared Item Information'),
           actions: const [],
         ),
         body: Container(
             padding: const EdgeInsets.all(10),
             child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               FractionallySizedBox(
                 widthFactor: 1.0,
                 child: SizedBox(
@@ -90,12 +94,36 @@ class _PostPageState extends State<PostPage> {
               ),
               Text(
                 widget.postData.name,
-                style: Theme.of(context).textTheme.headlineLarge,
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .headlineLarge,
               ),
               Text(
-                  'Amount: ${widget.postData.amount.nominal} ${widget.postData.amount.unit}',
-                  style: Theme.of(context).textTheme.headlineSmall),
+                  'Amount: ${widget.postData.amount.nominal} ${widget.postData
+                      .amount.unit}',
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .headlineSmall),
               // TODO: Insert User name here
+              const SizedBox(height: 10,),
+              widget.postData.imageUrl != null ? Center(
+                child: Container(
+                    height: 250,
+                    padding: const EdgeInsets.all(0.0),
+                    child: FutureBuilder(
+                      future: storageService.getImageUrlOfSharedItem(widget.postData.imageUrl!),
+                      builder: (BuildContext context, AsyncSnapshot<String> imageUrlSnapshot) {
+                        if (imageUrlSnapshot.hasData) {
+                          return Image.network(imageUrlSnapshot.requireData, height: 250,);
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
+                      },
+                    )
+                ),
+              ) : const Text('No image provided'),
               const Spacer(),
               //Add Mock Picture here
               Container(
@@ -121,7 +149,8 @@ class _PostPageState extends State<PostPage> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ChatroomPage(
+                                    builder: (context) =>
+                                        ChatroomPage(
                                           secondUserId: widget.postData.user,
                                           sharedItem: widget.postData,
                                         )));
