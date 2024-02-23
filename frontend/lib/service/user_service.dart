@@ -47,9 +47,15 @@ class UserService {
     });
   }
 
+  /// Rate a user with id @param userId and with the value of @param rating
+  /// Rating is 0 - 5;
   Future<void> rateUser(String userId, double rating) async {
     if (user == null) {
       throw Exception("User is not logged in but want to rate user");
+    }
+
+    if (rating < 0 || rating > 5) {
+      throw Exception("Value $rating is not between (incl.) 0 and 5");
     }
 
     logger.d('Start rating user $userId with value $rating');
