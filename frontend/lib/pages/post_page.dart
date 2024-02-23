@@ -1,13 +1,6 @@
-import 'dart:io';
-import 'dart:typed_data';
-
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:tooGoodToWaste/dto/chatroom_model.dart';
-import 'package:tooGoodToWaste/service/user_location_service.dart';
 import 'package:tooGoodToWaste/service/storage_service.dart';
 import 'package:tooGoodToWaste/service/user_service.dart';
 import '../dto/shared_item_model.dart';
@@ -28,31 +21,8 @@ class PostPage extends StatefulWidget {
 
 class _PostPageState extends State<PostPage> {
   final UserService userService = UserService();
-  Uint8List? imageFile;
-
-  Future<void> downloadImage(imageUrl) async {
-    // Create a storage reference from our app
-    final storageRef = FirebaseStorage.instance.ref();
-
-    // Create a reference from an HTTPS URL
-    // Note that in the URL, characters are URL escaped!
-    final httpsReference = FirebaseStorage.instance.refFromURL(
-        imageUrl);
-
-    try {
-      const oneMegabyte = 1024 * 1024;
-      final Uint8List? data = await httpsReference.getData(oneMegabyte);
-      setState(() {
-        imageFile = data;
-      });
-      // Data for "images/island.jpg" is returned, use this as needed.
-    } on FirebaseException catch (error) {
-      logger.e('Error while downloading image: $error');
-      // Handle any errors.
-    }
-  }
-
   final StorageService storageService = StorageService();
+  final User? currentUser = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +101,9 @@ class _PostPageState extends State<PostPage> {
                                       builder: (BuildContext context,
                                           AsyncSnapshot<String>
                                               imageUrlSnapshot) {
-                                        if (imageUrlSnapshot.hasData) {
+                                        if (imageUrlSnapshot.connectionState ==
+                                                ConnectionState.done &&
+                                            imageUrlSnapshot.hasData) {
                                           return Image.network(
                                             imageUrlSnapshot.requireData,
                                             height: 250,
