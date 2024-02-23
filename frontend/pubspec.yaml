@@ -67,6 +67,7 @@ dependencies:
   flutter_local_notifications: ^16.3.2
   firebase_core: ^2.25.4
   uuid: ^4.3.3
+  firebase_storage: ^11.6.6
 
 dev_dependencies:
   flutter_test:
@@ -103,6 +104,7 @@ flutter:
     - assets/images/tree.png
     - assets/images/sharedItem.png
     - assets/images/foodWaste.png
+    - assets/images/uploadImg.jpeg
     - assets/achievements/initialization.png
     - assets/achievements/first_encounter.png
     - assets/achievements/nesting.png

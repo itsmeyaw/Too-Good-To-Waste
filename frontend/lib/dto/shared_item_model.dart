@@ -17,6 +17,7 @@ class SharedItem {
   final String name;
   final ItemCategory category;
   final String user;
+  final String imageUrl;
 
   @GeoFirePointConverter()
   GeoFirePoint location = GeoFirePoint(0.0, 0.0);
@@ -32,7 +33,9 @@ class SharedItem {
       required this.itemRef,
       required this.name,
       required this.category,
-      required this.user});
+      required this.user
+      ,required this.imageUrl
+      });
 
   factory SharedItem.fromJson(Map<String, dynamic> json) =>
       _$SharedItemFromJson(json);

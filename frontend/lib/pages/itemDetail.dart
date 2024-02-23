@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,6 +22,7 @@ import 'package:tooGoodToWaste/service/db_helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tooGoodToWaste/service/user_item_service.dart';
 import '../dto/user_item_amount_model.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class itemDetailPage extends StatefulWidget {
     // Declare a field that holds the food.
@@ -101,28 +104,83 @@ class _ItemDetailPage extends State<itemDetailPage> {
 
   TextEditingController locationController = TextEditingController();
 
-  bool isEmpty = true;
+  XFile? image;
+  File? imageFile;
+  String imgDownloadUrl = '';
 
-  // Future<void> pickImage() async {
-  //   XFile? image;
+  Future<void> pickImage() async {
+   
+    image = await ImagePicker()
+          .pickImage(source: ImageSource.camera, requestFullMetadata: true);
 
-  //   image = await ImagePicker()
-  //         .pickImage(source: ImageSource.camera, requestFullMetadata: true);
 
-
-  //   if (image == null) return;
-
-  //   List<int> pickedImageData = await image.readAsBytes();
-  //   setState(() {
-  //     isEmpty = false;
-  //     showLocationDialog();
-  //   });
+    if (image == null) {
+      logger.e('Image is null');
+    } else {
+      setState(() {
+        image = image;
+        imageFile = File(image!.path);
+        logger.d('Image path: ${image!.path}');
+        //showLocationDialog();
+      });
+    }
     
-  //  }
+   }
+
+   Future<void> uploadImgToFirebase(XFile image) async {
+
+
+    if (image == null) logger.e('Image is null');
+
+    List<int> pickedImageData = await image.readAsBytes();
+    Reference ref = FirebaseStorage.instance.ref().child('images').child('image.jpg');
+    // While the file names are the same, the references point to different files
+    // assert(ref.name == ref.name);
+    // assert(ref.fullPath != ref.fullPath);
+
+    Uint8List bytes = Uint8List.fromList(pickedImageData);
+    UploadTask uploadTask = ref.putData(bytes);
+
+    // Listen for state changes, errors, and completion of the upload.
+    uploadTask.snapshotEvents.listen((TaskSnapshot taskSnapshot) {
+     switch (taskSnapshot.state) {
+    case TaskState.running:
+      final progress =
+          100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes);
+      logger.f("Upload is $progress% complete.");
+      break;
+    case TaskState.paused:
+      logger.f("Upload is paused.");
+      break;
+    case TaskState.canceled:
+      logger.f("Upload was canceled");
+      break;
+    case TaskState.error:
+      // Handle unsuccessful uploads
+      logger.e('Upload failed');
+      break;
+    case TaskState.success:
+      // Handle successful uploads on complete
+      logger.d('Upload complete');
+      break;
+  }
+});
+
+    uploadTask.whenComplete(() async {
+      String url = await ref.getDownloadURL();
+      logger.d('imgDownloadUrl $url');
+      setState(() {
+        imgDownloadUrl = url;
+      });
+    });
+    
+
+
+   }
    
 
   showLocationDialog(){
-    // BuildContext dialogContext;
+    
     Dialog dialog = Dialog(
 
       shape: RoundedRectangleBorder(
@@ -134,7 +192,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
             loader: (BuildContext context) => FractionallySizedBox(
               widthFactor: 1.0,
               child: SizedBox(
-                height: 400,
+                height: 420,
                 child: Container(
                   color: Theme.of(context).colorScheme.secondaryContainer,
                   child: const Center(
@@ -145,12 +203,12 @@ class _ItemDetailPage extends State<itemDetailPage> {
             ),
             builder: (BuildContext context, GeoPoint userLocation) =>
               SizedBox(
-                height: 400,
+                height: 420,
                 child: Column(
                   children: <Widget>[
                     const Padding(
                       padding: EdgeInsets.all(10.0),
-                      child: Text('Are you sue to share this item?',
+                      child: Text('Are you sure to share this item?',
                         textAlign: TextAlign.center,
                         style: const TextStyle(fontWeight: FontWeight.bold)),
                     ),
@@ -158,21 +216,40 @@ class _ItemDetailPage extends State<itemDetailPage> {
                       height: 250,
                       padding: const EdgeInsets.all(10.0),
                       child: 
-                        // Image.asset('assets/images/food_icons/${foodDetail.category}.png')
-                        Image.asset('assets/mock/milk.JPG'),
-                      // isEmpty ? null : Image.asset('assets/images/sharedItem.png') ,
+                        // Image.asset('assets/mock/milk.JPG'),
+                       imageFile == null
+                        ? Image.asset('assets/images/uploadImg.jpeg')
+                        : Image.file(imageFile!),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                     children: [
-                      ElevatedButton(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                           ElevatedButton(
+                            onPressed: () async {
+                              //Extract Location information
+                              pickImage();
+                            },
+                            // child: const Icon(Icons.camera_alt),
+                            child: const Text('Take Photo'),
+                          ),
+                          const SizedBox(width: 7),
+                           ElevatedButton(
                         onPressed: () async {
                           //Extract Location information
-                          // pickImage();
+                          if (image != null) {
+                            await uploadImgToFirebase(image!);
+                          } else {
+                            logger.e('Please choose an image first!');
+                          }
                         },
                         // child: const Icon(Icons.camera_alt),
-                        child: const Text('Upload Picture'),
+                        child: const Text('Upload'),
+                      ),
+                        ],
                       ),
                       ElevatedButton(
                         onPressed: () async {
@@ -197,6 +274,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
                                   expireDate: widget.foodDetail.remainDays,
                                   user: currentUser.uid,
                                   itemRef: '',
+                                  imageUrl: imgDownloadUrl,
                                 );
                                 sharedItemService.postSharedItem(userLocation, sharedItem);
 
