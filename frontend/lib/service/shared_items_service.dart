@@ -7,7 +7,7 @@ import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
 
 class SharedItemService {
-  static const String COLLECTION = "shared_items";
+  static const String SHARED_ITEM_COLLECTION = "shared_items";
   final Logger logger = Logger();
   final GeoHasher geoHasher = GeoHasher();
 
@@ -24,7 +24,7 @@ class SharedItemService {
     analytics.logEvent(name: "Share Item");
 
     // TODO: Check whether an item with the same ref is already exists, if yes then false
-    var collection = db.collection(COLLECTION);
+    var collection = db.collection(SHARED_ITEM_COLLECTION);
     final GeoFirePoint location = geo.point(
         latitude: userLocation.latitude, longitude: userLocation.longitude);
     sharedItem.location = location;
@@ -58,8 +58,8 @@ class SharedItemService {
   }
 
   Future<SharedItem?> getSharedItem(String sharedItemId) async {
-    return db.collection(COLLECTION).doc(sharedItemId).get().then((querySnapshot) =>
-        querySnapshot.exists
+    return db.collection(SHARED_ITEM_COLLECTION).doc(sharedItemId).get().then(
+        (querySnapshot) => querySnapshot.exists
             ? SharedItem.fromJson(querySnapshot.data() as Map<String, dynamic>)
             : null);
   }
@@ -72,7 +72,7 @@ class SharedItemService {
     logger.d('Start querying for shared item');
     analytics.logEvent(name: "Search Item");
 
-    var collection = db.collection(COLLECTION);
+    var collection = db.collection(SHARED_ITEM_COLLECTION);
     if (category != null) {
       String categoryString = category.name;
       logger.d("Adding category filter: $categoryString");
@@ -97,12 +97,38 @@ class SharedItemService {
 
   Future<Iterable<SharedItem>> getSharedItemOfUser(String userId) {
     return db
-        .collection(COLLECTION)
+        .collection(SHARED_ITEM_COLLECTION)
         .where('user', isEqualTo: userId)
         .get()
         .then((querySnapshot) {
       logger.d("Got ${querySnapshot.size} shared items of user $userId");
       return querySnapshot.docs.map((doc) => SharedItem.fromJson(doc.data()));
     });
+  }
+
+  /// Return previous state of is_available
+  Future<bool> setSharedItemIsAvailable(
+      String sharedItemId, bool isAvailable) async {
+    final bool oldIsAvailable = await db
+        .collection(SHARED_ITEM_COLLECTION)
+        .doc(sharedItemId)
+        .get()
+        .then((snapshot) async {
+      if (!snapshot.exists) {
+        throw Exception('Cannot find shared item id $sharedItemId');
+      }
+
+      SharedItem sharedItem =
+          SharedItem.fromJson(snapshot.data() as Map<String, dynamic>);
+
+      return sharedItem.isAvailable;
+    });
+
+    await db
+        .collection(SHARED_ITEM_COLLECTION)
+        .doc(sharedItemId)
+        .update({'is_available': isAvailable});
+
+    return oldIsAvailable;
   }
 }
