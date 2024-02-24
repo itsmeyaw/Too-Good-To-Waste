@@ -39,7 +39,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
 
    @override
   Widget build(BuildContext context) {
-    DBHelper dbhelper = DBHelper();
+  
     String categoryIconImagePath;
 
     if (GlobalCateIconMap[widget.foodDetail.category] == null) {
@@ -48,18 +48,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
       categoryIconImagePath = GlobalCateIconMap[widget.foodDetail.category]!;
     }
 
-    Future<dto_user.TGTWUser> getUserFromDatabase(String uid) async {
-      Logger logger = Logger();
 
-      return FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .get()
-          .then((DocumentSnapshot doc) {
-        logger.d('Got data ${doc.data()}');
-        return dto_user.TGTWUser.fromJson(doc.data() as Map<String, dynamic>);
-      });
-    }
 
     //toast contains 'Alert! Your *** has already expired and cannot be shared!'
   showExpiredDialog(String foodname, String category) {
@@ -103,41 +92,6 @@ class _ItemDetailPage extends State<itemDetailPage> {
     );
   }
 
-  TextEditingController locationController = TextEditingController();
-
-  XFile? image;
-  File? imageFile;
-  String imgDownloadUrl = '';
-  final StorageService storageService = StorageService();
-
-
-  Future<void> pickImage() async {
-   
-    image = await ImagePicker()
-          .pickImage(source: ImageSource.camera, requestFullMetadata: true);
-
-
-    if (image == null) {
-      logger.e('Image is null');
-    } else {
-      setState(() {
-        image = image;
-        imageFile = File(image!.path);
-        logger.d('Image path: ${image!.path}');
-        //showLocationDialog();
-      });
-    }
-    
-   }
-
-   Future<void> uploadImage(String imagePath) async {
-      await storageService.uploadImage(imagePath);
-      imgDownloadUrl = await storageService.getImageUrlOfSharedItem(imagePath);
-      logger.d('imgDownloadUrl $imgDownloadUrl');
-      setState(() {
-        imgDownloadUrl = imgDownloadUrl;
-      });
-   }
 
    Future<void> uploadImgToFirebase(XFile image) async {
 
@@ -182,7 +136,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
       String url = await ref.getDownloadURL();
       logger.d('imgDownloadUrl $url');
       setState(() {
-        imgDownloadUrl = url;
+        //imgDownloadUrl = url;
       });
     });
     
@@ -213,108 +167,10 @@ class _ItemDetailPage extends State<itemDetailPage> {
                 ),
               ),
             ),
-            builder: (BuildContext context, GeoPoint userLocation) =>
-              SizedBox(
-                height: 420,
-                child: Column(
-                  children: <Widget>[
-                    const Padding(
-                      padding: EdgeInsets.all(10.0),
-                      child: Text('Are you sure to share this item?',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                    Container(
-                      height: 250,
-                      padding: const EdgeInsets.all(10.0),
-                      child: 
-                        // Image.asset('assets/mock/milk.JPG'),
-                       imageFile == null
-                        ? Image.asset('assets/images/uploadImg.jpeg')
-                        : Image.file(imageFile!),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                           ElevatedButton(
-                            onPressed: () async {
-                              //Extract Location information
-                              pickImage();
-                            },
-                            // child: const Icon(Icons.camera_alt),
-                            child: const Text('Take Photo'),
-                          ),
-                          const SizedBox(width: 7),
-                           ElevatedButton(
-                        onPressed: () async {
-                          //Extract Location information
-                          if (image != null) {
-                            // await uploadImage(image!.path);
-                            await uploadImgToFirebase(image!);
-                          } else {
-                            logger.e('Please choose an image first!');
-                          }
-                        },
-                        // child: const Icon(Icons.camera_alt),
-                        child: const Text('Upload'),
-                      ),
-                        ],
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          //Extract Location information
-                          locationController.value.text;              
-            
-                          SharedItemService sharedItemService = SharedItemService();
-
-                          User? currentUser = FirebaseAuth.instance.currentUser;
-                            if (currentUser == null) {
-                              throw Exception('User is null but want to publish item');
-                            } else {
-                              getUserFromDatabase(currentUser.uid).then((dto_user.TGTWUser userData) {
-                                SharedItem sharedItem = SharedItem(
-                                  name: widget.foodDetail.name,
-                                  category: ItemCategory.parse(widget.foodDetail.category),
-                                  amount:  UserItemAmount(
-                                    nominal: widget.foodDetail.quantitynum,
-                                    unit: widget.foodDetail.quantitytype
-                                  ),
-                                  buyDate: widget.foodDetail.remainDays,
-                                  expireDate: widget.foodDetail.remainDays,
-                                  user: currentUser.uid,
-                                  itemRef: '',
-                                  imageUrl: imgDownloadUrl,
-                                );
-                                sharedItemService.postSharedItem(userLocation, sharedItem);
-
-                              });
-                            }
-
-                              UserItemService userItemService = UserItemService();
-                              
-                              await userItemService.deleteUserItem(currentUser.uid, widget.foodDetail.id);
-                         
-                              await dbhelper.deleteFood(widget.foodDetail.id);
-                              
-                              // Navigator.of(context, rootNavigator: true).pop();
-                              // Navigator.pop(context);
-                              setState(() {
-                                Navigator.of(context).pushNamedAndRemoveUntil('/', ModalRoute.withName('/'));
-                              });
-                             
-                        },
-                        child: const Text('Share Item'),
-                      )
-                  
-                      ],)
-                     ),
-                  ]
-                  )
-              ),
+            builder: (BuildContext context, GeoPoint userLocation) => _DialogContent(
+              foodDetail: widget.foodDetail,
+              userLocation: userLocation,
+            ),   
           )
     );
     showDialog(
@@ -369,6 +225,181 @@ class _ItemDetailPage extends State<itemDetailPage> {
        );
   }
 }
+
+class _DialogContent extends StatefulWidget {
+  // const _DialogContent({Key? key}) : super(key: key);
+   final UserItemDetail foodDetail;
+   final GeoPoint userLocation;
+
+  const _DialogContent({super.key, required this.foodDetail, required this.userLocation});
+
+  @override
+  __DialogContentState createState() => __DialogContentState();
+}
+
+class __DialogContentState extends State<_DialogContent> {
+
+  File? imageFile;
+  String localPath = '';
+  String imagePath = '';
+  final StorageService storageService = StorageService();
+  TextEditingController locationController = TextEditingController();
+  Future<dto_user.TGTWUser> getUserFromDatabase(String uid) async {
+    Logger logger = Logger();
+
+   
+
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get()
+        .then((DocumentSnapshot doc) {
+      logger.d('Got data ${doc.data()}');
+      return dto_user.TGTWUser.fromJson(doc.data() as Map<String, dynamic>);
+    });
+  }
+
+
+  Future<void> pickImage() async {
+    final pickedImage = await ImagePicker().pickImage(source: ImageSource.camera);
+
+    setState(() {
+      if (pickedImage != null) {
+        imageFile = File(pickedImage.path);
+        localPath = pickedImage.path;
+        logger.d('Image path: ${imageFile!.path}');
+      } else {
+        logger.d('Image is null');
+      }
+    });
+  }
+
+   Future<void> uploadImage(String localPath) async {
+      imagePath = await storageService.uploadImage(localPath);
+      // imgDownloadUrl = await storageService.getImageUrlOfSharedItem(imagePath);
+      logger.d('imagePath $imagePath');
+      setState(() {
+        imagePath = imagePath;
+      });
+   }
+
+  @override
+  Widget build(BuildContext context) {
+
+    DBHelper dbhelper = DBHelper();
+
+    return  SizedBox(
+                height: 420,
+                child: Column(
+                  children: <Widget>[
+                    const Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: Text('Are you sure to share this item?',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                    Container(
+                      height: 250,
+                      padding: const EdgeInsets.all(10.0),
+                      child: 
+                        // Image.asset('assets/mock/milk.JPG'),
+                       imageFile == null
+                        ? Image.asset('assets/images/uploadImg.jpeg')
+                        : Image.file(imageFile!),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                           ElevatedButton(
+                            onPressed: () async {
+                              //Extract Location information
+                              await pickImage();
+                          
+                            },
+                            // child: const Icon(Icons.camera_alt),
+                            child: const Text('Take Photo'),
+                          ),
+                          const SizedBox(width: 7),
+                           ElevatedButton(
+                        onPressed: () async {
+                          setState(() {
+                            localPath = '';
+                            imageFile = null;
+                          });
+                        },
+                        // child: const Icon(Icons.camera_alt),
+                        child: const Text('Cancel'),
+                      ),
+                        ],
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          //Extract Location information
+                          locationController.value.text;  
+
+                           //Extract Location information
+                          if (localPath != '') {
+                            await uploadImage(localPath);
+                            
+                           // await uploadImgToFirebase(image!);
+                          } else {
+                            logger.e('Please choose an image first!');
+                          }            
+            
+                          SharedItemService sharedItemService = SharedItemService();
+
+                          User? currentUser = FirebaseAuth.instance.currentUser;
+                            if (currentUser == null) {
+                              throw Exception('User is null but want to publish item');
+                            } else {
+                              getUserFromDatabase(currentUser.uid).then((dto_user.TGTWUser userData) {
+                                SharedItem sharedItem = SharedItem(
+                                  name: widget.foodDetail.name,
+                                  category: ItemCategory.parse(widget.foodDetail.category),
+                                  amount:  UserItemAmount(
+                                    nominal: widget.foodDetail.quantitynum,
+                                    unit: widget.foodDetail.quantitytype
+                                  ),
+                                  buyDate: widget.foodDetail.remainDays,
+                                  expireDate: widget.foodDetail.remainDays,
+                                  user: currentUser.uid,
+                                  isAvailable: true,
+                                  imageUrl: imagePath,
+                                );
+                                sharedItemService.postSharedItem(widget.userLocation, sharedItem);
+
+                              });
+                            }
+
+                              UserItemService userItemService = UserItemService();
+                              
+                              await userItemService.deleteUserItem(currentUser.uid, widget.foodDetail.id);
+                         
+                              await dbhelper.deleteFood(widget.foodDetail.id);
+                              
+                              // Navigator.of(context, rootNavigator: true).pop();
+                              // Navigator.pop(context);
+                              setState(() {
+                                Navigator.of(context).pushNamedAndRemoveUntil('/', ModalRoute.withName('/'));
+                              });
+                             
+                        },
+                        child: const Text('Publish'),
+                      )
+                  
+                      ],)
+                     ),
+                  ]
+                  )
+              );
+  }
+}
+
+
 
 class SwitchButton extends StatefulWidget {
   const SwitchButton({super.key});

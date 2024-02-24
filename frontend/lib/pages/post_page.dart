@@ -107,6 +107,7 @@ class _PostPageState extends State<PostPage> {
                                           return Image.network(
                                             imageUrlSnapshot.requireData,
                                             height: 250,
+                                            width: 250,
                                           );
                                         } else {
                                           return const CircularProgressIndicator();

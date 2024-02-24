@@ -31,7 +31,7 @@ class StorageService {
     );
 
     // Resize image to be smaller
-    Image destImageObj = copyResize(sourceImageObj, width: 120);
+    Image destImageObj = copyResize(sourceImageObj, width: 300);
 
     imageRef.putData(encodeJpg(destImageObj), metadata);
 
