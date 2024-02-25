@@ -29,6 +29,7 @@ Our application has the following features:
 - Automatically scan receipt to import items to database using AI
 - Automatically suggest the expiry date based on the category of item using AI
 
+Watch our video on YouTube [here](https://youtu.be/2UFMf3brnmo?si=ah2QfhD9QQyfoTTI).
 
 ## Architecture
 
