@@ -53,7 +53,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'FLUTTERFIRE_SHOULD_CHANGE_THIS_VALUE',
+    apiKey: 'AIzaSyCP8A9ut7Q7ZtfkMbKGSNpj6fC07Plu63M',
     appId: '1:686754712481:android:53ff9bd3df9f9d622459e0',
     messagingSenderId: '686754712481',
     projectId: 'sc2024-96b48',
