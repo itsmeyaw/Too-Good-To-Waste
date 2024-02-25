@@ -15,6 +15,14 @@ TGTWUser _$TGTWUserFromJson(Map<String, dynamic> json) => TGTWUser(
           (json['allergies'] as List<dynamic>).map((e) => e as String).toList(),
       goodPoints: json['good_points'] as int,
       reducedCarbonKg: (json['reduced_carbon_kg'] as num).toDouble(),
+      pickupProcesses: (json['pickup_processes'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
+      givingProcesses: (json['giving_processes'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
     );
 
 Map<String, dynamic> _$TGTWUserToJson(TGTWUser instance) => <String, dynamic>{
@@ -23,6 +31,8 @@ Map<String, dynamic> _$TGTWUserToJson(TGTWUser instance) => <String, dynamic>{
       'address': instance.address.toJson(),
       'phone_number': instance.phoneNumber,
       'allergies': instance.allergies,
+      'pickup_processes': instance.pickupProcesses,
+      'giving_processes': instance.givingProcesses,
       'good_points': instance.goodPoints,
       'reduced_carbon_kg': instance.reducedCarbonKg,
     };

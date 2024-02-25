@@ -5,7 +5,6 @@ import './user_name_model.dart';
 
 part 'public_user_model.g.dart';
 
-@immutable
 @JsonSerializable(explicitToJson: true)
 class PublicUser {
   final UserName name;

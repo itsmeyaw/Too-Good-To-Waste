@@ -10,13 +10,13 @@ class PickupProcess {
   final String receiver;
   final String giver;
   final String sharedItemId;
-  final bool isActive;
+  bool isActive;
 
   PickupProcess(
       {required this.receiver,
       required this.giver,
       required this.sharedItemId,
-      required this.isActive});
+      this.isActive = true});
 
   factory PickupProcess.fromJson(Map<String, dynamic> json) =>
       _$PickupProcessFromJson(json);

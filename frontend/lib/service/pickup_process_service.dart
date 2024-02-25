@@ -77,10 +77,12 @@ class PickupProcessService {
       throw Exception('User is not receiver');
     }
 
+    pickUpProcess.isActive = false;
+
     await db
         .collection(PICKUP_COLLECTION)
         .doc(pickUpProcessId)
-        .update({'is_active': false});
+        .set(pickUpProcess.toJson());
   }
 
   Future<void> prematurelyEndPickUpProcess(
@@ -101,9 +103,11 @@ class PickupProcessService {
       throw Exception('User is neither receiver nor giver');
     }
 
+    pickUpProcess.isActive = false;
+
     await db
         .collection(PICKUP_COLLECTION)
         .doc(pickUpProcessId)
-        .update({'is_active': false});
+        .set(pickUpProcess.toJson());
   }
 }

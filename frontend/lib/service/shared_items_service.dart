@@ -108,8 +108,8 @@ class SharedItemService {
 
   /// Return previous state of is_available
   Future<bool> setSharedItemIsAvailable(
-      String sharedItemId, bool isAvailable) async {
-    final bool oldIsAvailable = await db
+      String sharedItemId, bool isAvailable) {
+    return db
         .collection(SHARED_ITEM_COLLECTION)
         .doc(sharedItemId)
         .get()
@@ -121,14 +121,15 @@ class SharedItemService {
       SharedItem sharedItem =
           SharedItem.fromJson(snapshot.data() as Map<String, dynamic>);
 
-      return sharedItem.isAvailable;
+      final bool oldIsAvailable = sharedItem.isAvailable;
+      sharedItem.isAvailable = false;
+
+      await db
+          .collection(SHARED_ITEM_COLLECTION)
+          .doc(sharedItemId)
+          .set(sharedItem.toJson());
+
+      return oldIsAvailable;
     });
-
-    await db
-        .collection(SHARED_ITEM_COLLECTION)
-        .doc(sharedItemId)
-        .update({'is_available': isAvailable});
-
-    return oldIsAvailable;
   }
 }

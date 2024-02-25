@@ -79,8 +79,7 @@ class _FrameState extends State<Frame> {
           //showExpiringDialog(foodName, category);
           pushLocalNotification('Expiring Food Alert!', foodName, 'will expire in one day!');
         }
-        logger.e(
-            '###########################$foodName is expiring!!!###########################');
+        logger.i('$foodName is expiring');
       }
     }
   }

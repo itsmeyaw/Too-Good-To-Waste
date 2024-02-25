@@ -11,6 +11,10 @@ class TGTWUser extends PublicUser {
   final UserAddress address;
   final String phoneNumber;
   final List<String> allergies;
+  @JsonKey(defaultValue: [])
+  final List<String> pickupProcesses;
+  @JsonKey(defaultValue: [])
+  final List<String> givingProcesses;
   final int goodPoints;
   final double reducedCarbonKg;
 
@@ -21,7 +25,9 @@ class TGTWUser extends PublicUser {
     required this.address,
     required this.allergies,
     required this.goodPoints,
-    required this.reducedCarbonKg
+    required this.reducedCarbonKg,
+    this.pickupProcesses = const [],
+    this.givingProcesses = const []
   });
 
   factory TGTWUser.fromJson(Map<String, dynamic> json) => _$TGTWUserFromJson(json);
