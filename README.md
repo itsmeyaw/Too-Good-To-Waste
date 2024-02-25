@@ -61,11 +61,18 @@ The flutter code is included
 in the `frontend` directory. Make sure that you 
 already installed the flutter and configured 
 a virtual device.
-Like other usual Flutter applications, you need to run the 
+
+1. First install all dependencies with 
+    ```shell
+    flutter pub get
+    ```
+2. Configure the Firebase CLI and Flutterfire CLI by following [this tutorial](https://firebase.google.com/docs/flutter/setup?platform=android)
+
+3. Like other usual Flutter applications, you need to run the 
 following command inside `frontend` directory.
-```shell
-flutter run
-```
+    ```shell
+    flutter run
+    ```
 
 ## Screenshots and Demos
 
