@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!-- Setting
+Language: en-US
+voiceCode: en-US Studio O
+Speed: 1.2
+-->
+<!-- Introduction -->
+<speak version="1.1"
+       xmlns="http://www.w3.org/2001/10/synthesis"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.w3.org/2001/10/synthesis
+                 http://www.w3.org/TR/speech-synthesis11/synthesis.xsd"
+       xml:lang="en-US">
+    <voice name="en-US-Studio-O">
+        It might be trivial to throw food out, isn't it?
+        <break time="150ms"/>
+        But if there are 7 billions people doing it
+        <break time="100ms"/>
+        we have a global food waste problem.
+        <break time="200ms"/>
+        <p>
+            <s>
+                A report finds that we produced almost 1 trillion tonnes
+                of food waste in 2019 alone,
+                <break time="100ms"/>
+                contributing to 8 to 10 percents of greenhouse gas emission.
+            </s>
+            <break time="100ms"/>
+            <s>
+                It also says that household contributes the
+                most,
+                <break time="100ms"/>
+                suggesting that solution on this sector
+                play a major role.
+            </s>
+        </p>
+        <break time="200ms"/>
+        <p>
+            <s>
+                Our survey finds that more than 90 percent
+                of people mostly throws groceries.
+            </s>
+        </p>
+        <break time="100ms"/>
+        <p>
+            <s>
+                Hence, we introduce Too Good To Waste,
+                <break time="100ms"/>
+                an application that allows user to keep track of their
+                pantries and share them with other people.
+            </s>
+        </p>
+    </voice>
+</speak>
