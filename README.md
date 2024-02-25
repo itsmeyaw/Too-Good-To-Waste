@@ -68,7 +68,10 @@ a virtual device.
     ```
 2. Configure the Firebase CLI and Flutterfire CLI by following [this tutorial](https://firebase.google.com/docs/flutter/setup?platform=android)
 
-3. Like other usual Flutter applications, you need to run the 
+3. Create a Google Maps Platform API in the Google Cloud and paste the key in the file `frontend/android/app/src/main/AndroidManifest.xml`
+    for metadata `com.google.android.geo.API_KEY`
+
+4. Like other usual Flutter applications, you need to run the 
 following command
     ```shell
     flutter run
