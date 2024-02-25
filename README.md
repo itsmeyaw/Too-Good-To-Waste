@@ -58,7 +58,7 @@ firebase deploy
 ### Flutter
 
 The flutter code is included 
-in the `frontend` directory. Make sure that you 
+in the `frontend` directory, so make sure to run flutter related commands there. Make sure that you 
 already installed the flutter and configured 
 a virtual device.
 
@@ -69,7 +69,7 @@ a virtual device.
 2. Configure the Firebase CLI and Flutterfire CLI by following [this tutorial](https://firebase.google.com/docs/flutter/setup?platform=android)
 
 3. Like other usual Flutter applications, you need to run the 
-following command inside `frontend` directory.
+following command
     ```shell
     flutter run
     ```
