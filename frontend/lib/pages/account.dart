@@ -18,40 +18,47 @@ class AccountPage extends StatefulWidget {
 }
 
 class _MyAccountPageState extends State<AccountPage> {
-  User? currentUser = FirebaseAuth.instance.currentUser;
+  User? currentUser;
   TGTWUser? userData;
   Logger logger = Logger();
+  Future? _future;
 
   UserService userService = UserService();
 
-  Future<void> asyncMethod()  async {
+  Future<dynamic> asyncMethod()  async {
+    currentUser = FirebaseAuth.instance.currentUser;
+
     if (currentUser == null) {
       logger.e('Fetching user data but user is null');
     } else {
-      TGTWUser userData = await userService.getUserData(currentUser!.uid);
-      setState(() {
-        this.userData = userData;
-      });
-      logger.d('User data: $userData');
+      TGTWUser user = await userService.getUserData(currentUser!.uid);
+        setState(() {
+            userData = user;
+          });
+      return [currentUser, userData];
     }
-  }
+    // return null;
+  }  
 
   @override
   void initState() {
+    _future = asyncMethod();
     super.initState();
-    asyncMethod();
   }
-  
 
   @override
   Widget build(BuildContext context) {
-   
-    
-    if (currentUser == null) {
-      throw Exception('User is null but accessing account page');
-    } else {
-      return AccountSettingPage(user: currentUser!, userData: userData!);
-    }
+    return FutureBuilder(
+      future: _future, 
+      builder:(context, AsyncSnapshot<dynamic> snapshot)  {
+        
+        if (snapshot.hasError || snapshot.data == null) {
+          throw Exception('User is null but accessing account page');
+        } else {
+          return AccountSettingPage(user: snapshot.data[0], userData: snapshot.data[1]);
+        }
+      }
+    );
   }
 }
 
@@ -91,18 +98,6 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
   @override
   void initState() {
     super.initState();
-
-    // userData = const TGTWUser(
-    //   name: UserName(first: '', last: ''),
-    //   rating: 0,
-    //   phoneNumber: '',
-    //   address: UserAddress(
-    //       city: '', country: '', line1: '', line2: '', zipCode: ''),
-    //   allergies: [],
-    //   chatroomIds: [],
-    //   goodPoints: 0,
-    //   reducedCarbonKg: 0,
-    // );
 
     if (widget.user.displayName == null) {
       currentName = const UserName(first: '', last: '');

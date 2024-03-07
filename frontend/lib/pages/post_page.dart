@@ -84,7 +84,7 @@ class _PostPageState extends State<PostPage> {
                             style: Theme.of(context).textTheme.headlineSmall),
                         Text(
                           'Shared by: ${postUser.name.first} ${postUser.name.last} (Rating: ${postUser.rating.toStringAsFixed(1)})',
-                          style: Theme.of(context).textTheme.bodyMedium,
+                          style: Theme.of(context).textTheme.bodySmall,
                         ),
                         const SizedBox(
                           height: 10,
