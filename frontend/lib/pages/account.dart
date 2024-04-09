@@ -83,6 +83,9 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
   late TextEditingController countryController;
 
   late TextEditingController allergiesController;
+  late TextEditingController goodPointsController;
+  late TextEditingController carbonEmissionController;
+  late TextEditingController ratingController;
 
   late UserName currentName;
   late String currentEmail;
@@ -93,6 +96,9 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
   late String currentZipCode;
   late String currentCountry;
   late String currentAllergies;
+  late int currentGoodPoints;
+  late double currentCarbonEmission;
+  late double currentRating;
 
 
   @override
@@ -112,6 +118,9 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
     currentZipCode = widget.userData.address.zipCode;
     currentCountry = widget.userData.address.country;
     currentAllergies = widget.userData.allergies.join(', ');
+    currentGoodPoints = widget.userData.goodPoints;
+    currentCarbonEmission = widget.userData.reducedCarbonKg;
+    currentRating = widget.userData.rating;
 
     nameController = TextEditingController(text: '${widget.userData.name.first} ${widget.userData.name.last}');
     emailController = TextEditingController(text: widget.user.email ?? '');
@@ -122,6 +131,9 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
     zipCodeController = TextEditingController(text: widget.userData.address.zipCode);
     countryController = TextEditingController(text: widget.userData.address.country);
     allergiesController = TextEditingController(text: currentAllergies);
+    goodPointsController = TextEditingController(text: currentGoodPoints.toString());
+    carbonEmissionController = TextEditingController(text: currentCarbonEmission.toString());
+    ratingController = TextEditingController(text: currentRating.toString());
   }
 
   showUpdateDialog() {
@@ -166,7 +178,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
     
     TGTWUser newUser = TGTWUser(
       name: currentName,
-      rating: widget.userData.rating,
+      rating: currentRating,
       phoneNumber: currentPhoneNumber,
       address: UserAddress(
           city: currentCity,
@@ -174,9 +186,9 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
           line1: currentAddress1,
           line2: currentAddress2,
           zipCode: currentZipCode),
-      allergies: widget.userData.allergies,
-      goodPoints: widget.userData.goodPoints,
-      reducedCarbonKg: widget.userData.reducedCarbonKg,
+      allergies: currentAllergies.split(', ').toList(),
+      goodPoints: currentGoodPoints,
+      reducedCarbonKg: currentCarbonEmission,
     );
 
     await userService.updateUserData(widget.user.uid, newUser);
@@ -327,9 +339,11 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                             fontSize: 20,
                           ),
                          ),
+
                         const SizedBox(
                           height: 20,
                         ),
+
                         Text(
                           'Address',
                           style: Theme.of(context).textTheme.headlineSmall,
@@ -414,6 +428,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                             fontSize: 20,
                           ),
                          ),
+
                         const SizedBox(
                           height: 20,
                         ),
@@ -424,15 +439,27 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                         const SizedBox(
                           height: 10,
                         ),
-                        const Text('Allergies'),
+
+                        TextField(   
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Allergies',
+                          ),
+                          enabled: isEditMode,
+                          controller: allergiesController,
+                          style: const TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: 20,
+                          ),
+                         ),
                         
-                        Text(
-                          widget.userData.allergies.isEmpty
-                              ? 'No allergies listed'
-                              : widget.userData.allergies.join(', '),
+                        // Text(
+                        //   widget.userData.allergies.isEmpty
+                        //       ? 'No allergies listed'
+                        //       : widget.userData.allergies.join(', '),
                           
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
+                        //   style: Theme.of(context).textTheme.bodyLarge,
+                        // ),
                         const SizedBox(
                           height: 20,
                         ),
@@ -443,19 +470,56 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                         const SizedBox(
                           height: 10,
                         ),
-                        const Text('GoodPoints'),
-                        Text(
-                          '${widget.userData.goodPoints}',
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
+                        TextField(   
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Rating',
+                          ),
+                          enabled: isEditMode,
+                          controller: ratingController,
+                          style: const TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: 20,
+                          ),
+                         ),
                         const SizedBox(
                           height: 10,
                         ),
-                        const Text('Carbon Emission Reduced'),
-                        Text(
-                          '${widget.userData.reducedCarbonKg} kg',
-                          style: Theme.of(context).textTheme.bodyLarge,
+                        TextField(   
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Good Points',
+                          ),
+                          enabled: isEditMode,
+                          controller: goodPointsController,
+                          style: const TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: 20,
+                          ),
+                         ),
+                        // Text(
+                        //   '${widget.userData.goodPoints}',
+                        //   style: Theme.of(context).textTheme.bodyLarge,
+                        // ),
+                        const SizedBox(
+                          height: 10,
                         ),
+                        TextField(   
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Carbon Emission',
+                          ),
+                          enabled: isEditMode,
+                          controller: carbonEmissionController,
+                          style: const TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: 20,
+                          ),
+                         ),
+                        // Text(
+                        //   '${widget.userData.reducedCarbonKg} kg',
+                        //   style: Theme.of(context).textTheme.bodyLarge,
+                        // ),
                         const SizedBox(
                           height: 20,
                         ),
