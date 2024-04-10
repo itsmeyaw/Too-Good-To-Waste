@@ -10,6 +10,7 @@ import 'package:tooGoodToWaste/util/geo_utils.dart';
 import 'package:tooGoodToWaste/widgets/allergies_picker.dart';
 import 'package:tooGoodToWaste/widgets/category_picker.dart';
 import 'package:tooGoodToWaste/widgets/user_location_aware_widget.dart';
+import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import '../Pages/post_page.dart';
 import '../service/shared_items_service.dart';
 
@@ -334,6 +335,18 @@ class Post extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String? categoryIconImagePath;
+    Color progressColor;
+    int remainDays = DateTime.fromMillisecondsSinceEpoch(postData.expireDate)
+          .difference(DateTime.now())
+          .inDays;
+    if (GlobalCateIconMap[postData.category.name] == null) {
+      categoryIconImagePath = GlobalCateIconMap["Others"];
+    } else {
+      categoryIconImagePath = GlobalCateIconMap[postData.category.name];
+    }
+
+
     return InkWell(
         onTap: () {
           Navigator.push(
@@ -343,25 +356,88 @@ class Post extends StatelessWidget {
         },
         child: FractionallySizedBox(
           widthFactor: 1.0,
-          child: Container(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Item name: ${postData.name}',
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                  Text(
-                    'Amount: ${postData.amount.nominal} ${postData.amount.unit}',
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                  Text(
-                    'Distance: ${postData.distance.toStringAsFixed(2)} m',
-                    style: const TextStyle(color: Colors.black),
-                  )
-                ],
+          child: 
+            Card(
+             // child: Image.network(postData.imageUrl!, fit: BoxFit.cover),
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              margin: const EdgeInsets.all(10),
+              color: remainDays > 1
+                ? Colors.white
+                : const Color.fromRGBO(238, 162, 164, 0.8),
+              child: 
+            ListTile(
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          leading: Container(
+            padding: const EdgeInsets.only(right: 12.0),
+            decoration: const BoxDecoration(
+                border: Border(right: BorderSide(width: 1.0))),
+            child: Image(
+              image: AssetImage("$categoryIconImagePath"),
+              width: 32,
+              height: 32,
+            ),
+          ),
+          title: Text(
+            postData.name,
+            style: const TextStyle(fontSize: 18),
+          ),
+          subtitle: Row(
+            children: <Widget>[
+              Expanded(
+                flex: 4,
+                child: Padding(
+                    padding: const EdgeInsets.only(left: 10.0),
+                    child: Text("$remainDays Days Left",
+                        style: TextStyle(
+                            color: remainDays > 3
+                                ? Colors.orange
+                                : Colors.black))),
+              ),
+              Expanded(
+                flex: 4,
+                child: Padding(
+                    padding: const EdgeInsets.only(left: 10.0),
+                    child: Text('Distance: ${postData.distance.toStringAsFixed(2)} m',
+                        style: TextStyle(color: Colors.black))),
+              )
+            ],
+          ),
+          // subtitle: Text("Expired in $expire days", style: TextStyle(fontStyle: FontStyle.italic),),
+          trailing: Text("${postData.amount.nominal } ${postData.amount.unit}",
+              style: const TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 18,
               )),
+          onTap: () {
+            //pushItemDetailScreen(itemId, userItem.name);
+          },
+        ),
+      ),
+     
+            
+            // Container(
+            //   padding: const EdgeInsets.all(10),
+            //   child: Column(
+            //     crossAxisAlignment: CrossAxisAlignment.start,
+            //     children: [
+            //       Text(
+            //         'Item name: ${postData.name}',
+            //         style: const TextStyle(color: Colors.black),
+            //       ),
+            //       Text(
+            //         'Amount: ${postData.amount.nominal} ${postData.amount.unit}',
+            //         style: const TextStyle(color: Colors.black),
+            //       ),
+            //       Text(
+            //         'Distance: ${postData.distance.toStringAsFixed(2)} m',
+            //         style: const TextStyle(color: Colors.black),
+            //       )
+            //     ],
+            //   )),
         ));
   }
 }
