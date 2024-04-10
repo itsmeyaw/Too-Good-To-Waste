@@ -347,14 +347,7 @@ class Post extends StatelessWidget {
     }
 
 
-    return InkWell(
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => PostPage(postData: postData)));
-        },
-        child: FractionallySizedBox(
+    return FractionallySizedBox(
           widthFactor: 1.0,
           child: 
             Card(
@@ -413,31 +406,14 @@ class Post extends StatelessWidget {
                 fontSize: 18,
               )),
           onTap: () {
-            //pushItemDetailScreen(itemId, userItem.name);
+             Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => PostPage(postData: postData)));
           },
         ),
       ),
-     
-            
-            // Container(
-            //   padding: const EdgeInsets.all(10),
-            //   child: Column(
-            //     crossAxisAlignment: CrossAxisAlignment.start,
-            //     children: [
-            //       Text(
-            //         'Item name: ${postData.name}',
-            //         style: const TextStyle(color: Colors.black),
-            //       ),
-            //       Text(
-            //         'Amount: ${postData.amount.nominal} ${postData.amount.unit}',
-            //         style: const TextStyle(color: Colors.black),
-            //       ),
-            //       Text(
-            //         'Distance: ${postData.distance.toStringAsFixed(2)} m',
-            //         style: const TextStyle(color: Colors.black),
-            //       )
-            //     ],
-            //   )),
-        ));
+    );
+        
   }
 }
