@@ -524,6 +524,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                           height: 20,
                         ),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             IntrinsicWidth(
                                 child: FilledButton(
