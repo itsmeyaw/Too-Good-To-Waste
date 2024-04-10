@@ -336,7 +336,7 @@ class Post extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String? categoryIconImagePath;
-    Color progressColor;
+
     int remainDays = DateTime.fromMillisecondsSinceEpoch(postData.expireDate)
           .difference(DateTime.now())
           .inDays;
@@ -347,23 +347,20 @@ class Post extends StatelessWidget {
     }
 
 
-    return FractionallySizedBox(
-          widthFactor: 1.0,
-          child: 
-            Card(
-             // child: Image.network(postData.imageUrl!, fit: BoxFit.cover),
-              elevation: 3,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              margin: const EdgeInsets.all(10),
-              color: remainDays > 1
-                ? Colors.white
-                : const Color.fromRGBO(238, 162, 164, 0.8),
-              child: 
-            ListTile(
+    return 
+      Card(
+        // child: Image.network(postData.imageUrl!, fit: BoxFit.cover),
+        elevation: 3,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        margin: const EdgeInsets.all(10),
+        color: remainDays > 1
+          ? Colors.white
+          : const Color.fromRGBO(238, 162, 164, 0.8),
+        child: ListTile(
           contentPadding:
-              const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+            const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
           leading: Container(
             padding: const EdgeInsets.only(right: 12.0),
             decoration: const BoxDecoration(
@@ -380,16 +377,14 @@ class Post extends StatelessWidget {
           ),
           subtitle: Row(
             children: <Widget>[
-              Expanded(
-                flex: 4,
-                child: Padding(
-                    padding: const EdgeInsets.only(left: 10.0),
-                    child: Text("$remainDays Days Left",
-                        style: TextStyle(
-                            color: remainDays > 3
-                                ? Colors.orange
-                                : Colors.black))),
-              ),
+              // Expanded(
+              //   flex: 4,
+              //   child: Padding(
+              //       padding: const EdgeInsets.only(left: 10.0),
+              //       child: Text("From ${postData.user}",
+              //           style: TextStyle(
+              //               color: Colors.black))),
+              // ),
               Expanded(
                 flex: 4,
                 child: Padding(
@@ -412,8 +407,6 @@ class Post extends StatelessWidget {
                   builder: (context) => PostPage(postData: postData)));
           },
         ),
-      ),
-    );
-        
+      );      
   }
 }

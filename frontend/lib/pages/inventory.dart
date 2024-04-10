@@ -397,7 +397,7 @@ class _BottomTopScreenState extends State<Inventory>
                         const SizedBox(
                           height: 5,
                         ),
-                        const Text('Month: Feb 2024'),
+                        Text('Month: ${timeNowDate.month} ${timeNowDate.year}'),
                         const SizedBox(
                           height: 10,
                         ),
@@ -442,7 +442,7 @@ class _BottomTopScreenState extends State<Inventory>
                         const SizedBox(
                           height: 20,
                         ),
-                        const Text('Period: Jan 2024 - Feb 2024'),
+                        const Text('Period: April 2024 - May 2024'),
                         const SizedBox(
                           height: 10,
                         ),

@@ -82,9 +82,24 @@ class _PostPageState extends State<PostPage> {
                         Text(
                             'Amount: ${widget.postData.amount.nominal} ${widget.postData.amount.unit}',
                             style: Theme.of(context).textTheme.headlineSmall),
-                        Text(
-                          'Shared by: ${postUser.name.first} ${postUser.name.last} (Rating: ${postUser.rating.toStringAsFixed(1)})',
-                          style: Theme.of(context).textTheme.bodySmall,
+                        Row(
+                          children: [
+                            Text(
+                              'Shared by: ${postUser.name.first} ${postUser.name.last}}',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  const Icon(Icons.grade,
+                                      color: Color.fromRGBO(9, 162, 109, 1)),
+                                  Text(
+                                    'Rating: ${postUser.rating.toStringAsFixed(1)}',
+                                    style: Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                ],
+                              )
+                          ],
                         ),
                         const SizedBox(
                           height: 10,
