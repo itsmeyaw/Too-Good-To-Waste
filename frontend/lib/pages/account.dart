@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tooGoodToWaste/Pages/post_page.dart';
+import 'package:tooGoodToWaste/const/color_const.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -201,6 +202,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
   @override
   Widget build(BuildContext context) {
     final UserService userService = UserService();
+    final _media = MediaQuery.of(context).size;
 
     // return 
     // FutureBuilder(
@@ -245,6 +247,18 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                 body: Stack(
       clipBehavior: Clip.none,
       children: [
+        Container(
+          height: _media.height,
+          width: _media.width,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: FractionalOffset(0.5, 0.0),
+              end: FractionalOffset(0.6, 0.8),
+              stops: [0.0, 0.9],
+              colors: [YELLOW, BLUE],
+            ),
+          ),
+        ),
         Positioned(
             top: 5.0,
             right: 10.0,

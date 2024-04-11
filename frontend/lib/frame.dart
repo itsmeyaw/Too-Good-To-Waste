@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tooGoodToWaste/const/color_const.dart';
 import 'package:mime/mime.dart';
 import 'package:tooGoodToWaste/Pages/home.dart';
 import 'package:tooGoodToWaste/Pages/account.dart';
@@ -239,6 +240,14 @@ class _FrameState extends State<Frame> {
           actions: const [],
         ),
         body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: FractionalOffset(0.5, 0.0),
+              end: FractionalOffset(0.6, 0.8),
+              stops: [0.0, 0.9],
+              colors: [YELLOW, BLUE],
+            ),
+          ),
           child: _getPage(currentPage),
         ),
         bottomNavigationBar: NavigationBar(

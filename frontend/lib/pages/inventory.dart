@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:convert';
+import 'package:flutter/src/painting/gradient.dart' as Gradient; 
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -14,6 +15,7 @@ import 'package:logger/logger.dart';
 import 'package:mime/mime.dart';
 import 'package:rive/rive.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:tooGoodToWaste/const/color_const.dart';
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import 'package:tooGoodToWaste/dto/item_allergies_enum.dart';
 import 'package:tooGoodToWaste/dto/item_category_enum.dart';
@@ -351,6 +353,8 @@ class _BottomTopScreenState extends State<Inventory>
     } else {  
        logger.d('Title: $message');
     }
+
+    final _media = MediaQuery.of(context).size;
     
     return Scaffold(
       appBar: AppBar(
@@ -364,9 +368,22 @@ class _BottomTopScreenState extends State<Inventory>
               Tab(icon: Icon(Icons.recycling), text: "Recycle"),
             ],
           )),
-      body: TabBarView(
+      body: Container(
+          height: _media.height,
+          width: _media.width,
+          decoration: BoxDecoration(
+            gradient: Gradient.LinearGradient(
+              begin: FractionalOffset(0.5, 0.0),
+              end: FractionalOffset(0.6, 0.8),
+              stops: [0.0, 0.9],
+              colors: [YELLOW, BLUE],
+            ),
+          ),
+      child:
+      TabBarView(
         controller: _tabController,
         children: [
+          
           Column(
             children: [
               const TextField(
@@ -501,6 +518,7 @@ class _BottomTopScreenState extends State<Inventory>
             ],
           ),
         ],
+      ),
       ),
       floatingActionButton: ExpandableFab(
         distance: 112.0,

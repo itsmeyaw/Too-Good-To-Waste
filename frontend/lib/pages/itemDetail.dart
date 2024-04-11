@@ -1,12 +1,12 @@
 import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
+import 'package:tooGoodToWaste/const/gradient_const.dart';
+import 'package:tooGoodToWaste/const/size_const.dart';
 import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
 import 'package:tooGoodToWaste/dto/user_item_detail_model.dart';
@@ -17,6 +17,7 @@ import 'package:tooGoodToWaste/service/shared_items_service.dart';
 import 'package:tooGoodToWaste/service/storage_service.dart';
 import 'package:tooGoodToWaste/service/user_location_service.dart';
 import 'package:tooGoodToWaste/widgets/category_picker.dart';
+import 'package:tooGoodToWaste/widgets/signup_arrow_button.dart';
 import 'package:tooGoodToWaste/widgets/user_location_aware_widget.dart';
 import 'package:tooGoodToWaste/service/db_helper.dart';
 
@@ -24,6 +25,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tooGoodToWaste/service/user_item_service.dart';
 import '../dto/user_item_amount_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:tooGoodToWaste/widgets/appbar.dart';
 
 class itemDetailPage extends StatefulWidget {
     // Declare a field that holds the food.
@@ -39,6 +41,7 @@ class _ItemDetailPage extends State<itemDetailPage> {
 
    @override
   Widget build(BuildContext context) {
+    final _media = MediaQuery.of(context).size;
   
     String categoryIconImagePath;
 
@@ -94,8 +97,6 @@ class _ItemDetailPage extends State<itemDetailPage> {
 
 
    Future<void> uploadImgToFirebase(XFile image) async {
-
-
     if (image == null) logger.e('Image is null');
 
     List<int> pickedImageData = await image.readAsBytes();
@@ -183,24 +184,35 @@ class _ItemDetailPage extends State<itemDetailPage> {
   }
 
      return Scaffold(
-        appBar: AppBar(
-              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-              title: const Text('Item Detail Page')),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-           
+        appBar: SignupApbar(
+              //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+              title: 'Item Detail Page'),
+        body: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Stack(
             children: <Widget>[
+                Container(
+              height: _media.height,
+              width: _media.width,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(
+                    'assets/images/detail_page.png',
+                  ),
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ),
               Expanded(
                 child:
                     DetailsList(
                       foodDetail: widget.foodDetail,
                       imagePth: categoryIconImagePath,
                     ),
-                    ),
-                  ],
-                ),
               ),
+            ],
+          ),
+        ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () async {
             try {
@@ -572,31 +584,29 @@ class _DetailsListState extends State<DetailsList> {
      Navigator.pop(context);
   }
 
+  final nums = List.generate(10, (index) => index);
+  int quanNum = 0;
+  int quanSmallNum = 0;
+  var quanType = "";
+  List<Widget> numList = List.generate(10, (index) => Text("$index"));
+  final quanTypes = ["g", "kg", "piece", "bag", "bottle", "num"];
+ 
+ 
   @override
   Widget build(BuildContext context) {
-    final nums = List.generate(10, (index) => index);
-    int quanNum = 0;
-    int quanSmallNum = 0;
-    var quanType = "";
-    List<Widget> numList = List.generate(10, (index) => Text("$index"));
-    final quanTypes = ["g", "kg", "piece", "bag", "bottle", "num"];
-    List<Widget> quanTypeList =
-      List<Widget>.generate(6, (index) => Text(quanTypes[index]));
-
-    DateTime selectedBuyDate = DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.buyDate);
-    DateTime selectedExpiryDate= DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.expiryDate);
-   
-    return Stack(
+    
+    return Column(
       children: [
-        Positioned(
-            top: 0.0,
-            right: 0.0,
-            child: 
-            // const SwitchButton(),
-              IconButton(
-                icon: Icon(isEditMode ? Icons.done : Icons.edit),
-                onPressed: () {
-                  setState(() {
+        SizedBox(
+          height: 30,
+        ),
+        SignUpArrowButton(
+            height: 70,
+            width: 70,
+            icon: isEditMode ? IconData(Icons.done.codePoint) : IconData(Icons.edit.codePoint),
+            iconSize: 30, 
+            onTap: () { 
+              setState(() {
                     isEditMode = !isEditMode;
                     if (!isEditMode) {
                       // Save changes
@@ -609,176 +619,270 @@ class _DetailsListState extends State<DetailsList> {
                       // updateFood();
                     }
                   });
-                },
-              ),
+            },
+        ),
+        SizedBox(
+          height: 30,
+        ),
+        Text(
+          "Tap to edit the item detail",
+          style: TextStyle(
+            fontSize: 13,
           ),
-          Container(
-            padding: EdgeInsets.only(top: 20, bottom: 40),
-            child:
+        ),
+        SizedBox(
+          height: 40,
+        ),
+      Container(
+        padding: EdgeInsets.only(top: 20, bottom: 40),
+        child:
           Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: <Widget>[
-                  Expanded(
-                    child: Card(
-                      child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[   
-                          const Text(
-                            'Storage Detail',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          SizedBox(height: 5), 
-                        // subtitle: Text("Expired in $expire days", style: TextStyle(fontStyle: FontStyle.italic),),
-                      Container(
-                          width: 250,
-                          child:
-                          TextField(   
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Quantity',
-                          ),
-                          enabled: isEditMode,
-                          controller: quanNumAndTypeController,
-                          style: const TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 20,
-                          ),
-                          onTap: () {
-                        FocusScope.of(context).requestFocus(FocusNode());
-                        showCupertinoModalPopup(
-                            context: context,
-                            builder: (context) {
-                              return Container(
-                                  height: 200,
-                                  color: Colors.white,
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 2,
-                                        child: CupertinoPicker(
-                                          itemExtent: 24.0,
-                                          onSelectedItemChanged: (value) {
-                                            setState(() {
-                                              quanNum = nums[value];
-                                              quantityNumController.text =
-                                                  "$quanNum.$quanSmallNum";
-                                              quanNumAndTypeController.text =
-                                                  "$quanNum.$quanSmallNum $quanType";
-                                            });
-                                          },
-                                          children: numList,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        flex: 2,
-                                        child: CupertinoPicker(
-                                          itemExtent: 24.0,
-                                          onSelectedItemChanged: (value) {
-                                            setState(() {
-                                              quanSmallNum = nums[value];
-                                              quantityNumController.text =
-                                                  "$quanNum.$quanSmallNum";
-                                              quanNumAndTypeController.text =
-                                                  "$quanNum.$quanSmallNum $quanType";
-                                            });
-                                          },
-                                          children: numList,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        flex: 3,
-                                        child: CupertinoPicker(
-                                          itemExtent: 24.0,
-                                          onSelectedItemChanged: (value) {
-                                            setState(() {
-                                              quantityTypeController.text =
-                                                  quanTypes[value];
-                                              quanType = quanTypes[value];
-                                              quanNumAndTypeController.text =
-                                                  "$quanNum.$quanSmallNum $quanType";
-                                            });
-                                          },
-                                          children: quanTypeList,
-                                        ),
-                                      )
-                                    ],
-                                  ));
+                  QuantityColorBox(SIGNUP_BACKGROUND, "STORAGE DETAILS"),
+                  
+                  CategoryColorBox(SIGNUP_BACKGROUND, "CATEGORY"),
+                  
+                  BuyDateColorBox(SIGNUP_BACKGROUND, "BUY DATE"),
+                
+                  ExpiryDateColorBox(SIGNUP_BACKGROUND, "EXPIRES IN"),
+                ],
+                  ),
+                  ),
+          ),
+      ),
+                ],
+              );
+  }
+
+  Widget QuantityColorBox( Gradient gradient, String title ) {
+    List<Widget> quanTypeList =
+      List<Widget>.generate(6, (index) => Text(quanTypes[index]));
+
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 10.0,
+        right: 10,
+        bottom: 8,
+      ),
+      child: Container(
+        height: 80,
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black38,
+              blurRadius: 30,
+              offset: Offset(1.0, 9.0),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              width: 30,
+            ),
+            Expanded(
+              flex: 3,
+              child: Text(
+                title,
+                style: TextStyle(fontSize: TEXT_SMALL_SIZE, color: Colors.grey),
+              ),
+            ),
+            Expanded(
+              flex: 5,
+              child:        
+               TextField(   
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Quantity',
+                  ),
+                  enabled: isEditMode,
+                  controller: quanNumAndTypeController,
+                  style: const TextStyle(
+                    fontSize: TEXT_NORMAL_SIZE,
+                    color: Colors.black,
+                  ),
+                  onTap: () {
+                    FocusScope.of(context).requestFocus(FocusNode());
+                    showCupertinoModalPopup(
+                        context: context,
+                        builder: (context) {
+                          return Container(
+                              height: 200,
+                              color: Colors.white,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 2,
+                                    child: CupertinoPicker(
+                                      itemExtent: 24.0,
+                                      onSelectedItemChanged: (value) {
+                                        setState(() {
+                                          quanNum = nums[value];
+                                          quantityNumController.text =
+                                              "$quanNum.$quanSmallNum";
+                                          quanNumAndTypeController.text =
+                                              "$quanNum.$quanSmallNum $quanType";
+                                        });
+                                      },
+                                      children: numList,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: CupertinoPicker(
+                                      itemExtent: 24.0,
+                                      onSelectedItemChanged: (value) {
+                                        setState(() {
+                                          quanSmallNum = nums[value];
+                                          quantityNumController.text =
+                                              "$quanNum.$quanSmallNum";
+                                          quanNumAndTypeController.text =
+                                              "$quanNum.$quanSmallNum $quanType";
+                                        });
+                                      },
+                                      children: numList,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 3,
+                                    child: CupertinoPicker(
+                                      itemExtent: 24.0,
+                                      onSelectedItemChanged: (value) {
+                                        setState(() {
+                                          quantityTypeController.text =
+                                              quanTypes[value];
+                                          quanType = quanTypes[value];
+                                          quanNumAndTypeController.text =
+                                              "$quanNum.$quanSmallNum $quanType";
+                                        });
+                                      },
+                                      children: quanTypeList,
+                                    ),
+                                  )
+                                ],
+                              ));
                             });
                           },
                         ),
-                        ),
-                        ],
+            )
+            ,SizedBox(
+              width: 10,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget CategoryColorBox(
+      Gradient gradient, String title) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 10.0,
+        right: 10,
+        bottom: 8,
+      ),
+      child: Container(
+        height: 80,
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              width: 30,
+            ),
+            Expanded(
+              flex: 3,
+              child: Text(
+                title,
+                style: TextStyle(fontSize: TEXT_SMALL_SIZE, color: Colors.grey),
+              ),
+            ),
+            Expanded(
+              flex: 5,
+              child: Wrap(
+                children: <Widget>[
+                  TextField(
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Category',
                     ),
-                      ),
+                    enabled: isEditMode,
+                    controller: categoryController,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w400,
                     ),
+                    onTap: () {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      _showCategoryDialog();
+                    },
                   ),
-                  
-                  Expanded(
-                    child: Card(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[   
-                          const Text(
-                            'Category',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          SizedBox(height: 5),
-                        // subtitle: Text("Expired in $expire days", style: TextStyle(fontStyle: FontStyle.italic),),
-                        Container(
-                          width: 250,
-                          child: TextField(
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Category',
-                            ),
-                            enabled: isEditMode,
-                            controller: categoryController,
-                            style: const TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: 20,
-                            ),
-                            onTap: () {
-                              FocusScope.of(context).requestFocus(FocusNode());
-                              _showCategoryDialog();
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                    ),
-                    ),
-                  ),
-                 
-                  Expanded(
-                    child: Card(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[   
-                          const Text(
-                            'Bought in',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          SizedBox(height: 5),
-                        Container(
-                          width: 250,
-                          child: TextField(
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Purchase date',
-                            ),
-                            enabled: isEditMode,
-                            controller: buyTimeController,
-                            style: const TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: 24,
-                            ),
-                            onTap: () {
-                        FocusScope.of(context).requestFocus(FocusNode());
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 10,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget BuyDateColorBox( Gradient gradient, String title) {
+    DateTime selectedBuyDate = DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.buyDate);
+  
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 10.0,
+        right: 10,
+        bottom: 8,
+      ),
+      child: Container(
+        height: 80,
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              width: 30,
+            ),
+            Expanded(
+              flex: 3,
+              child: Text(
+                title,
+                style: TextStyle(fontSize: TEXT_SMALL_SIZE, color: Colors.grey),
+              ),
+            ),
+            Expanded(
+              flex: 5,
+              child: TextField(
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Purchase Date',
+                ),
+                enabled: isEditMode,
+                controller: buyTimeController,
+                style: const TextStyle(
+                  fontSize: TEXT_NORMAL_SIZE,
+                  color: Colors.black,
+                ),
+                onTap: () {
+                  FocusScope.of(context).requestFocus(FocusNode());
                         showCupertinoModalPopup(
                             context: context,
                             builder: (context) {
@@ -824,41 +928,63 @@ class _DetailsListState extends State<DetailsList> {
                                     ],
                                   ));
                             });
-                          },
-                          ),
-                          ),
+                },
+              ),
+            ),
+            SizedBox(
+              width: 10,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-                        ], 
-                    ),
-                    ),
-                  ),
-                  ),
-                  Expanded(
-                    child: Card(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[   
-                          const Text(
-                            'Expires in',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          SizedBox(height: 5),
-                        Container(
-                          width: 250,
-                          child: TextField(
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Expiration date',
-                            ),
-                            enabled: isEditMode,
-                            controller: expireTimeController,
-                            style: const TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: 24,
-                            ),
-                            onTap: () {
-                        FocusScope.of(context).requestFocus(FocusNode());
+  Widget ExpiryDateColorBox( Gradient gradient, String title) {
+    DateTime selectedExpiryDate= DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.expiryDate);
+
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 10.0,
+        right: 10,
+        bottom: 8,
+      ),
+      child: Container(
+        height: 80,
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              width: 30,
+            ),
+            Expanded(
+              flex: 3,
+              child: Text(
+                title,
+                style: TextStyle(fontSize: TEXT_SMALL_SIZE, color: Colors.grey),
+              ),
+            ),
+            Expanded(
+              flex: 5,
+              child: Wrap(
+                children: <Widget>[
+                TextField(
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Expiry Date',
+                ),
+                enabled: isEditMode,
+                controller: expireTimeController,
+                style: const TextStyle(
+                  fontSize: TEXT_NORMAL_SIZE,
+                  color: Colors.black,
+                ),
+                onTap: () {
+                    FocusScope.of(context).requestFocus(FocusNode());
                         showCupertinoModalPopup(
                             context: context,
                             builder: (context) {
@@ -888,7 +1014,7 @@ class _DetailsListState extends State<DetailsList> {
                                                     .millisecondsSinceEpoch;
 
                                                 currentExpiryDate = timestamp;
-                                                
+
                                                 expireTimeController.text =
                                                     "$year-$month-$day";
                                                 // Navigator.pop(context)
@@ -904,22 +1030,20 @@ class _DetailsListState extends State<DetailsList> {
                                     ],
                                   ));
                             });
-                          },
-                          ),
-                          ),
-
-                        ], 
-                    ),
-                    ),
-                  ),
-                  ),
+                }
+              ),
                 ],
               ),
             ),
-          )
-                          ),]
-              );
+            SizedBox(
+              width: 10,
+            ),
+          ],
+        ),
+      ),
+    );
   }
+
 }
 
 
