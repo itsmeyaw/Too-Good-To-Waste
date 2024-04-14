@@ -27,6 +27,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tooGoodToWaste/service/shared_items_service.dart';
 import 'package:tooGoodToWaste/widgets/category_picker.dart';
 import 'package:tooGoodToWaste/widgets/expandableFab.dart';
+import 'package:tooGoodToWaste/widgets/indicator.dart';
 import 'dart:io';
 import 'itemDetail.dart';
 import '../dto/user_item_detail_model.dart';
@@ -344,6 +345,7 @@ class _BottomTopScreenState extends State<Inventory>
 
   bool isExpanded = false; // State variable to control animation
   bool toClose = false;
+  int touchedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -355,6 +357,71 @@ class _BottomTopScreenState extends State<Inventory>
     }
 
     final _media = MediaQuery.of(context).size;
+
+    List<PieChartSectionData> showingSections() {
+    return List.generate(4, (i) {
+      final isTouched = i == touchedIndex;
+      final fontSize = isTouched ? 25.0 : 16.0;
+      final radius = isTouched ? 60.0 : 50.0;
+      const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
+      switch (i) {
+        case 0:
+          return PieChartSectionData(
+            color: Colors.red,
+            value: wastedPercentage,
+            title: 'Wasted',
+            radius: radius,
+            titleStyle: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+              shadows: shadows,
+            ),
+          );
+        case 1:
+          return PieChartSectionData(
+            color: Colors.blue,
+            value: goodPercentage,
+            title: 'Used',
+            radius: radius,
+            titleStyle: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+              shadows: shadows,
+            ),
+          );
+        case 2:
+          return PieChartSectionData(
+            color: Colors.green,
+            value: sharedPercentage,
+            title: 'Shared',
+            radius: radius,
+            titleStyle: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+              shadows: shadows,
+            ),
+          );
+        case 3:
+          return PieChartSectionData(
+            color: Colors.yellow,
+            value: expiringPercentage,
+            title: 'Expiring',
+            radius: radius,
+            titleStyle: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+              shadows: shadows,
+            ),
+          );
+        default:
+          throw Error();
+      }
+    });
+  }
     
     return Scaffold(
       appBar: AppBar(
@@ -418,6 +485,11 @@ class _BottomTopScreenState extends State<Inventory>
                         const SizedBox(
                           height: 10,
                         ),
+                    Row(
+                      children: <Widget>[
+                        const SizedBox(
+                          width: 15,
+                        ),
                         AnimatedContainer(
                           duration: Duration(seconds: 1),
                           curve: Curves.easeInOut,
@@ -435,27 +507,73 @@ class _BottomTopScreenState extends State<Inventory>
                                   child:
                                   PieChart(
                                     PieChartData(
-                                    sections: [
-                                      PieChartSectionData(
-                                          value: wastedPercentage,
-                                          title: 'Wasted',
-                                          color: Colors.red),
-                                      PieChartSectionData(
-                                          value: goodPercentage,
-                                          title: 'Used',
-                                          color: Colors.blue),
-                                      PieChartSectionData(
-                                          value: sharedPercentage,
-                                          title: 'Shared',
-                                          color: Colors.green),
-                                      PieChartSectionData(
-                                          value: expiringPercentage,
-                                          title: 'Almost Expired',
-                                          color: Colors.yellow)
-                                  ])),
-                                )),
-                              ],
+                                      pieTouchData: PieTouchData(
+                                        touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                                          setState(() {
+                                            if (!event.isInterestedForInteractions ||
+                                                pieTouchResponse == null ||
+                                                pieTouchResponse.touchedSection == null) {
+                                              touchedIndex = -1;
+                                              return;
+                                            }
+                                            touchedIndex = pieTouchResponse
+                                                .touchedSection!.touchedSectionIndex;
+                                          });
+                                        },
+                                      ),
+                                      borderData: FlBorderData(
+                                        show: false,
+                                      ),
+                                      sectionsSpace: 0,
+                                      centerSpaceRadius: 40,
+                                      sections: showingSections(),
+                                    ),
+                                  ),
+                                 ) ),
+                            ],
                             )),
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        const Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Indicator(
+                color: Colors.red,
+                text: 'Wasted Pantries',
+                isSquare: true,
+              ),
+              SizedBox(
+                height: 4,
+              ),
+              Indicator(
+                color: Colors.blue,
+                text: 'Used Pantries',
+                isSquare: true,
+              ),
+              SizedBox(
+                height: 4,
+              ),
+              Indicator(
+                color: Colors.green,
+                text: 'Shared Pantries',
+                isSquare: true,
+              ),
+              SizedBox(
+                height: 4,
+              ),
+              Indicator(
+                color: Colors.yellow,
+                text: 'Almost Expired Foods',
+                isSquare: true,
+              ),
+              SizedBox(
+                height: 18,
+              ),
+            ],
+          ),
+                      ],),
                         const SizedBox(
                           height: 20,
                         ),
@@ -1382,7 +1500,8 @@ class _LineChart extends StatelessWidget {
   LineTouchData get lineTouchData1 => LineTouchData(
         handleBuiltInTouches: true,
         touchTooltipData: LineTouchTooltipData(
-          tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+
+          //tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
         ),
       );
 
