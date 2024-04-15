@@ -592,17 +592,28 @@ class _BottomTopScreenState extends State<Inventory>
                         const SizedBox(
                           height: 20,
                         ),
-                        IconButton(
-                                  icon: Icon(
-                                    Icons.refresh,
-                                    color: Colors.white.withOpacity(isShowingMainData ? 1.0 : 0.5),
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      isShowingMainData = !isShowingMainData;
-                                    });
-                                  },
-                                  ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.refresh,
+                                color: Colors.black.withOpacity(isShowingMainData ? 1.0 : 0.5),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  isShowingMainData = !isShowingMainData;
+                                });
+                              },
+                            ),
+                            Text(
+                              'Show Food Saving Trend',
+                              style: TextStyle(
+                                color: Colors.black.withOpacity(isShowingMainData ? 1.0 : 0.5),
+                              ),
+                            ),
+                            ]
+                        ),
                         SizedBox(
                             height: 200,
                             child: Row(
