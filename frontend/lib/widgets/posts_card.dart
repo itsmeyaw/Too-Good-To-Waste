@@ -22,7 +22,7 @@ Widget foodItem(SharedItem postData, remainDays, {onTapped, onLike}) {
     width: 170,
     height: 170,
     // color: Colors.red,
-    margin: EdgeInsets.only(left: 10),
+    margin: EdgeInsets.only(left: 5, right: 5, bottom: 5),
     child: Stack(
       children: <Widget>[
         SizedBox(
@@ -30,9 +30,10 @@ Widget foodItem(SharedItem postData, remainDays, {onTapped, onLike}) {
             height: 170,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: remainDays > 1
-                  ? Colors.white
-                  : const Color.fromRGBO(238, 162, 164, 0.8), // Button color
+                backgroundColor: Colors.white,
+                // remainDays > 1
+                //   ? Colors.white
+                //   : const Color.fromRGBO(238, 162, 164, 0.8), // Button color
                 elevation: 20,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5),
@@ -46,7 +47,7 @@ Widget foodItem(SharedItem postData, remainDays, {onTapped, onLike}) {
                  postData.imageUrl != null ? 
                   Container(
                         height: 100,
-                        padding: const EdgeInsets.all(0.0),
+                        padding: const EdgeInsets.all(5.0),
                         child: FutureBuilder(
                           future: storageService
                               .getImageUrlOfSharedItem(
@@ -60,7 +61,7 @@ Widget foodItem(SharedItem postData, remainDays, {onTapped, onLike}) {
                               return Image.network(
                                 imageUrlSnapshot.requireData,
                                 height: 100,
-                                width: 100,
+                                width: 120,
                               );
                             } else {
                               return const CircularProgressIndicator();
@@ -73,36 +74,36 @@ Widget foodItem(SharedItem postData, remainDays, {onTapped, onLike}) {
             )
         ),
         Positioned(
-            bottom: 10,
-            right: 0,
+            bottom: 0,
+            right: -10,
             child: TextButton(
               style: TextButton.styleFrom(
-                padding: EdgeInsets.all(20),
+                padding: EdgeInsets.all(5),
                 shape: CircleBorder(),
               ),
               onPressed: onLike,
               child: Icon(
                 (postData.isAvailable) ? Icons.favorite : Icons.favorite_border,
                 color: (postData.isAvailable) ? Colors.black : Colors.grey,
-                size: 25,
+                size: 20,
               ),
             )),
         Positioned(
-          bottom: 20,
+          bottom: 5,
           left: 5,
           child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text( postData.name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text( postData.name, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                     Text( 'Amount: ${postData.amount.nominal} ${postData.amount.unit}',
-                            style: const TextStyle(fontSize: 12)),
+                            style: const TextStyle(fontSize: 10)),
                   ],
                 )
         ),
         Positioned(
-            top: 10,
-            left: 10,
+            top: 5,
+            left: 5,
             child: Container(
                     padding:
                         EdgeInsets.only(top: 5, left: 10, right: 10, bottom: 5),
@@ -112,7 +113,7 @@ Widget foodItem(SharedItem postData, remainDays, {onTapped, onLike}) {
                     child: 
                        Text('${postData.distance.toStringAsFixed(2)} m',
                         style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.w700)),
+                            color: Colors.white, fontWeight: FontWeight.w600)),
                       
                   )
               ),

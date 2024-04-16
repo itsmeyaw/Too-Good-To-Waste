@@ -631,7 +631,7 @@ class _DetailsListState extends State<DetailsList> {
           ),
         ),
         SizedBox(
-          height: 40,
+          height: 20,
         ),
       Container(
         padding: EdgeInsets.only(top: 20, bottom: 40),

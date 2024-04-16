@@ -487,7 +487,7 @@ class _BottomTopScreenState extends State<Inventory>
                         ),
                         Text(
                           'Your Statistic',
-                          style: Theme.of(context).textTheme.headlineMedium,
+                          style: Theme.of(context).textTheme.headlineSmall,
                         ),
                         const SizedBox(
                           height: 5,
@@ -552,7 +552,7 @@ class _BottomTopScreenState extends State<Inventory>
             children: <Widget>[
               Indicator(
                 color: Colors.red,
-                text: 'Wasted Pantries',
+                text: 'Wasted',
                 isSquare: true,
               ),
               SizedBox(
@@ -560,7 +560,7 @@ class _BottomTopScreenState extends State<Inventory>
               ),
               Indicator(
                 color: Colors.blue,
-                text: 'Used Pantries',
+                text: 'Used',
                 isSquare: true,
               ),
               SizedBox(
@@ -568,7 +568,7 @@ class _BottomTopScreenState extends State<Inventory>
               ),
               Indicator(
                 color: Colors.green,
-                text: 'Shared Pantries',
+                text: 'Shared',
                 isSquare: true,
               ),
               SizedBox(
@@ -576,7 +576,7 @@ class _BottomTopScreenState extends State<Inventory>
               ),
               Indicator(
                 color: Colors.yellow,
-                text: 'Almost Expired Foods',
+                text: 'Expiring',
                 isSquare: true,
               ),
               SizedBox(
@@ -586,7 +586,7 @@ class _BottomTopScreenState extends State<Inventory>
           ),
                       ],),
                         const SizedBox(
-                          height: 20,
+                          height: 50,
                         ),
                         const Text('Period: April 2024 - May 2024'),
                         const SizedBox(

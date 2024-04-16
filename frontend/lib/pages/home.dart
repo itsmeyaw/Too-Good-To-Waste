@@ -107,7 +107,7 @@ class _HomeState extends State<Home> {
               loader: (BuildContext context) => FractionallySizedBox(
                     widthFactor: 1.0,
                     child: SizedBox(
-                      height: 200,
+                      height: 180,
                       child: Container(
                         color: Theme.of(context).colorScheme.secondaryContainer,
                         child: const Center(
@@ -146,7 +146,7 @@ class _HomeState extends State<Home> {
                           return FractionallySizedBox(
                             widthFactor: 1.0,
                             child: SizedBox(
-                                height: 200,
+                                height: 180,
                                 child: GoogleMap(
                                   initialCameraPosition: CameraPosition(
                                     target: LatLng(userLocation.latitude,
@@ -160,7 +160,7 @@ class _HomeState extends State<Home> {
                           return FractionallySizedBox(
                             widthFactor: 1.0,
                             child: SizedBox(
-                              height: 200,
+                              height: 180,
                               child: Container(
                                 color: Theme.of(context)
                                     .colorScheme
@@ -206,17 +206,17 @@ class _HomeState extends State<Home> {
             ),
           ),
           const SizedBox(
-            height: 20,
+            height: 10,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                'Results',
-                style: Theme.of(context).textTheme.headlineMedium,
-              )
-            ],
-          ),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.start,
+          //   children: [
+          //     Text(
+          //       'Results',
+          //       style: Theme.of(context).textTheme.headlineMedium,
+          //     )
+          //   ],
+          // ),
           UserLocationAwareWidget(
               builder: (BuildContext context, GeoPoint userLocation) =>
                   StreamBuilder(
