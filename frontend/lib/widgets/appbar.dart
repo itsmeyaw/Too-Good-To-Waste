@@ -23,13 +23,10 @@ class SignupApbar extends StatelessWidget implements PreferredSizeWidget {
           alignment: Alignment(-0.5, 4),
           child: SignUpArrowButton(
             onTap: () => Navigator.maybePop(context),
-            icon: const IconData(
-              arrow_left,
-              fontFamily: "Icons",
-            ),
-            iconSize: 9,
+            icon: Icons.arrow_back,
+            iconSize: 20,
             height: 48,
-            width: 48,
+            width: 50,
           ),
         ),
         centerMiddle: true,

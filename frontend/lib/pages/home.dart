@@ -9,6 +9,7 @@ import 'package:tooGoodToWaste/dto/shared_item_model.dart';
 import 'package:tooGoodToWaste/util/geo_utils.dart';
 import 'package:tooGoodToWaste/widgets/allergies_picker.dart';
 import 'package:tooGoodToWaste/widgets/category_picker.dart';
+import 'package:tooGoodToWaste/widgets/posts_card.dart';
 import 'package:tooGoodToWaste/widgets/user_location_aware_widget.dart';
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import '../Pages/post_page.dart';
@@ -250,7 +251,13 @@ class _HomeState extends State<Home> {
                           }
 
                           return Expanded(
-                              child: ListView.separated(
+                          child: 
+                          GridView.builder(
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 4.0,
+                              mainAxisSpacing: 4.0,
+                            ),
                             itemCount: sharedItems.length,
                             itemBuilder: (_, index) {
                               if (sharedItems[index] != null) {
@@ -260,10 +267,8 @@ class _HomeState extends State<Home> {
                               }
                               return null;
                             },
-                            separatorBuilder: (_, index) {
-                              return const Divider();
-                            },
                           ));
+                        
                         } else if (sharedItemSnapshot.connectionState ==
                             ConnectionState.active) {
                           return const Center(
@@ -346,67 +351,12 @@ class Post extends StatelessWidget {
       categoryIconImagePath = GlobalCateIconMap[postData.category.name];
     }
 
-
-    return 
-      Card(
-        // child: Image.network(postData.imageUrl!, fit: BoxFit.cover),
-        elevation: 3,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        margin: const EdgeInsets.all(10),
-        color: remainDays > 1
-          ? Colors.white
-          : const Color.fromRGBO(238, 162, 164, 0.8),
-        child: ListTile(
-          contentPadding:
-            const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-          leading: Container(
-            padding: const EdgeInsets.only(right: 12.0),
-            decoration: const BoxDecoration(
-                border: Border(right: BorderSide(width: 1.0))),
-            child: Image(
-              image: AssetImage("$categoryIconImagePath"),
-              width: 32,
-              height: 32,
-            ),
-          ),
-          title: Text(
-            postData.name,
-            style: const TextStyle(fontSize: 18),
-          ),
-          subtitle: Row(
-            children: <Widget>[
-              // Expanded(
-              //   flex: 4,
-              //   child: Padding(
-              //       padding: const EdgeInsets.only(left: 10.0),
-              //       child: Text("From ${postData.user}",
-              //           style: TextStyle(
-              //               color: Colors.black))),
-              // ),
-              Expanded(
-                flex: 4,
-                child: Padding(
-                    padding: const EdgeInsets.only(left: 10.0),
-                    child: Text('Distance: ${postData.distance.toStringAsFixed(2)} m',
-                        style: TextStyle(color: Colors.black))),
-              )
-            ],
-          ),
-          // subtitle: Text("Expired in $expire days", style: TextStyle(fontStyle: FontStyle.italic),),
-          trailing: Text("${postData.amount.nominal } ${postData.amount.unit}",
-              style: const TextStyle(
-                fontFamily: 'Roboto',
-                fontSize: 18,
-              )),
-          onTap: () {
-             Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => PostPage(postData: postData)));
-          },
-        ),
-      );      
-  }
+    return foodItem(postData, remainDays, onTapped: () {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => PostPage(postData: postData)));
+    },
+      );     
+   }
 }

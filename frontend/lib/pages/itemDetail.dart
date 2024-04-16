@@ -603,7 +603,7 @@ class _DetailsListState extends State<DetailsList> {
         SignUpArrowButton(
             height: 70,
             width: 70,
-            icon: isEditMode ? IconData(Icons.done.codePoint) : IconData(Icons.edit.codePoint),
+            icon: isEditMode ? Icons.done : Icons.edit,
             iconSize: 30, 
             onTap: () { 
               setState(() {
