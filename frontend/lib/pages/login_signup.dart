@@ -11,6 +11,8 @@ import 'package:tooGoodToWaste/const/gradient_const.dart';
 import 'package:tooGoodToWaste/const/styles.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart';
 import 'package:tooGoodToWaste/dto/user_name_model.dart';
+import 'package:tooGoodToWaste/widgets/appbar.dart';
+import 'package:tooGoodToWaste/widgets/signup_arrow_button.dart';
 import 'package:tooGoodToWaste/widgets/verifiable_text_field.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 
@@ -213,7 +215,7 @@ class _LoginPageState extends State<LoginPage> {
       style: hintAndValueStyle,
       decoration: InputDecoration(
           suffixIcon: Icon(Icons.email_rounded,
-              color: Color(0xff35AA90), size: 10.0),
+              color: Color(0xff35AA90), size: 20.0),
           contentPadding: EdgeInsets.fromLTRB(40.0, 30.0, 10.0, 10.0),
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.0),
@@ -450,6 +452,23 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
         aOptions: _getAndroidOptions());
   }
 
+  int widgetIndex = 0;
+  late PageController _pageController;
+  bool _isSelected = false;
+
+  _selectType(bool isSelected) {
+    setState(() {
+      _isSelected = isSelected;
+    });
+  }
+
+   @override
+  void initState() {
+    _pageController = PageController();
+
+    super.initState();
+  }
+
   @override
   void dispose() {
     _firstNameController.dispose();
@@ -464,162 +483,594 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
     _countryController.dispose();
     super.dispose();
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: ListView(
-        children: [
-          const SizedBox(
-            height: 30,
-          ),
-          Text(
-            'Sign Up',
-            style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                fontWeight: FontWeight.w900,
-                color: Theme.of(context).primaryColor),
-          ),
-          const Text('Ready to be a food warrior?'),
-          const SizedBox(
-            height: 30,
-          ),
-          Text(
-            'Personal Information',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w900,
-                color: Theme.of(context).primaryColor),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          VerifiableTextField(
-            onChanged: (input) {
-              _putIntoStorage(_FIRST_NAME_KEY, input);
-            },
-            labelText: 'First Name',
-            controller: _firstNameController,
-            validator: _requiredValidator,
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          VerifiableTextField(
-            onChanged: (input) {
+  Widget emailTextFieldWidget() {
+    return
+    TextField(
+      onChanged: (input) {
               _putIntoStorage(_LAST_NAME_KEY, input);
             },
-            labelText: 'Last Name',
-            controller: _lastNameController,
-            validator: _requiredValidator,
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          VerifiableTextField(
-            onChanged: (input) {
-              _putIntoStorage(_LAST_NAME_KEY, input);
-            },
-            labelText: 'E-mail Address',
-            controller: _emailController,
-            validator: _emailValidator,
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          VerifiableTextField(
-            onChanged: (input) {
-              _putIntoStorage(_PHONE_NUM_KEY, input);
-            },
-            labelText: 'Phone Number',
-            validator: _phoneValidator,
-            controller: _phoneController,
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          VerifiableTextField(
-            onChanged: (input) {
+      controller: _emailController,
+      decoration: new InputDecoration(
+        suffixIcon: Padding(
+          padding: const EdgeInsets.only(right: 30.0),
+          child: Icon(Icons.email_rounded,
+              color: Color(0xff35AA90), size: 20.0),
+        ),
+        hintText: 'Email',
+        labelStyle: TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 14,
+        ),
+        hintStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+        border: InputBorder.none,
+      ),
+    );
+  }
+  Widget passwordTextFieldWidget() {
+    return TextField(
+      onChanged: (input) {
               _putIntoStorage(_PASSWORD_KEY, input);
             },
-            canBeHidden: true,
-            labelText: 'Password',
-            validator: _passwordValidator,
-            controller: _passwordController,
-          ),
-          const SizedBox(
-            height: 30,
-          ),
-          Text(
-            'Address',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w900,
-                color: Theme.of(context).primaryColor),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          VerifiableTextField(
-            onChanged: (input) {
+      controller: _passwordController,
+      decoration: new InputDecoration(
+        hintText: 'Password',
+        labelStyle: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 14,
+        ),
+        hintStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+        border: InputBorder.none,
+      ),
+      obscureText: true,
+    );
+  }
+
+  Widget firstNameTextFieldWidget() {
+    return
+    TextField(
+      onChanged: (input) {
+              _putIntoStorage(_FIRST_NAME_KEY, input);
+            },
+      controller: _firstNameController,
+      decoration: new InputDecoration(
+        hintText: 'First Name',
+        labelStyle: TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 14,
+        ),
+        hintStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+        border: InputBorder.none,
+      ),
+    );
+  }
+  Widget lastNameTextFieldWidget() {
+    return
+    TextField(
+      onChanged: (input) {
+              _putIntoStorage(_LAST_NAME_KEY, input);
+            },
+      controller: _lastNameController,
+      decoration: new InputDecoration(
+        
+        hintText: 'Last Name',
+        labelStyle: TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 14,
+        ),
+        hintStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+        border: InputBorder.none,
+      ),
+    );
+  }
+  Widget phoneNumTextFieldWidget() {
+    return
+    TextField(
+      onChanged: (input) {
+              _putIntoStorage(_PHONE_NUM_KEY, input);
+            },
+      controller: _phoneController,
+      decoration: InputDecoration(
+       
+        suffixIcon: Padding(
+          padding: const EdgeInsets.only(right: 30.0),
+          child: Icon(Icons.phone_rounded,
+              color: Color(0xff35AA90), size: 20.0),
+        ),
+        hintText: 'Phone Number',
+        labelStyle: TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 14,
+        ),
+        hintStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+        border: InputBorder.none,
+      ),
+    );
+  }
+  
+  Widget add1TextFieldWidget() {
+    return
+    TextField(
+      onChanged: (input) {
               _putIntoStorage(_ADDRESS_LINE_1_KEY, input);
               setState(() {
                 _addressLine1Controller.text = input;
               });
             },
-            labelText: 'Address Line 1',
-            validator: _requiredValidator,
-            controller: _addressLine1Controller,
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          VerifiableTextField(
-            onChanged: (input) {
+      controller: _addressLine1Controller,
+      decoration: new InputDecoration(
+        suffixIcon: Padding(
+          padding: const EdgeInsets.only(right: 30.0),
+          child: Icon(Icons.streetview_rounded,
+              color: Color(0xff35AA90), size: 20.0),
+        ),
+        hintText: 'Address Line 1',
+        labelStyle: TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 14,
+        ),
+        hintStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+        border: InputBorder.none,
+      ),
+    );
+  }
+  Widget add2TextFieldWidget() {
+    return TextField(
+      onChanged: (input) {
               _putIntoStorage(_ADDRESS_LINE_2_KEY, input);
             },
-            labelText: 'Address Line 2',
-            controller: _addressLine2Controller,
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          VerifiableTextField(
-            onChanged: (input) {
+      controller: _addressLine2Controller,
+      decoration: new InputDecoration(
+        suffixIcon: Padding(
+          padding: const EdgeInsets.only(right: 30.0),
+          child: Icon(Icons.house_rounded,
+              color: Color(0xff35AA90), size: 20.0),
+        ),
+        hintText: 'Address Line 2',
+        labelStyle: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 14,
+        ),
+        hintStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+        border: InputBorder.none,
+      ),
+      obscureText: true,
+    );
+  }
+
+  Widget zipTextFieldWidget() {
+    return
+    TextField(
+      onChanged: (input) {
               _putIntoStorage(_ZIP_CODE_KEY, input);
             },
-            labelText: 'Zip Code',
-            controller: _zipCodeController,
-            validator: _requiredValidator,
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          VerifiableTextField(
-            onChanged: (input) {
+            
+      controller: _zipCodeController,
+      decoration: new InputDecoration(
+        hintText: 'Zip Code',
+        labelStyle: TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 14,
+        ),
+        hintStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+        border: InputBorder.none,
+      ),
+    );
+  }
+  Widget cityTextFieldWidget() {
+    return
+    TextField(
+      onChanged: (input) {
               _putIntoStorage(_CITY_KEY, input);
             },
-            labelText: 'City',
-            controller: _cityController,
-            validator: _requiredValidator,
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          VerifiableTextField(
-            onChanged: (input) {
+            
+      controller: _cityController,
+      decoration: new InputDecoration(
+        
+        hintText: 'City',
+        labelStyle: TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 14,
+        ),
+        hintStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+        border: InputBorder.none,
+      ),
+    );
+  }
+  Widget countryTextFieldWidget() {
+    return
+    TextField(
+      onChanged: (input) {
               _putIntoStorage(_COUNTRY_KEY, input);
             },
-            labelText: 'Country',
-            controller: _countryController,
-            validator: _requiredValidator,
+            
+      controller: _countryController,
+      decoration: new InputDecoration(
+        suffixIcon: Padding(
+          padding: const EdgeInsets.only(right: 30.0),
+          child: Icon(Icons.phone_rounded,
+              color: Color(0xff35AA90), size: 10.0),
+        ),
+        hintText: 'Country',
+        labelStyle: TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 14,
+        ),
+        hintStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+        border: InputBorder.none,
+      ),
+    );
+  }
+  
+  Column PersonalColumn() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        SizedBox(
+          height: 10,
+        ),
+        Text(
+          "Personal",
+          style: TextStyle(
+            fontSize: 35,
+            fontWeight: FontWeight.w400,
+            wordSpacing: 2,
+            letterSpacing: 2,
           ),
-          const SizedBox(
-            height: 20,
+        ),
+        Text(
+          "Information",
+          style: TextStyle(
+            fontSize: 35,
+            fontWeight: FontWeight.w400,
+            wordSpacing: 2,
+            letterSpacing: 2,
           ),
-          Row(children: [
-            IntrinsicWidth(
-                child: FilledButton(
-              onPressed: () {
-                logger.d('Pressed sign up button');
+        ),
+        firstNameTextFieldWidget(),
+        SizedBox(
+          height: 1.5,
+          child: Container(
+            color: Colors.black,
+          ),
+        ),
+        lastNameTextFieldWidget(),
+        SizedBox(
+          height: 1.5,
+          child: Container(
+            color: Colors.black,
+          ),
+        ),
+        emailTextFieldWidget(),
+        SizedBox(
+          height: 1.5,
+          child: Container(
+            color: Colors.black,
+          ),
+        ),
+        phoneNumTextFieldWidget(),
+        SizedBox(
+          height: 1.5,
+          child: Container(
+            color: Colors.black,
+          ),
+        ),
+        passwordTextFieldWidget(),
+        SizedBox(
+          height: 1.5,
+          child: Container(
+            color: Colors.black,
+          ),
+        ),
+        SizedBox(
+          height: 5,
+        )
+      ],
+    );
+  }
+
+  Column AddressColumn() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        SizedBox(
+          height: 10,
+        ),
+        Text(
+          "Address",
+          style: TextStyle(
+            fontSize: 35,
+            fontWeight: FontWeight.w400,
+            wordSpacing: 2,
+            letterSpacing: 2,
+          ),
+        ),
+        Text(
+          "Fillin",
+          style: TextStyle(
+            fontSize: 35,
+            fontWeight: FontWeight.w400,
+            wordSpacing: 2,
+            letterSpacing: 2,
+          ),
+        ),
+        Expanded(child: Container()),
+        add1TextFieldWidget(),
+        SizedBox(
+          height: 1.5,
+          child: Container(
+            color: Colors.black,
+          ),
+        ),
+        add2TextFieldWidget(),
+        SizedBox(
+          height: 1.5,
+          child: Container(
+            color: Colors.black,
+          ),
+        ),
+        zipTextFieldWidget(),
+        SizedBox(
+          height: 1.5,
+          child: Container(
+            color: Colors.black,
+          ),
+        ),
+        cityTextFieldWidget(),
+        SizedBox(
+          height: 1.5,
+          child: Container(
+            color: Colors.black,
+          ),
+        ),
+        countryTextFieldWidget(),
+        SizedBox(
+          height: 1.5,
+          child: Container(
+            color: Colors.black,
+          ),
+        ),
+        // Text(
+        //   "NEXT",
+        //   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+        // ),
+        SizedBox(
+          height: 5,
+        )
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> widgets = [
+      PersonalColumn(),
+      AddressColumn(),
+    ];
+
+    return Scaffold(
+    appBar: SignupApbar(
+        title: "SIGNUP",
+      ),
+    body: Stack(
+        children: <Widget>[
+          Container(
+            height: double.infinity,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: SIGNUP_BACKGROUND,
+            ),
+          ),
+          SingleChildScrollView(
+            child: Container(
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(
+                            top: 80,
+                            left: 70,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: <Widget>[
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  InkWell(
+                                    onTap: () {
+                                      _selectType(false);
+                                      _pageController.previousPage(
+                                        duration: Duration(milliseconds: 300),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    },
+                                    child: Opacity(
+                                      opacity: _isSelected ? 0.5 : 1,
+                                      child: Text(
+                                        "Pers.",
+                                        style: TextStyle(
+                                          fontSize: 28,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 1.5,
+                                          wordSpacing: 1.5,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      _pageController.nextPage(
+                                        duration: Duration(milliseconds: 300),
+                                        curve: Curves.easeOut,
+                                      );
+                                      _selectType(true);
+                                    },
+                                    child: Opacity(
+                                      opacity: _isSelected ? 1 : 0.5,
+                                      child: Text(
+                                        "Address",
+                                        style: TextStyle(
+                                          fontSize: 28,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 1.5,
+                                          wordSpacing: 1.5,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 25,
+                              ),
+                              Column(
+                                children: <Widget>[
+                                  Container(
+                                    height:
+                                        MediaQuery.of(context).size.height / 1.8,
+                                    width: double.infinity,
+                                    child: Stack(
+                                      children: <Widget>[
+                                        Container(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height /
+                                                1.8,
+                                            width: double.infinity,
+                                            padding: EdgeInsets.all(25),
+                                            decoration: BoxDecoration(
+                                              gradient: SIGNUP_CARD_BACKGROUND,
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(
+                                                  15,
+                                                ),
+                                                bottomLeft: Radius.circular(
+                                                  15,
+                                                ),
+                                              ),
+                                            ),
+                                            child: PageView.builder(
+                                              controller: _pageController,
+                                              itemBuilder: (context, index) {
+                                                return widgets[index];
+                                              },
+                                              physics: BouncingScrollPhysics(),
+                                              itemCount: widgets.length,
+                                              scrollDirection: Axis.horizontal,
+                                            )),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 20,
+                                    margin: EdgeInsets.only(
+                                      left: 15,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(15),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color:
+                                              Colors.white70.withOpacity(0.3),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 20,
+                                    margin: EdgeInsets.only(
+                                      left: 30,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(15),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color:
+                                              Colors.white70.withOpacity(0.2),
+                                          blurRadius: 2,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 20,
+                                    margin: EdgeInsets.only(
+                                      left: 45,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(15),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color:
+                                              Colors.white54.withOpacity(0.2),
+                                          blurRadius: 8,
+                                          offset: Offset(0, 3),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 35,
+                    left: 97,
+                    child: SignUpArrowButton(
+                      icon: Icons.arrow_forward,
+                      iconSize: 20,
+                      onTap: () {
+                        logger.d('Pressed sign up button');
                 setState(() {
                   if (!_formKey.currentState!.validate()) {
                     return;
@@ -671,19 +1122,13 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
                     ));
                   });
                 });
-              },
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text('Sign Up'),
-                  SizedBox(
-                    width: 10,
+                      },
+                    ),
                   ),
-                  Icon(Icons.arrow_right_alt)
                 ],
               ),
-            ))
-          ])
+            ),
+          ),
         ],
       ),
     );
