@@ -7,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:tooGoodToWaste/const/gradient_const.dart';
+import 'package:tooGoodToWaste/const/styles.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart';
 import 'package:tooGoodToWaste/dto/user_name_model.dart';
 import 'package:tooGoodToWaste/widgets/verifiable_text_field.dart';
@@ -75,11 +77,13 @@ class _LoginSignUpState extends State<LoginSignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return 
+    
+    Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
           child: Container(
-              margin: const EdgeInsets.fromLTRB(50, 0, 50, 0),
+              margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
               child: Column(
                 children: [
                   Expanded(
@@ -134,75 +138,130 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-        key: _formKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Login',
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: Theme.of(context).primaryColor),
-            ),
-            const Text('Welcome back, food warrior!'),
-            const SizedBox(
-              height: 30,
-            ),
-            TextFormField(
-              onChanged: (input) {
-                setState(() {
-                  _emailErrorMessage = _emailValidator(input);
-                });
-              },
-              controller: _emailController,
-              validator: _emailValidator,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                labelText: 'E-Mail Address',
-                errorText: _emailErrorMessage,
+  Widget headlinesWidget() {
+    return Container(
+      margin: EdgeInsets.only(left: 48.0, top: 32.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'WELCOME BACK,',
+            textAlign: TextAlign.left,
+            style: TextStyle(
+                letterSpacing: 3,
+                fontSize: 20.0,
+                fontFamily: 'Montserrat',
+                fontWeight: FontWeight.bold),
+          ),
+          Text(
+            'FOOD WARRIOR!',
+            textAlign: TextAlign.left,
+            style: TextStyle(
+                letterSpacing: 3,
+                fontSize: 20.0,
+                fontFamily: 'Montserrat',
+                fontWeight: FontWeight.bold),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 48.0),
+            child: Text(
+              'Log in \nto continue.',
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                letterSpacing: 3,
+                fontSize: 32.0,
+                fontFamily: 'Montserrat',
               ),
             ),
-            const SizedBox(
-              height: 20,
-            ),
-            TextFormField(
-              onChanged: (input) {
-                setState(() {
-                  _passwordErrorMessage = _passwordValidator(input);
-                });
-              },
-              controller: _passwordController,
-              obscureText: _isPasswordObscured,
-              validator: _passwordValidator,
-              decoration: InputDecoration(
-                  border: const OutlineInputBorder(),
-                  labelText: 'Password',
-                  errorText: _passwordErrorMessage,
-                  suffixIcon: IconButton(
-                    icon: _isPasswordObscured
-                        ? const Icon(Icons.visibility)
-                        : const Icon(Icons.visibility_off),
-                    onPressed: () {
-                      setState(() {
-                        _isPasswordObscured = !_isPasswordObscured;
-                      });
-                    },
-                  )),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            IntrinsicWidth(
-                child: FilledButton(
-              onPressed: () {
-                if (!_formKey.currentState!.validate()) {
-                  return;
-                }
+          )
+        ],
+      ),
+    );
+  }
 
+  Widget emailTextFieldWidget() {
+  return Container(
+    margin: EdgeInsets.only(left: 16.0, right: 32.0, top: 32.0),
+    decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black12,
+              blurRadius: 15,
+              spreadRadius: 0,
+              offset: Offset(0.0, 16.0)),
+        ],
+        borderRadius: BorderRadius.circular(12.0),
+        gradient: LinearGradient(
+            begin: FractionalOffset(0.0, 0.4),
+            end: FractionalOffset(0.9, 0.7),
+            // Add one stop for each color. Stops should increase from 0 to 1
+            stops: [
+              0.2,
+              0.9
+            ],
+            colors: [
+              Color(0xffFFC3A0),
+              Color(0xffFFAFBD),
+            ])),
+    child: TextField(
+      controller: _emailController,
+      onChanged: (input) {
+        setState(() {
+          _emailErrorMessage = _emailValidator(input);
+        });
+      },
+      style: hintAndValueStyle,
+      decoration: InputDecoration(
+          suffixIcon: Icon(Icons.email_rounded,
+              color: Color(0xff35AA90), size: 10.0),
+          contentPadding: EdgeInsets.fromLTRB(40.0, 30.0, 10.0, 10.0),
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              borderSide: BorderSide.none),
+          hintText: 'Email',
+          errorText: _emailErrorMessage,
+          hintStyle: hintAndValueStyle),
+    ),
+  );
+}
+
+  Widget passwordTextFieldWidget() {
+  return Container(
+    margin: EdgeInsets.only(left: 32.0, right: 16.0),
+    child: TextField(
+      style: hintAndValueStyle,
+      onChanged: (input) {
+        setState(() {
+          _passwordErrorMessage = _passwordValidator(input);
+        });
+      },
+      controller: _passwordController,
+      obscureText: _isPasswordObscured,
+      decoration:  InputDecoration(
+          fillColor: Color(0x3305756D),
+          filled: true,
+          contentPadding: EdgeInsets.fromLTRB(40.0, 30.0, 10.0, 10.0),
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              borderSide: BorderSide.none),
+          hintText: 'Password',
+          errorText: _passwordErrorMessage,
+          hintStyle: hintAndValueStyle),
+          
+    ),
+  );
+}
+
+  Widget loginButtonWidget() {
+  return Container(
+    margin: EdgeInsets.only(left: 32.0, top: 32.0),
+    child: Row(
+      children: <Widget>[
+        InkWell(
+          onTap: () {
+            // if (!_formKey.currentState!.validate()) {
+            //       return;
+            //     }
                 FirebaseAuth.instance
                     .signInWithEmailAndPassword(
                         email: _emailController.value.text,
@@ -226,19 +285,66 @@ class _LoginPageState extends State<LoginPage> {
                         Theme.of(context).colorScheme.inversePrimary,
                   ));
                 });
-              },
-              child: const Row(
-                children: [
-                  Text('Log In'),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Icon(Icons.arrow_right_alt)
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 36.0, vertical: 16.0),
+            decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 15,
+                      spreadRadius: 0,
+                      offset: Offset(0.0, 32.0)),
                 ],
+                borderRadius: new BorderRadius.circular(36.0),
+                gradient: LinearGradient(begin: FractionalOffset.centerLeft,
+// Add one stop for each color. Stops should increase from 0 to 1
+                    stops: [
+                      0.2,
+                      1
+                    ], colors: [
+                  Color(0xff000000),
+                  Color(0xff434343),
+                ])),
+            child: Text(
+              'LOGIN',
+              style: TextStyle(
+                  color: Color(0xffF1EA94),
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Montserrat'),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        padding: EdgeInsets.only(top: 64.0),
+        decoration: BoxDecoration(gradient: SIGNUP_BACKGROUND),
+        child: ListView(
+          physics: BouncingScrollPhysics(),
+          children: <Widget>[
+            Center(
+              child: Image.asset(
+                'assets/images/logo_signup.png',
+                width: 100.0,
+                height: 100.0,
+                fit: BoxFit.cover,
               ),
-            ))
+            ),
+            headlinesWidget(),
+            emailTextFieldWidget(),
+            passwordTextFieldWidget(),
+            loginButtonWidget(),
           ],
-        ));
+        ),
+      ),
+    );
   }
 }
 
