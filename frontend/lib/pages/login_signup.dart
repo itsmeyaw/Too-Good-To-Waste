@@ -165,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                 fontWeight: FontWeight.bold),
           ),
           Container(
-            margin: EdgeInsets.only(top: 48.0),
+            margin: EdgeInsets.only(top: 40.0),
             child: Text(
               'Log in \nto continue.',
               textAlign: TextAlign.left,
@@ -240,6 +240,11 @@ class _LoginPageState extends State<LoginPage> {
       controller: _passwordController,
       obscureText: _isPasswordObscured,
       decoration:  InputDecoration(
+        suffixIcon: Padding(
+          padding: const EdgeInsets.only(right: 30.0),
+          child: Icon(Icons.lock_rounded,
+              color: Color(0xff35AA90), size: 20.0),
+        ),
           fillColor: Color(0x3305756D),
           filled: true,
           contentPadding: EdgeInsets.fromLTRB(40.0, 30.0, 10.0, 10.0),
@@ -516,6 +521,11 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
             },
       controller: _passwordController,
       decoration: new InputDecoration(
+        suffixIcon: Padding(
+          padding: const EdgeInsets.only(right: 30.0),
+          child: Icon(Icons.lock_rounded,
+              color: Color(0xff35AA90), size: 20.0),
+        ),
         hintText: 'Password',
         labelStyle: TextStyle(
           fontWeight: FontWeight.w600,
@@ -539,6 +549,11 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
             },
       controller: _firstNameController,
       decoration: new InputDecoration(
+        suffixIcon: Padding(
+          padding: const EdgeInsets.only(right: 30.0),
+          child: Icon(Icons.person_rounded,
+              color: Color(0xff35AA90), size: 20.0),
+        ),
         hintText: 'First Name',
         labelStyle: TextStyle(
           fontWeight: FontWeight.w700,
@@ -560,7 +575,11 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
             },
       controller: _lastNameController,
       decoration: new InputDecoration(
-        
+        suffixIcon: Padding(
+          padding: const EdgeInsets.only(right: 30.0),
+          child: Icon(Icons.person_search_outlined,
+              color: Color(0xff35AA90), size: 20.0),
+        ),
         hintText: 'Last Name',
         labelStyle: TextStyle(
           fontWeight: FontWeight.w700,
@@ -667,6 +686,11 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
             
       controller: _zipCodeController,
       decoration: new InputDecoration(
+        suffixIcon: Padding(
+          padding: const EdgeInsets.only(right: 30.0),
+          child: Icon(Icons.post_add_rounded,
+              color: Color(0xff35AA90), size: 20.0),
+        ),
         hintText: 'Zip Code',
         labelStyle: TextStyle(
           fontWeight: FontWeight.w700,
@@ -689,7 +713,11 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
             
       controller: _cityController,
       decoration: new InputDecoration(
-        
+        suffixIcon: Padding(
+          padding: const EdgeInsets.only(right: 30.0),
+          child: Icon(Icons.location_city_rounded,
+              color: Color(0xff35AA90), size: 20.0),
+        ),
         hintText: 'City',
         labelStyle: TextStyle(
           fontWeight: FontWeight.w700,
@@ -714,8 +742,8 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
       decoration: new InputDecoration(
         suffixIcon: Padding(
           padding: const EdgeInsets.only(right: 30.0),
-          child: Icon(Icons.phone_rounded,
-              color: Color(0xff35AA90), size: 10.0),
+          child: Icon(Icons.map_rounded,
+              color: Color(0xff35AA90), size: 20.0),
         ),
         hintText: 'Country',
         labelStyle: TextStyle(
@@ -739,18 +767,9 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
           height: 10,
         ),
         Text(
-          "Personal",
+          "Pers. Info",
           style: TextStyle(
-            fontSize: 35,
-            fontWeight: FontWeight.w400,
-            wordSpacing: 2,
-            letterSpacing: 2,
-          ),
-        ),
-        Text(
-          "Information",
-          style: TextStyle(
-            fontSize: 35,
+            fontSize: 30,
             fontWeight: FontWeight.w400,
             wordSpacing: 2,
             letterSpacing: 2,
@@ -808,22 +827,21 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
         Text(
           "Address",
           style: TextStyle(
-            fontSize: 35,
+            fontSize: 30,
             fontWeight: FontWeight.w400,
             wordSpacing: 2,
             letterSpacing: 2,
           ),
         ),
-        Text(
-          "Fillin",
-          style: TextStyle(
-            fontSize: 35,
-            fontWeight: FontWeight.w400,
-            wordSpacing: 2,
-            letterSpacing: 2,
-          ),
-        ),
-        Expanded(child: Container()),
+        // Text(
+        //   "Fillin",
+        //   style: TextStyle(
+        //     fontSize: 35,
+        //     fontWeight: FontWeight.w400,
+        //     wordSpacing: 2,
+        //     letterSpacing: 2,
+        //   ),
+        // ),
         add1TextFieldWidget(),
         SizedBox(
           height: 1.5,
