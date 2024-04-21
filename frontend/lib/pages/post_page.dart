@@ -82,19 +82,20 @@ class _PostPageState extends State<PostPage> {
                         Text(
                             'Amount: ${widget.postData.amount.nominal} ${widget.postData.amount.unit}',
                             style: Theme.of(context).textTheme.headlineSmall),
-                        Row(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Shared by: ${postUser.name.first} ${postUser.name.last}}',
+                              'Shared by: ${postUser.name.first} ${postUser.name.last}',
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                             Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.grade,
-                                      color: Color.fromRGBO(9, 162, 109, 1)),
+                                  Icon(Icons.grade,
+                                      color: Theme.of(context).colorScheme.primary),
                                   Text(
-                                    'Rating: ${postUser.rating.toStringAsFixed(1)}',
+                                    'User rating: ${postUser.rating.toStringAsFixed(1)}',
                                     style: Theme.of(context).textTheme.bodySmall,
                                   ),
                                 ],
