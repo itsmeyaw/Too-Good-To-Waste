@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:logger/logger.dart';
+import 'package:tooGoodToWaste/service/shared_items_service.dart';
 import 'package:tooGoodToWaste/service/storage_service.dart';
 import 'package:tooGoodToWaste/service/user_service.dart';
 import '../dto/shared_item_model.dart';
@@ -22,6 +24,8 @@ class PostPage extends StatefulWidget {
 class _PostPageState extends State<PostPage> {
   final UserService userService = UserService();
   final StorageService storageService = StorageService();
+  final SharedItemService sharedItemService = SharedItemService();
+  final Logger logger = Logger();
   final User? currentUser = FirebaseAuth.instance.currentUser;
 
   @override
@@ -82,19 +86,20 @@ class _PostPageState extends State<PostPage> {
                         Text(
                             'Amount: ${widget.postData.amount.nominal} ${widget.postData.amount.unit}',
                             style: Theme.of(context).textTheme.headlineSmall),
-                        Row(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Shared by: ${postUser.name.first} ${postUser.name.last}}',
+                              'Shared by: ${postUser.name.first} ${postUser.name.last}',
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                             Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.grade,
-                                      color: Color.fromRGBO(9, 162, 109, 1)),
+                                  Icon(Icons.grade,
+                                      color: Theme.of(context).colorScheme.primary),
                                   Text(
-                                    'Rating: ${postUser.rating.toStringAsFixed(1)}',
+                                    'User rating: ${postUser.rating.toStringAsFixed(1)}',
                                     style: Theme.of(context).textTheme.bodySmall,
                                   ),
                                 ],
@@ -140,40 +145,53 @@ class _PostPageState extends State<PostPage> {
                           if (currentUser != null &&
                               currentUser!.uid != widget.postData.user) {
                             return 
-                             Row(
-                              children: [
-                                const FilledButton(
-                                    onPressed: null,
-                                    child: FractionallySizedBox(
-                                        widthFactor: 1,
-                                        child: Text(
-                                          'Reserve',
-                                          textAlign: TextAlign.center,
-                                        ))),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                FilledButton(
+                             Column(
+                              children: <Widget>[
+                                FilledButton.tonal(
                                     onPressed: () {
                                       Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => ChatroomPage(
-                                                  secondUserId:
-                                                      widget.postData.user,
-                                                  sharedItem: widget.postData,
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => ChatroomPage(
+                                                secondUserId:
+                                                widget.postData.user,
+                                                sharedItem: widget.postData,
                                               )));
                                     },
                                     child: FractionallySizedBox(
-                                        widthFactor: 1,
-                                        child: Text(
-                                          'Chat with ${postUser.name.last}',
-                                          textAlign: TextAlign.center,
-                                        ),
+                                      widthFactor: 1,
+                                      child: Text(
+                                        'Chat with ${postUser.name.last}',
+                                        textAlign: TextAlign.center,
+                                      ),
                                     )
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                FilledButton(
+                                    onPressed: widget.postData.isAvailable && widget.postData.sharedItemReservation == null ? () async {
+                                      try {
+                                        if (await sharedItemService.reserveItem(widget.postData.id!)) {
+                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Succesfully reserved item")));
+                                        } else {
+                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Cannot reserved item")));
+                                        }
+                                      } catch (e) {
+                                        logger.e("Error when trying to reserve item", error: e);
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("There was error while reserving item")));
+                                      }
+                                    } : null,
+                                      child: FractionallySizedBox(
+                                          widthFactor: 1,
+                                          child: Text(
+                                            'Reserve',
+                                            textAlign: TextAlign.center,
+                                          )
+                                      )
                                 )
                               ],
-                              
+
                              );
                           } else {
                             return const FilledButton(
@@ -194,19 +212,6 @@ class _PostPageState extends State<PostPage> {
             }
           },
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () async {
-            // Reserve the shared item
-          //  await userService.reserveSharedItem(widget.postData.id!);
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Shared item reserved')));
-      
-          },
-          tooltip: 'Reserve',
-          label: const Text('Reserve'),
-          icon: const Icon(Icons.add_shopping_cart),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       
       );
   }

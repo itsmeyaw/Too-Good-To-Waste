@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:logger/logger.dart';
 import 'package:dart_geohash/dart_geohash.dart';
 import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
+import 'package:tooGoodToWaste/dto/shared_item_reservation_model.dart';
 
 class SharedItemService {
   static const String SHARED_ITEM_COLLECTION = "shared_items";
@@ -130,5 +132,34 @@ class SharedItemService {
         .update({'is_available': isAvailable});
 
     return oldIsAvailable;
+  }
+
+  Future<bool> reserveItem(String sharedItemId) async {
+    final DocumentSnapshot<Map<String, dynamic>> sharedItemDoc = await db.collection(SHARED_ITEM_COLLECTION).doc(sharedItemId).get();
+
+    if (!sharedItemDoc.exists) {
+      throw Error();
+    } else {
+      final SharedItem sharedItem = SharedItem.fromJson(sharedItemDoc.data()!);
+
+      if (!sharedItem.isAvailable) {
+        logger.w("Shared item $sharedItemId is not available");
+        return false;
+      }
+
+      if (sharedItem.sharedItemReservation != null) {
+        logger.w("Shared item $sharedItemId has reservation");
+        return false;
+      }
+
+      String userId = FirebaseAuth.instance.currentUser!.uid;
+
+      await db
+        .collection(SHARED_ITEM_COLLECTION)
+        .doc(sharedItemId)
+        .update({ "shared_item_reservation": SharedItemReservation(reserver: userId, reservationTime: DateTime.now().millisecondsSinceEpoch).toJson() });
+    }
+
+    return true;
   }
 }
