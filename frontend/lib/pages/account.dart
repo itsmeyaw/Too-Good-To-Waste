@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:tooGoodToWaste/Pages/post_page.dart';
 import 'package:tooGoodToWaste/const/color_const.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +53,8 @@ class _MyAccountPageState extends State<AccountPage> {
       builder:(context, AsyncSnapshot<dynamic> snapshot)  {
         
         if (snapshot.hasError || snapshot.data == null) {
-          throw Exception('User is null but accessing account page');
+          //throw Exception('User is null but accessing account page');
+          return const Center(child: CircularProgressIndicator());
         } else {
           return AccountSettingPage(user: snapshot.data[0], userData: snapshot.data[1]);
         }
