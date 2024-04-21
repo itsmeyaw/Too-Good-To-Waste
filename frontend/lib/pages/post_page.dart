@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:logger/logger.dart';
+import 'package:tooGoodToWaste/service/shared_items_service.dart';
 import 'package:tooGoodToWaste/service/storage_service.dart';
 import 'package:tooGoodToWaste/service/user_service.dart';
 import '../dto/shared_item_model.dart';
@@ -22,6 +24,8 @@ class PostPage extends StatefulWidget {
 class _PostPageState extends State<PostPage> {
   final UserService userService = UserService();
   final StorageService storageService = StorageService();
+  final SharedItemService sharedItemService = SharedItemService();
+  final Logger logger = Logger();
   final User? currentUser = FirebaseAuth.instance.currentUser;
 
   @override
@@ -166,9 +170,18 @@ class _PostPageState extends State<PostPage> {
                                   height: 10,
                                 ),
                                 FilledButton(
-                                    onPressed: () {
-
-                                    },
+                                    onPressed: widget.postData.isAvailable && widget.postData.sharedItemReservation == null ? () async {
+                                      try {
+                                        if (await sharedItemService.reserveItem(widget.postData.id!)) {
+                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Succesfully reserved item")));
+                                        } else {
+                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Cannot reserved item")));
+                                        }
+                                      } catch (e) {
+                                        logger.e("Error when trying to reserve item", error: e);
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("There was error while reserving item")));
+                                      }
+                                    } : null,
                                       child: FractionallySizedBox(
                                           widthFactor: 1,
                                           child: Text(

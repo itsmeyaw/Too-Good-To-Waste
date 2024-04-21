@@ -1,6 +1,7 @@
 import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:tooGoodToWaste/dto/item_category_enum.dart';
+import 'package:tooGoodToWaste/dto/shared_item_reservation_model.dart';
 import 'package:tooGoodToWaste/util/geo_fire_point_converter.dart';
 
 import './user_item_amount_model.dart';
@@ -18,6 +19,7 @@ class SharedItem {
   final String? imageUrl;
   final ItemCategory category;
   final String user;
+  SharedItemReservation? sharedItemReservation;
 
   @JsonKey(defaultValue: true)
   bool isAvailable = true;
@@ -37,7 +39,8 @@ class SharedItem {
       required this.name,
       required this.category,
       required this.user,
-      required this.isAvailable});
+      required this.isAvailable,
+      this.sharedItemReservation});
 
   factory SharedItem.fromJson(Map<String, dynamic> json) =>
       _$SharedItemFromJson(json);
