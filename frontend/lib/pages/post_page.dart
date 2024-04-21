@@ -105,7 +105,11 @@ class _PostPageState extends State<PostPage> {
                           height: 10,
                         ),
                         widget.postData.imageUrl != null
-                            ? Center(
+                            ? Hero(
+                        transitionOnUserGestures: true,
+                        tag: widget.postData.name,
+                        child: 
+                            Center(
                                 child: Container(
                                     height: 250,
                                     padding: const EdgeInsets.all(0.0),
@@ -129,7 +133,7 @@ class _PostPageState extends State<PostPage> {
                                         }
                                       },
                                     )),
-                              )
+                              ))
                             : const Text('No image provided'),
                         const Spacer(),
                         Builder(builder: (BuildContext context) {
