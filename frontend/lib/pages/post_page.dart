@@ -140,40 +140,44 @@ class _PostPageState extends State<PostPage> {
                           if (currentUser != null &&
                               currentUser!.uid != widget.postData.user) {
                             return 
-                             Row(
-                              children: [
-                                const FilledButton(
-                                    onPressed: null,
-                                    child: FractionallySizedBox(
-                                        widthFactor: 1,
-                                        child: Text(
-                                          'Reserve',
-                                          textAlign: TextAlign.center,
-                                        ))),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                FilledButton(
+                             Column(
+                              children: <Widget>[
+                                FilledButton.tonal(
                                     onPressed: () {
                                       Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => ChatroomPage(
-                                                  secondUserId:
-                                                      widget.postData.user,
-                                                  sharedItem: widget.postData,
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => ChatroomPage(
+                                                secondUserId:
+                                                widget.postData.user,
+                                                sharedItem: widget.postData,
                                               )));
                                     },
                                     child: FractionallySizedBox(
-                                        widthFactor: 1,
-                                        child: Text(
-                                          'Chat with ${postUser.name.last}',
-                                          textAlign: TextAlign.center,
-                                        ),
+                                      widthFactor: 1,
+                                      child: Text(
+                                        'Chat with ${postUser.name.last}',
+                                        textAlign: TextAlign.center,
+                                      ),
                                     )
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                FilledButton(
+                                    onPressed: () {
+
+                                    },
+                                      child: FractionallySizedBox(
+                                          widthFactor: 1,
+                                          child: Text(
+                                            'Reserve',
+                                            textAlign: TextAlign.center,
+                                          )
+                                      )
                                 )
                               ],
-                              
+
                              );
                           } else {
                             return const FilledButton(
@@ -194,19 +198,6 @@ class _PostPageState extends State<PostPage> {
             }
           },
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () async {
-            // Reserve the shared item
-          //  await userService.reserveSharedItem(widget.postData.id!);
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Shared item reserved')));
-      
-          },
-          tooltip: 'Reserve',
-          label: const Text('Reserve'),
-          icon: const Icon(Icons.add_shopping_cart),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       
       );
   }
