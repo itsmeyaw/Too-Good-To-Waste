@@ -12,6 +12,8 @@ PickupProcess _$PickupProcessFromJson(Map<String, dynamic> json) =>
       giver: json['giver'] as String,
       sharedItemId: json['shared_item_id'] as String,
       isActive: json['is_active'] as bool,
+      state: $enumDecodeNullable(_$PickupStateEnumMap, json['state']) ??
+          PickupState.INITIALIZED,
     )..id = json['id'] as String?;
 
 Map<String, dynamic> _$PickupProcessToJson(PickupProcess instance) =>
@@ -20,4 +22,12 @@ Map<String, dynamic> _$PickupProcessToJson(PickupProcess instance) =>
       'giver': instance.giver,
       'shared_item_id': instance.sharedItemId,
       'is_active': instance.isActive,
+      'state': _$PickupStateEnumMap[instance.state],
     };
+
+const _$PickupStateEnumMap = {
+  PickupState.INITIALIZED: 'Initialized',
+  PickupState.RECEIVER_RECEVICES: 'ReceiverReceives',
+  PickupState.DONE: 'Done',
+  PickupState.CANCELLED: 'Cancelled',
+};

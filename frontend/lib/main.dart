@@ -104,7 +104,7 @@ class MyApp extends StatelessWidget {
       title: 'Too Good To Waste',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 210, 252, 194)),
         useMaterial3: true,
       ),
       home: const Frame(),
