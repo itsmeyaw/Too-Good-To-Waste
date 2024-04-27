@@ -160,6 +160,7 @@ class SharedItemService {
 
       String userId = FirebaseAuth.instance.currentUser!.uid;
 
+      analytics.logEvent(name: "Reserve Shared Item");
       await db
         .collection(SHARED_ITEM_COLLECTION)
         .doc(sharedItemId)
@@ -182,6 +183,7 @@ class SharedItemService {
         return false;
       }
 
+      analytics.logEvent(name: "Cancel Shared Item Reservation");
       await db
           .collection(SHARED_ITEM_COLLECTION)
           .doc(sharedItemId)
