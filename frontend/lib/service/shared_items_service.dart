@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -64,6 +66,10 @@ class SharedItemService {
         (querySnapshot) => querySnapshot.exists
             ? SharedItem.fromJson(querySnapshot.data() as Map<String, dynamic>)
             : null);
+  }
+
+  Stream<SharedItem?> streamSharedItem(String sharedItemId) {
+    return db.collection(SHARED_ITEM_COLLECTION).doc(sharedItemId).snapshots().map((event) => event.exists ? SharedItem.fromJson(event.data()!) : null);
   }
 
   Stream<List<DocumentSnapshot>> getSharedItemsWithinRadius(
@@ -161,5 +167,27 @@ class SharedItemService {
     }
 
     return true;
+  }
+
+  Future<bool> cancelReserveItem(String sharedItemId) async {
+    final DocumentSnapshot<Map<String, dynamic>> sharedItemDoc = await db.collection(SHARED_ITEM_COLLECTION).doc(sharedItemId).get();
+
+    if (!sharedItemDoc.exists) {
+      throw Error();
+    } else {
+      final SharedItem sharedItem = SharedItem.fromJson(sharedItemDoc.data()!);
+
+      if (sharedItem.sharedItemReservation == null) {
+        logger.w("Shared item $sharedItemId is not reserved");
+        return false;
+      }
+
+      await db
+          .collection(SHARED_ITEM_COLLECTION)
+          .doc(sharedItemId)
+          .update({ "shared_item_reservation": null });
+
+      return true;
+    }
   }
 }
