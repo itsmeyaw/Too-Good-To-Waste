@@ -192,4 +192,27 @@ class SharedItemService {
       return true;
     }
   }
+
+  Future<bool> confirmPickUp(String sharedItemId) async {
+    final DocumentSnapshot<Map<String, dynamic>> sharedItemDoc = await db.collection(SHARED_ITEM_COLLECTION).doc(sharedItemId).get();
+
+    if (!sharedItemDoc.exists) {
+      throw Error();
+    } else {
+      final SharedItem sharedItem = SharedItem.fromJson(sharedItemDoc.data()!);
+
+      if (sharedItem.sharedItemReservation == null) {
+        logger.w("Shared item $sharedItemId is not reserved");
+        return false;
+      }
+
+      analytics.logEvent(name: "Confirm Shared Item Pickup");
+      await db
+          .collection(SHARED_ITEM_COLLECTION)
+          .doc(sharedItemId)
+          .update({ "is_available": false, "picked_up": true });
+
+      return true;
+    }
+  }
 }
