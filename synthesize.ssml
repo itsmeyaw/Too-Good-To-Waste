@@ -13,38 +13,28 @@ Speed: 1.4
        xml:lang="en-US">
     <!-- Introduction -->
     <voice name="en-US-Studio-O">
-        Imagine you wanted to make a Carbonara <break time="50ms"/> and only needed one egg.
+        Have you ever thrown away groceries?
         <break time="100ms"/>
-        However, the only available option is to buy a pack of ten eggs.
+        If yes, use our Too Good To Waste.
         <break time="100ms"/>
-        3 weeks later, you didn't manage to use the rest and had to throw them because they went bad.
-        <break time="100ms"/>
-        If this sometimes happens to you
-        <break time="100ms"/>
-        fret not as you are not alone.
+        We are from <say-as interpret-as="verbatim">TUM</say-as> in Germany.
         <break time="200ms"/>
         <p>
             <s>
-                In fact, <break time="50ms"/> we produced almost 1 trillion tonnes
-                of food waste in 2019 alone,
-            <break time="100ms"/>
-                most of them are from households.
-            </s>
-        </p>
-        <break time="200ms"/>
-        <p>
-            <s>
-                Moreover, 90% of the food waste we throw
-                are groceries.
+                Society produce 1 trillion tonnes of food waste in a year and most of them are from households.
             </s>
         </p>
         <break time="100ms"/>
         <p>
             <s>
-                Hence, we introduce Too Good To Waste,
-                <break time="100ms"/>
-                an application that allows user to keep track of their
-                pantries and share them with other people.
+                Hence, we want to tackle this problem to attain the <say-as interpret-as="verbatim">UN</say-as>'s twelfth
+                <say-as interpret-as="verbatim">SDG</say-as> target.
+            </s>
+        </p>
+        <break time="100ms"/>
+        <p>
+            <s>
+                Our app allows users to keep track of their pantries and share them with others.
             </s>
         </p>
     </voice>
@@ -82,39 +72,23 @@ Speed: 1.4
 
     <!-- Story -->
     <voice name="en-US-Studio-O">
-        One week later,
+        This is Yudhis.
         <break time="150ms"/>
-        Yudhis is going on a long trip tomorrow,
+        He scans a receipt and tracks pantries in "Too Good To Waste".
         <break time="150ms"/>
-        while packing up he found out that he still had a large amount of milk.
+        Our app suggests the expiration date of his pantries.
+        <break time="150ms"/>
+        He has milks nearing their expiry,<break time="75ms"/> with our app,<break time="75ms"/> he can share them instead of throwing them away.
+        <break time="150ms"/>
+        On the other hand, his friend Nana runs out of milk and decides to find it in the app.
+        <break time="150ms"/>
+        She finds his post and start chatting with him.
         <break time="200ms"/>
-        He immediately decided to share three bottles of them.
-        <break time="300ms"/>
-        Yudhis took a photo and posted it in the application.
-        <break time="200ms"/>
-        Now everyone can see that his post is listed in the post page waiting to be picked out.
-        <break time="300ms"/>
-        This is Nana. She is busy baking but she ran out of milk.
-        <break time="200ms"/>
-        Unfortunately,
-        <break time="100ms"/>
-        it is sunday meaning all the stores are closed in Germany.
-        <break time="200ms"/>
-        She opened Too Good To Waste and searched milk posts using Diaries category filter.
-        <break time="200ms"/>
-        She found Yudhis' post of three bottles of fresh milk nearby and asked Yudhis about them.
-        <break time="300ms"/>
-        Yudhis and Nana exchanged messages and they agreed to meet.
-        <break time="200ms"/>
-        By this, Yudhis didn't have to throw the milks and Nana could have the milk she needed.
+        By this,<break time="75ms"/> Yudhis doesn’t have to throw the milk and Nana gets the milks she needs.
     </voice>
 
     <!-- Closing -->
     <voice name="en-US-Studio-O">
-        Do you know how much food waste can you reduce by using too good to waste?
-        <break time="300ms"/>
-        Let’s try and confirm by yourself.
-        <break time="300ms"/>
         Too good to waste,
         <break time="100ms"/>
         your first step to food-waste-free life
