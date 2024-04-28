@@ -48,7 +48,7 @@ class UserService {
 
   /// Rate a user with id @param userId and with the value of @param rating
   /// Rating is 0 - 5;
-  Future<void> rateUser(String userId, double rating) async {
+  Future<void> rateUser(String userId, double rating, String sharedItemId) async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       throw Exception("User is not logged in but want to rate user");
@@ -65,8 +65,8 @@ class UserService {
         .collection(COLLECTION)
         .doc(userId)
         .collection(RATING_SUB_COLLECTION)
-        .doc(user!.uid)
-        .set(UserRating(ratingFrom: user!.uid, ratingValue: rating).toJson());
+        .doc(sharedItemId)
+        .set(UserRating(ratingFrom: user!.uid, ratingValue: rating, sharedItemId: sharedItemId).toJson());
 
     logger.d('Updated the user rating in the collection');
 
