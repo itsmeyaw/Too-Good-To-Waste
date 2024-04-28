@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:rive/rive.dart';
@@ -28,7 +29,68 @@ class _PostPageState extends State<PostPage> {
   final SharedItemService sharedItemService = SharedItemService();
   final Logger logger = Logger();
   final User? currentUser = FirebaseAuth.instance.currentUser;
+  double userRating = 0;
 
+  Future<bool?> showConfirmDialog(BuildContext context, String sharedItemId) async {
+    return showDialog<bool>(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Rate and Confirm"),
+            content: IntrinsicHeight(
+              child: Column(
+                children: [
+                  const Text("Please rate your experience and confirm"),
+                  const SizedBox(height: 10,),
+                  RatingBar.builder(
+                    minRating: 1,
+                    maxRating: 5,
+                    allowHalfRating: true,
+                    updateOnDrag: true,
+                    itemBuilder: (BuildContext context, int index) {
+                      return const Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                      );
+                    },
+                    onRatingUpdate: (double value) {
+                      setState(() {
+                        userRating = value;
+                      });
+                    },
+                  )
+                ],
+              ),
+            ),
+            actions: [
+              FilledButton(
+                  style: FilledButton.styleFrom(backgroundColor: Theme.of(context).buttonTheme.colorScheme!.error),
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: const Text('Cancel')
+              ),
+              FilledButton(
+                  onPressed: () async {
+                    if (userRating == 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Please input your rating"))
+                      );
+                      return;
+                    }
+
+                    await userService.rateUser(widget.postData.user, userRating, sharedItemId);
+                    await sharedItemService.confirmPickUp(sharedItemId);
+
+                    Navigator.of(context).pop(true);
+                  },
+                  child: const Text("Confirm"))
+            ],
+          );
+        }
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -227,7 +289,12 @@ class _PostPageState extends State<PostPage> {
                                               Expanded(
                                                   child: SizedBox(
                                                       child: FilledButton (
-                                                          onPressed: () {},
+                                                          onPressed: () async {
+                                                            bool? confirm = await showConfirmDialog(context, sharedItemId);
+                                                            if (confirm != null && confirm) {
+                                                              Navigator.of(context).pop();
+                                                            }
+                                                          },
                                                           child: const Text('Confirm Pick Up')
                                                       )
                                                   )

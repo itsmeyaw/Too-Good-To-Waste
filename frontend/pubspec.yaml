@@ -71,6 +71,7 @@ dependencies:
   firebase_analytics: ^10.8.6
   firebase_crashlytics: ^3.4.15
   image: ^4.1.7
+  flutter_rating_bar: ^4.0.1
 
 dev_dependencies:
   flutter_test:
