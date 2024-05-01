@@ -147,11 +147,11 @@ class _PostPageState extends State<PostPage> {
                         ),
                         Text(
                           widget.postData.name,
-                          style: Theme.of(context).textTheme.headlineLarge,
+                          style: Theme.of(context).textTheme.headlineSmall,
                         ),
                         Text(
                             'Amount: ${widget.postData.amount.nominal} ${widget.postData.amount.unit}',
-                            style: Theme.of(context).textTheme.headlineSmall),
+                            style: Theme.of(context).textTheme.bodyMedium),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -173,7 +173,7 @@ class _PostPageState extends State<PostPage> {
                           ],
                         ),
                         const SizedBox(
-                          height: 10,
+                          height: 5,
                         ),
                         widget.postData.imageUrl != null
                             ? Hero(
@@ -182,7 +182,7 @@ class _PostPageState extends State<PostPage> {
                         child:
                             Center(
                                 child: Container(
-                                    height: 250,
+                                    height: 200,
                                     padding: const EdgeInsets.all(0.0),
                                     child: FutureBuilder(
                                       future: storageService
@@ -196,7 +196,7 @@ class _PostPageState extends State<PostPage> {
                                             imageUrlSnapshot.hasData) {
                                           return Image.network(
                                             imageUrlSnapshot.requireData,
-                                            height: 250,
+                                            height: 200,
                                             width: 250,
                                           );
                                         } else {

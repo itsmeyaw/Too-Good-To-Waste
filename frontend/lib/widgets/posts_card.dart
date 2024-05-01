@@ -113,24 +113,24 @@ Widget foodItem(SharedItem postData, remainDays, {onTapped, onLike}) {
                     child: 
                        Text('${postData.distance.toStringAsFixed(2)} m',
                         style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.w600)),
+                            color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13)),
                       
                   )
               ),
         Positioned(
-            top: 10,
-            right: 10,
+            top: 0,
+            right: 0,
             child: (postUser.rating != 0.0)
                 ? Container(
                     padding:
-                        EdgeInsets.only(top: 5, left: 10, right: 10, bottom: 5),
+                        EdgeInsets.only(top: 2, left: 10, right: 2, bottom: 5),
                     child: Row(
                       children: <Widget>[
                         const Icon(Icons.grade,
                                       color: Color.fromRGBO(9, 162, 109, 1)),
-                       Text('Rating: ${postUser.rating.toStringAsFixed(1)}',
+                       Text('Rating:${postUser.rating.toStringAsFixed(1)}',
                         style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.w700)),
+                            color: Color.fromRGBO(9, 162, 109, 1), fontWeight: FontWeight.w500, fontSize: 10)),
                       ]
                   ))
                 : SizedBox(width: 0))
