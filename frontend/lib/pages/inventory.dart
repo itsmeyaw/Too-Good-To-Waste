@@ -674,7 +674,7 @@ class _BottomTopScreenState extends State<Inventory>
       ),
       floatingActionButton: ExpandableFab(
         distance: 112.0,
-        toClose: toClose,
+        //toClose: toClose,
         children: [
           FloatingActionButton(
             tooltip: "Add item",
