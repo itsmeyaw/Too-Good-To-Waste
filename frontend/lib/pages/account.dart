@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tooGoodToWaste/const/color_const.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:tooGoodToWaste/dto/user_name_model.dart';
+import 'package:tooGoodToWaste/pages/home.dart';
 import 'package:tooGoodToWaste/pages/message_thread_list.dart';
 import 'package:tooGoodToWaste/service/shared_items_service.dart';
 import 'package:tooGoodToWaste/service/user_service.dart';
@@ -203,26 +205,10 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
   Widget build(BuildContext context) {
     final UserService userService = UserService();
     final _media = MediaQuery.of(context).size;
-
-    // return 
-    // FutureBuilder(
-    //     future: userService.getUserData(widget.user.uid),
-    //     builder:
-    //         (BuildContext context, AsyncSnapshot<TGTWUser> userDataSnapshot) {
-    //       if (userDataSnapshot.connectionState == ConnectionState.waiting) {
-    //         return const Center(child: CircularProgressIndicator());
-    //       }
-
-    //       if (userDataSnapshot.hasError) {
-    //         return Center(
-    //           child: Text('Error: ${userDataSnapshot.error}'),
-    //         );
-    //       }
-
         
-          return 
+    return 
           DefaultTabController(
-              length: 3,
+              length: 4,
               child: Scaffold(
                 appBar: AppBar(
                   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -234,324 +220,326 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                         text: 'Pers. Info',
                       ),
                       Tab(
+                        icon: Icon(Icons.favorite_border_outlined),
+                        text: 'Liked',
+                      ),
+                      Tab(
                         icon: Icon(Icons.chat_bubble_outline),
                         text: 'Messages',
                       ),
                       Tab(
                         icon: Icon(Icons.notifications_active_outlined),
-                        text: 'Active Posts',
+                        text: 'Posted',
                       )
                     ],
                   ),
                 ),
-                body: Stack(
+      body: Stack(
       clipBehavior: Clip.none,
       children: [
-        Container(
-          height: _media.height,
-          width: _media.width,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: FractionalOffset(0.5, 0.0),
-              end: FractionalOffset(0.6, 0.8),
-              stops: [0.0, 0.9],
-              colors: [YELLOW, BLUE],
-            ),
-          ),
-        ),
-        Positioned(
-            top: 5.0,
-            right: 10.0,
-            child: 
-            // const SwitchButton(),
-              IconButton(
-                icon: Icon(isEditMode ? Icons.done : Icons.edit),
-                onPressed: () {
-                  setState(() {
-                    isEditMode = !isEditMode;
-                    if (!isEditMode) {
-                      // Save changes
-                      currentAddress1 = address1Controller.text;
-                      currentAddress2 = address2Controller.text;
-                      currentName = UserName(
-                              first: nameController.text.split(' ')[0],
-                              last: nameController.text.split(' ')[1]);
-                      currentEmail = emailController.text;
-                      currentPhoneNumber = phoneNumberController.text;
-                      currentCity = cityController.text;
-                      currentZipCode = zipCodeController.text;
-                      currentCountry = countryController.text;
-                      currentAllergies = allergiesController.text;                  
-                      showUpdateDialog();
-                     
-                    }
-                  });
-                },
-              ),
-          ),
             Container(
-            padding: EdgeInsets.only(top: 20, bottom: 40),
-            child:
+              height: _media.height,
+              width: _media.width,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: FractionalOffset(0.5, 0.0),
+                  end: FractionalOffset(0.6, 0.8),
+                  stops: [0.0, 0.9],
+                  colors: [YELLOW, BLUE],
+                ),
+              ),
+            ),
+        
+            Container(
+              padding: EdgeInsets.only(top: 20, bottom: 40),
+              child:
                 TabBarView(
                   children: [
+                    Stack(
+                        children: [
+                          Positioned(
+                            top: 5.0,
+                            right: 10.0,
+                            child: 
+                            // const SwitchButton(),
+                              IconButton(
+                                icon: Icon(isEditMode ? Icons.done : Icons.edit),
+                                onPressed: () {
+                                  setState(() {
+                                    isEditMode = !isEditMode;
+                                    if (!isEditMode) {
+                                      // Save changes
+                                      currentAddress1 = address1Controller.text;
+                                      currentAddress2 = address2Controller.text;
+                                      currentName = UserName(
+                                              first: nameController.text.split(' ')[0],
+                                              last: nameController.text.split(' ')[1]);
+                                      currentEmail = emailController.text;
+                                      currentPhoneNumber = phoneNumberController.text;
+                                      currentCity = cityController.text;
+                                      currentZipCode = zipCodeController.text;
+                                      currentCountry = countryController.text;
+                                      currentAllergies = allergiesController.text;                  
+                                      showUpdateDialog();
+                                    
+                                    }
+                                  });
+                                },
+                              ),
+                          ),
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          height: MediaQuery.of(context).size.height,
+                          child: ListView(children: [
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              'User Information',
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                        
+                            TextField(   
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Name',
+                              ),
+                              enabled: isEditMode,
+                              controller: nameController,
+                              style: const TextStyle(
+                                fontFamily: 'Roboto',
+                                fontSize: 20,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                       
+                            TextField(   
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Email',
+                              ),
+                              enabled: isEditMode,
+                              controller: emailController,
+                              style: const TextStyle(
+                                fontFamily: 'Roboto',
+                                fontSize: 20,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                      
+                            TextField(   
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Phone Number',
+                                ),
+                                enabled: isEditMode,
+                                controller: phoneNumberController,
+                                style: const TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: 20,
+                                ),
+                              ),
+
+                            const SizedBox(
+                              height: 20,
+                            ),
+
+                            Text(
+                              'Address',
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                       
+                            TextField(   
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Address Line 1',
+                              ),
+                              enabled: isEditMode,
+                              controller: address1Controller,
+                              style: const TextStyle(
+                                fontFamily: 'Roboto',
+                                fontSize: 20,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                     
+                            TextField(   
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Address Line 2',
+                                ),
+                                enabled: isEditMode,
+                                controller: address2Controller,
+                                style: const TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: 20,
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                       
+                              TextField(   
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'City',
+                                ),
+                                enabled: isEditMode,
+                                controller: cityController,
+                                style: const TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: 20,
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                      
+                              TextField(   
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Zip Code',
+                                ),
+                                enabled: isEditMode,
+                                controller: zipCodeController,
+                                style: const TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: 20,
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                     
+                              TextField(   
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Country',
+                                ),
+                                enabled: isEditMode,
+                                controller: countryController,
+                                style: const TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: 20,
+                                ),
+                              ),
+
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Text(
+                                'Additional Information',
+                                style: Theme.of(context).textTheme.headlineSmall,
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+
+                              TextField(   
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Allergies',
+                                ),
+                                enabled: isEditMode,
+                                controller: allergiesController,
+                                style: const TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: 20,
+                                ),
+                              ),
+                        
+                        
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Text(
+                                'Achievements',
+                                style: Theme.of(context).textTheme.headlineSmall,
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              TextField(   
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Rating',
+                                ),
+                                enabled: isEditMode,
+                                controller: ratingController,
+                                style: const TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: 20,
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              TextField(   
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Good Points',
+                                ),
+                                enabled: isEditMode,
+                                controller: goodPointsController,
+                                style: const TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: 20,
+                                ),
+                              ),
+                        
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              TextField(   
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Carbon Emission',
+                                ),
+                                enabled: isEditMode,
+                                controller: carbonEmissionController,
+                                style: const TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: 20,
+                                ),
+                              ),
+                            
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IntrinsicWidth(
+                                      child: FilledButton(
+                                          onPressed: () {
+                                            FirebaseAuth.instance.signOut();
+                                          },
+                                          child: const Text('Sign Out')))
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                            ]),
+                          ),
+                      ]
+                    ),
                     Container(
                       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                       height: MediaQuery.of(context).size.height,
-                      child: ListView(children: [
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          'User Information',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        
-                         TextField(   
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Name',
-                          ),
-                          enabled: isEditMode,
-                          controller: nameController,
-                          style: const TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 20,
-                          ),
-                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                       
-                        TextField(   
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Email',
-                          ),
-                          enabled: isEditMode,
-                          controller: emailController,
-                          style: const TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 20,
-                          ),
-                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                      
-                       TextField(   
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Phone Number',
-                          ),
-                          enabled: isEditMode,
-                          controller: phoneNumberController,
-                          style: const TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 20,
-                          ),
-                         ),
-
-                        const SizedBox(
-                          height: 20,
-                        ),
-
-                        Text(
-                          'Address',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                       
-                        TextField(   
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Address Line 1',
-                          ),
-                          enabled: isEditMode,
-                          controller: address1Controller,
-                          style: const TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 20,
-                          ),
-                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                     
-                       TextField(   
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Address Line 2',
-                          ),
-                          enabled: isEditMode,
-                          controller: address2Controller,
-                          style: const TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 20,
-                          ),
-                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                       
-                        TextField(   
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'City',
-                          ),
-                          enabled: isEditMode,
-                          controller: cityController,
-                          style: const TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 20,
-                          ),
-                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                      
-                        TextField(   
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Zip Code',
-                          ),
-                          enabled: isEditMode,
-                          controller: zipCodeController,
-                          style: const TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 20,
-                          ),
-                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                     
-                        TextField(   
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Country',
-                          ),
-                          enabled: isEditMode,
-                          controller: countryController,
-                          style: const TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 20,
-                          ),
-                         ),
-
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Text(
-                          'Additional Information',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-
-                        TextField(   
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Allergies',
-                          ),
-                          enabled: isEditMode,
-                          controller: allergiesController,
-                          style: const TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 20,
-                          ),
-                         ),
-                        
-                        // Text(
-                        //   widget.userData.allergies.isEmpty
-                        //       ? 'No allergies listed'
-                        //       : widget.userData.allergies.join(', '),
-                          
-                        //   style: Theme.of(context).textTheme.bodyLarge,
-                        // ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Text(
-                          'Achievements',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        TextField(   
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Rating',
-                          ),
-                          enabled: isEditMode,
-                          controller: ratingController,
-                          style: const TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 20,
-                          ),
-                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        TextField(   
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Good Points',
-                          ),
-                          enabled: isEditMode,
-                          controller: goodPointsController,
-                          style: const TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 20,
-                          ),
-                         ),
-                        // Text(
-                        //   '${widget.userData.goodPoints}',
-                        //   style: Theme.of(context).textTheme.bodyLarge,
-                        // ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        TextField(   
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Carbon Emission',
-                          ),
-                          enabled: isEditMode,
-                          controller: carbonEmissionController,
-                          style: const TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 20,
-                          ),
-                         ),
-                        // Text(
-                        //   '${widget.userData.reducedCarbonKg} kg',
-                        //   style: Theme.of(context).textTheme.bodyLarge,
-                        // ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IntrinsicWidth(
-                                child: FilledButton(
-                                    onPressed: () {
-                                      FirebaseAuth.instance.signOut();
-                                    },
-                                    child: const Text('Sign Out')))
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                      ]),
+                      child: LikedPostPageWidget(),
                     ),
                     Container(
                       padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
@@ -565,12 +553,17 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                     )
                   ],
                 ),
-              ),
-              ]))
+            ),
+      ],
+        )
+      )
           );
             }
         }
 
+// class PersInfoWidget extends StatelessWidget {
+
+// }
 
 class PostPageWidget extends StatelessWidget {
   final SharedItemService sharedItemService = SharedItemService();
@@ -641,3 +634,72 @@ class UserSharedItemPost extends StatelessWidget {
     );
   }
 }
+
+class LikedPostPageWidget extends StatelessWidget {
+  final SharedItemService sharedItemService = SharedItemService();
+  final User? user = FirebaseAuth.instance.currentUser;
+
+  LikedPostPageWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    if (user == null) {
+      throw Exception("Accessting liked post page without authentication");
+    }
+
+    final String userId = user!.uid;
+    List<SharedItem> sharedItems = [];
+
+    return 
+      StreamBuilder(
+        stream: sharedItemService.getLikedSharedItemOfUser(userId: userId),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<DocumentSnapshot>>
+                sharedItemSnapshot) {
+          if (sharedItemSnapshot.connectionState ==
+                  ConnectionState.active &&
+              sharedItemSnapshot.hasData) {
+            if (sharedItemSnapshot.data != null) {
+              List<SharedItem?> results = sharedItemService
+                  .createSharedItemList(sharedItemSnapshot.data!);
+              for (var res in results) {
+                if (res != null) {
+                  logger.d('Got items: ${res.toJson()}');
+                  sharedItems.add(res);
+                }
+              }
+            }
+
+            if (sharedItems.isEmpty) {
+              return const Center(
+                  child: Text("There is no liked post yet"));
+            }
+
+            return Expanded(
+              child: 
+              ListView.builder(
+                itemCount: sharedItems.length,
+                itemBuilder: (_, index) {
+                  if (sharedItems[index] != null) {
+                    logger.d(
+                        'Got items: ${sharedItems[index].toJson()}');
+                    return Post(postData: sharedItems[index]);
+                  }
+                  return null;
+                },
+              )
+            );
+                        
+          } else if (sharedItemSnapshot.connectionState ==
+              ConnectionState.active) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            return const Center(
+                child: Text("There is no liked item"));
+          }
+        }
+      );  
+    }
+  }

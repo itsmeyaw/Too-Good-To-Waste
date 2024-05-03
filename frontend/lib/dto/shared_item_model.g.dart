@@ -16,6 +16,10 @@ SharedItem _$SharedItemFromJson(Map<String, dynamic> json) => SharedItem(
       category: $enumDecode(_$ItemCategoryEnumMap, json['category']),
       user: json['user'] as String,
       isAvailable: json['is_available'] as bool? ?? true,
+      likedBy: (json['liked_by'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
       sharedItemReservation: json['shared_item_reservation'] == null
           ? null
           : SharedItemReservation.fromJson(
@@ -36,6 +40,7 @@ Map<String, dynamic> _$SharedItemToJson(SharedItem instance) =>
       'user': instance.user,
       'shared_item_reservation': instance.sharedItemReservation?.toJson(),
       'is_available': instance.isAvailable,
+      'liked_by': instance.likedBy,
       'location': const GeoFirePointConverter().toJson(instance.location),
     };
 

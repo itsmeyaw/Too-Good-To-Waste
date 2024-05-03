@@ -33,6 +33,8 @@ class _HomeState extends State<Home> {
   ItemCategory? category;
   List<ItemAllergy> allergies = [];
   List<SharedItem> sharedItems = [];
+  bool showLikedPosts = false;
+
 
   void _resetSharedItems() {
     sharedItems = [];
@@ -79,6 +81,13 @@ class _HomeState extends State<Home> {
     }
   }
 
+  Future<void> _showLikedPosts() async {
+    //final List<SharedItem> likedItems = await sharedItemService.getLikedItems(userId);
+    setState(() {
+      showLikedPosts = true;
+    });
+  }
+
   Set<Marker> createMarkers(List<SharedItem> sharedItems) {
     logger.d('Created Google Map, adding ${sharedItems.length} results');
     Set<Marker> markers = {};
@@ -122,7 +131,8 @@ class _HomeState extends State<Home> {
                           userLocation: userLocation,
                           radiusInKm: radius,
                           userId: userId,
-                          category: category),
+                          category: category,
+                          showLiked: showLikedPosts),
                       builder: (BuildContext context,
                           AsyncSnapshot<List<DocumentSnapshot>>
                               sharedItemSnapshot) {
@@ -201,22 +211,20 @@ class _HomeState extends State<Home> {
                 ActionChip(
                     onPressed: _showAllergyDialog,
                     avatar: const Icon(Icons.warning),
-                    label: Text('Allergies (${allergies.length})'))
+                    label: Text('Allergies (${allergies.length})')),
+                const SizedBox(
+                  width: 10,
+                ),
+                ActionChip(
+                    onPressed: _showLikedPosts,
+                    avatar: const Icon(Icons.favorite),
+                    label: Text('Liked Posts (${allergies.length})'))
               ],
             ),
           ),
           const SizedBox(
             height: 10,
           ),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.start,
-          //   children: [
-          //     Text(
-          //       'Results',
-          //       style: Theme.of(context).textTheme.headlineMedium,
-          //     )
-          //   ],
-          // ),
           UserLocationAwareWidget(
               builder: (BuildContext context, GeoPoint userLocation) =>
                   StreamBuilder(
@@ -224,7 +232,8 @@ class _HomeState extends State<Home> {
                           userLocation: userLocation,
                           radiusInKm: radius,
                           userId: userId,
-                          category: category),
+                          category: category,
+                          showLiked: showLikedPosts),
                       builder: (BuildContext context,
                           AsyncSnapshot<List<DocumentSnapshot>>
                               sharedItemSnapshot) {
@@ -250,24 +259,25 @@ class _HomeState extends State<Home> {
                                 child: Text("There is no item in your area"));
                           }
 
-                          return Expanded(
+                        return Expanded(
                           child: 
-                          GridView.builder(
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 4.0,
-                              mainAxisSpacing: 4.0,
-                            ),
-                            itemCount: sharedItems.length,
-                            itemBuilder: (_, index) {
-                              if (sharedItems[index] != null) {
-                                logger.d(
-                                    'Got items: ${sharedItems[index].toJson()}');
-                                return Post(postData: sharedItems[index]);
-                              }
-                              return null;
-                            },
-                          ));
+                            GridView.builder(
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 4.0,
+                                mainAxisSpacing: 4.0,
+                              ),
+                              itemCount: sharedItems.length,
+                              itemBuilder: (_, index) {
+                                if (sharedItems[index] != null) {
+                                  logger.d(
+                                      'Got items: ${sharedItems[index].toJson()}');
+                                  return Post(postData: sharedItems[index]);
+                                }
+                                return null;
+                              },
+                            )
+                        );
                         
                         } else if (sharedItemSnapshot.connectionState ==
                             ConnectionState.active) {
@@ -333,30 +343,50 @@ class _RadiusPickerState extends State<RadiusPicker> {
   }
 }
 
-class Post extends StatelessWidget {
+class Post extends StatefulWidget {
   final SharedItem postData;
-
+  
   const Post({super.key, required this.postData});
+
+  @override
+  State<StatefulWidget> createState() => _PostState();
+}
+
+class _PostState extends State<Post> {
+  final SharedItemService sharedItemService = SharedItemService();
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
+
 
   @override
   Widget build(BuildContext context) {
     String? categoryIconImagePath;
 
-    int remainDays = DateTime.fromMillisecondsSinceEpoch(postData.expireDate)
+    int remainDays = DateTime.fromMillisecondsSinceEpoch(widget.postData.expireDate)
           .difference(DateTime.now())
           .inDays;
-    if (GlobalCateIconMap[postData.category.name] == null) {
+    if (GlobalCateIconMap[widget.postData.category.name] == null) {
       categoryIconImagePath = GlobalCateIconMap["Others"];
     } else {
-      categoryIconImagePath = GlobalCateIconMap[postData.category.name];
+      categoryIconImagePath = GlobalCateIconMap[widget.postData.category.name];
     }
 
-    return foodItem(postData, remainDays, onTapped: () {
+    final String userId = FirebaseAuth.instance.currentUser!.uid;
+
+    bool isLiked = widget.postData.likedBy.contains(userId);
+
+    return foodItem(widget.postData, remainDays, onTapped: () {
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => PostPage(postData: postData)));
+              builder: (context) => PostPage(postData: widget.postData)));
     },
+      onLike: () {
+        sharedItemService.setLikedBy(widget.postData.id!, userId);
+        setState(() {
+          isLiked = !isLiked;
+        });
+    },
+      isLiked: isLiked,
       );     
    }
 }

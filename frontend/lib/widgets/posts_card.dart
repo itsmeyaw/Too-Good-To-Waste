@@ -1,13 +1,20 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
 import 'package:tooGoodToWaste/dto/user_model.dart';
 import 'package:tooGoodToWaste/pages/post_page.dart';
+import 'package:tooGoodToWaste/service/shared_items_service.dart';
 import 'package:tooGoodToWaste/service/storage_service.dart';
 import 'package:tooGoodToWaste/service/user_service.dart';
 
-Widget foodItem(SharedItem postData, remainDays, {onTapped, onLike}) {
+Widget foodItem(SharedItem postData, remainDays, {onTapped, onLike, isLiked}) {
     final UserService userService = UserService();
     final StorageService storageService = StorageService();
+    
+    // final String userId = FirebaseAuth.instance.currentUser!.uid;
+
+    // bool isLiked = postData.likedBy.contains(userId);
+   
     
   return FutureBuilder(
           future: userService.getUserData(postData.user),
@@ -83,8 +90,8 @@ Widget foodItem(SharedItem postData, remainDays, {onTapped, onLike}) {
               ),
               onPressed: onLike,
               child: Icon(
-                (postData.isAvailable) ? Icons.favorite : Icons.favorite_border,
-                color: (postData.isAvailable) ? Colors.black : Colors.grey,
+                (isLiked) ? Icons.favorite : Icons.favorite_border,
+                color: (isLiked) ? Colors.black : Colors.grey,
                 size: 20,
               ),
             )),
@@ -119,7 +126,7 @@ Widget foodItem(SharedItem postData, remainDays, {onTapped, onLike}) {
               ),
         Positioned(
             top: 0,
-            right: 0,
+            right: 5,
             child: (postUser.rating != 0.0)
                 ? Container(
                     padding:
@@ -128,9 +135,9 @@ Widget foodItem(SharedItem postData, remainDays, {onTapped, onLike}) {
                       children: <Widget>[
                         const Icon(Icons.grade,
                                       color: Color.fromRGBO(9, 162, 109, 1)),
-                       Text('Rating:${postUser.rating.toStringAsFixed(1)}',
+                       Text(' ${postUser.rating.toStringAsFixed(1)}',
                         style: TextStyle(
-                            color: Color.fromRGBO(9, 162, 109, 1), fontWeight: FontWeight.w500, fontSize: 10)),
+                            color: Color.fromRGBO(9, 162, 109, 1), fontWeight: FontWeight.w700, fontSize: 15)),
                       ]
                   ))
                 : SizedBox(width: 0))

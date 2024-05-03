@@ -20,9 +20,16 @@ class SharedItem {
   final ItemCategory category;
   final String user;
   SharedItemReservation? sharedItemReservation;
+ 
 
   @JsonKey(defaultValue: true)
   bool isAvailable = true;
+
+  // @JsonKey(defaultValue: false)
+  // bool isLiked = false;
+  @JsonKey(defaultValue: [])
+  List<String> likedBy = [];
+
 
   @GeoFirePointConverter()
   GeoFirePoint location = GeoFirePoint(0.0, 0.0);
@@ -40,6 +47,7 @@ class SharedItem {
       required this.category,
       required this.user,
       required this.isAvailable,
+      required this.likedBy,
       this.sharedItemReservation});
 
   factory SharedItem.fromJson(Map<String, dynamic> json) =>

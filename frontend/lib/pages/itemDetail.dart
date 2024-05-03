@@ -380,6 +380,7 @@ class __DialogContentState extends State<_DialogContent> {
                                   expireDate: widget.foodDetail.remainDays,
                                   user: currentUser.uid,
                                   isAvailable: true,
+                                  likedBy: [],
                                   imageUrl: imagePath,
                                 );
                                 sharedItemService.postSharedItem(widget.userLocation, sharedItem);
