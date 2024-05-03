@@ -247,7 +247,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
               Container(
                 height: _media.height,
                 width: _media.width,
-                decoration: constBoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: FractionalOffset(0.5, 0.0),
                     end: FractionalOffset(0.6, 0.8),
