@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
+import 'package:tooGoodToWaste/dto/user_preference_model.dart';
 import 'package:tooGoodToWaste/dto/user_rating.dart';
 
 import '../dto/user_item_model.dart';
@@ -48,7 +49,8 @@ class UserService {
 
   /// Rate a user with id @param userId and with the value of @param rating
   /// Rating is 0 - 5;
-  Future<void> rateUser(String userId, double rating, String sharedItemId) async {
+  Future<void> rateUser(
+      String userId, double rating, String sharedItemId) async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       throw Exception("User is not logged in but want to rate user");
@@ -66,7 +68,11 @@ class UserService {
         .doc(userId)
         .collection(RATING_SUB_COLLECTION)
         .doc(sharedItemId)
-        .set(UserRating(ratingFrom: user!.uid, ratingValue: rating, sharedItemId: sharedItemId).toJson());
+        .set(UserRating(
+                ratingFrom: user!.uid,
+                ratingValue: rating,
+                sharedItemId: sharedItemId)
+            .toJson());
 
     logger.d('Updated the user rating in the collection');
 
@@ -89,5 +95,22 @@ class UserService {
         .collection(COLLECTION)
         .doc(userId)
         .update({'rating': calculatedRating});
+  }
+
+  Future<void> setUserFoodPreference(FoodPreference? foodPreference) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception("User is not logged in but want to rate user");
+    }
+
+    analytics.logEvent(name: "Set Food Preference");
+
+    TGTWUser tgtwUser = await getUserData(user.uid);
+    Map<String, dynamic> modifiedUser = tgtwUser.toJson();
+    (modifiedUser['user_preference']
+            as Map<String, dynamic>)['food_preference'] =
+        FoodPreferenceEnumMap[foodPreference];
+
+    await db.collection(COLLECTION).doc(user.uid).update(modifiedUser);
   }
 }
