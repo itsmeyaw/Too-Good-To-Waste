@@ -261,6 +261,9 @@ class _HomeState extends State<Home> {
                             avatar: const Icon(Icons.rice_bowl),
                             label: Text(
                                 'Preference (${foodPreference?.name ?? "None"})')),
+                        const SizedBox(
+                          width: 10,
+                        ),
                         ActionChip(
                             onPressed: _showLikedPosts,
                             avatar: const Icon(Icons.favorite),
