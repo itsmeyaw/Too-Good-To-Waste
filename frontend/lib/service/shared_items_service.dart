@@ -81,11 +81,26 @@ class SharedItemService {
       {required GeoPoint userLocation,
       required double radiusInKm,
       required String userId,
-      ItemCategory? category}) {
+      ItemCategory? category,
+      required bool showLiked}) {
     logger.d('Start querying for shared item');
     analytics.logEvent(name: "Search Item");
 
     var collection = db.collection(SHARED_ITEM_COLLECTION);
+
+    if (showLiked) {
+      return geo
+        .collection(
+            collectionRef: collection
+                .where('liked_by', arrayContains: userId)
+        )
+        .within(
+            center: GeoFirePoint(0, 0),
+            radius: 10000,
+            field: "location",
+            strictMode: true);
+    }
+
     if (category != null) {
       String categoryString = category.name;
       logger.d("Adding category filter: $categoryString");
@@ -117,6 +132,75 @@ class SharedItemService {
       logger.d("Got ${querySnapshot.size} shared items of user $userId");
       return querySnapshot.docs.map((doc) => SharedItem.fromJson(doc.data()));
     });
+  }
+
+  Stream<List<DocumentSnapshot>> getLikedSharedItemOfUser({required String userId}) {
+    logger.d('Start querying for shared item');
+    analytics.logEvent(name: "Search Item");
+
+    var collection = db.collection(SHARED_ITEM_COLLECTION);
+
+    return geo
+        .collection(
+            collectionRef: collection
+                .where('liked_by', arrayContains: userId)
+        )
+        .within(
+            center: GeoFirePoint(0, 0),
+            radius: 10000,
+            field: "location",
+            strictMode: true);
+    // return 
+    //     .where('liked_by', arrayContains: userId)
+    //     .get()
+    //     .then((querySnapshot) {
+    //   logger.d("Got ${querySnapshot.size} liked shared items of user $userId");
+    //   return querySnapshot.docs;
+    // });
+  }
+
+  Future<Iterable<SharedItem>> getSharedItemOfUserWithReservation(String userId) {
+    return db
+        .collection(SHARED_ITEM_COLLECTION)
+        .where('user', isEqualTo: userId)
+        .where('shared_item_reservation.reserver', isNotEqualTo: null)
+        .get()
+        .then((querySnapshot) {
+      logger.d("Got ${querySnapshot.size} shared items of user $userId with reservation");
+      return querySnapshot.docs.map((doc) => SharedItem.fromJson(doc.data()));
+    });
+  }
+
+  Future<void> deleteSharedItem(String sharedItemId) async {
+    await db.collection(SHARED_ITEM_COLLECTION).doc(sharedItemId).delete();
+  }
+
+  Future<bool> setLikedBy(String sharedItemId, String userId) async {
+    final DocumentSnapshot<Map<String, dynamic>> sharedItemDoc = await db.collection(SHARED_ITEM_COLLECTION).doc(sharedItemId).get();
+
+    if (!sharedItemDoc.exists) {
+      throw Error();
+    } else {
+      final SharedItem sharedItem = SharedItem.fromJson(sharedItemDoc.data()!);
+
+      bool isLiked = sharedItem.likedBy.contains(userId);
+
+      List<String> likedBy = sharedItem.likedBy;
+      if (likedBy.contains(userId)) {
+        likedBy.remove(userId);
+        isLiked = false;
+      } else {
+        likedBy.add(userId);
+        isLiked = true;
+      }
+
+      await db
+          .collection(SHARED_ITEM_COLLECTION)
+          .doc(sharedItemId)
+          .update({'liked_by': likedBy});
+
+      return isLiked;
+    }
   }
 
   /// Return previous state of is_available
