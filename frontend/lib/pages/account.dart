@@ -251,43 +251,14 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
             ),
         
             Container(
-              padding: EdgeInsets.only(top: 20, bottom: 40),
+              padding: EdgeInsets.only(top: 10, bottom: 40),
               child:
                 TabBarView(
                   children: [
                     Stack(
+                        clipBehavior: Clip.none,
                         children: [
-                          Positioned(
-                            top: 5.0,
-                            right: 10.0,
-                            child: 
-                            // const SwitchButton(),
-                              IconButton(
-                                icon: Icon(isEditMode ? Icons.done : Icons.edit),
-                                onPressed: () {
-                                  setState(() {
-                                    isEditMode = !isEditMode;
-                                    if (!isEditMode) {
-                                      // Save changes
-                                      currentAddress1 = address1Controller.text;
-                                      currentAddress2 = address2Controller.text;
-                                      currentName = UserName(
-                                              first: nameController.text.split(' ')[0],
-                                              last: nameController.text.split(' ')[1]);
-                                      currentEmail = emailController.text;
-                                      currentPhoneNumber = phoneNumberController.text;
-                                      currentCity = cityController.text;
-                                      currentZipCode = zipCodeController.text;
-                                      currentCountry = countryController.text;
-                                      currentAllergies = allergiesController.text;                  
-                                      showUpdateDialog();
-                                    
-                                    }
-                                  });
-                                },
-                              ),
-                          ),
-                        Container(
+                          Container(
                           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                           height: MediaQuery.of(context).size.height,
                           child: ListView(children: [
@@ -533,6 +504,35 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                                 height: 10,
                               ),
                             ]),
+                          ),
+                         Positioned(
+                            top: -10.0,
+                            right: 10.0,
+                            child: 
+                              IconButton(
+                                icon: Icon(isEditMode ? Icons.done : Icons.edit),
+                                onPressed: () {
+                                  setState(() {
+                                    isEditMode = !isEditMode;
+                                    if (!isEditMode) {
+                                      // Save changes
+                                      currentAddress1 = address1Controller.text;
+                                      currentAddress2 = address2Controller.text;
+                                      currentName = UserName(
+                                              first: nameController.text.split(' ')[0],
+                                              last: nameController.text.split(' ')[1]);
+                                      currentEmail = emailController.text;
+                                      currentPhoneNumber = phoneNumberController.text;
+                                      currentCity = cityController.text;
+                                      currentZipCode = zipCodeController.text;
+                                      currentCountry = countryController.text;
+                                      currentAllergies = allergiesController.text;                  
+                                      showUpdateDialog();
+                                    
+                                    }
+                                  });
+                                },
+                              ),
                           ),
                       ]
                     ),

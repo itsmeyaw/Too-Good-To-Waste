@@ -126,7 +126,7 @@ Widget foodItem(SharedItem postData, remainDays, {onTapped, onLike, isLiked}) {
               ),
         Positioned(
             top: 0,
-            right: 5,
+            right: 10,
             child: (postUser.rating != 0.0)
                 ? Container(
                     padding:
