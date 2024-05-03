@@ -41,7 +41,6 @@ class _HomeState extends State<Home> {
   List<SharedItem> sharedItems = [];
   bool showLikedPosts = false;
 
-
   @override
   void initState() {
     super.initState();
@@ -260,7 +259,8 @@ class _HomeState extends State<Home> {
                                   userData.userPreference.foodPreference);
                             },
                             avatar: const Icon(Icons.rice_bowl),
-                            label: Text('Preference (${foodPreference?.name ?? "None"})')),
+                            label: Text(
+                                'Preference (${foodPreference?.name ?? "None"})')),
                         ActionChip(
                             onPressed: _showLikedPosts,
                             avatar: const Icon(Icons.favorite),
@@ -404,14 +404,14 @@ class _PostState extends State<Post> {
   final SharedItemService sharedItemService = SharedItemService();
   final String userId = FirebaseAuth.instance.currentUser!.uid;
 
-
   @override
   Widget build(BuildContext context) {
     String? categoryIconImagePath;
 
-    int remainDays = DateTime.fromMillisecondsSinceEpoch(widget.postData.expireDate)
-        .difference(DateTime.now())
-        .inDays;
+    int remainDays =
+        DateTime.fromMillisecondsSinceEpoch(widget.postData.expireDate)
+            .difference(DateTime.now())
+            .inDays;
     if (GlobalCateIconMap[widget.postData.category.name] == null) {
       categoryIconImagePath = GlobalCateIconMap["Others"];
     } else {
@@ -420,7 +420,8 @@ class _PostState extends State<Post> {
 
     final String userId = FirebaseAuth.instance.currentUser!.uid;
 
-    bool isLiked = widget.postData.likedBy.contains(userId);return foodItem(
+    bool isLiked = widget.postData.likedBy.contains(userId);
+    return foodItem(
       widget.postData,
       remainDays,
       onTapped: () {
@@ -428,12 +429,13 @@ class _PostState extends State<Post> {
             context,
             MaterialPageRoute(
                 builder: (context) => PostPage(postData: widget.postData)));
-      },onLike: () {
+      },
+      onLike: () {
         sharedItemService.setLikedBy(widget.postData.id!, userId);
         setState(() {
           isLiked = !isLiked;
         });
-    },
+      },
       isLiked: isLiked,
     );
   }

@@ -12,9 +12,8 @@ Widget foodItem(SharedItem postData, remainDays, {onTapped, onLike, isLiked}) {
   final StorageService storageService = StorageService();
 // final String userId = FirebaseAuth.instance.currentUser!.uid;
 
-    // bool isLiked = postData.likedBy.contains(userId);
+  // bool isLiked = postData.likedBy.contains(userId);
 
-    
   return FutureBuilder(
       future: userService.getUserData(postData.user),
       builder:
@@ -85,11 +84,8 @@ Widget foodItem(SharedItem postData, remainDays, {onTapped, onLike, isLiked}) {
                       ),
                       onPressed: onLike,
                       child: Icon(
-                        (isLiked)
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color:
-                            (isLiked) ? Colors.black : Colors.grey,
+                        (isLiked) ? Icons.favorite : Icons.favorite_border,
+                        color: (isLiked) ? Colors.black : Colors.grey,
                         size: 20,
                       ),
                     )),
@@ -133,8 +129,7 @@ Widget foodItem(SharedItem postData, remainDays, {onTapped, onLike, isLiked}) {
                             child: Row(children: <Widget>[
                               const Icon(Icons.grade,
                                   color: Color.fromRGBO(9, 162, 109, 1)),
-                              Text(
-                                  ' ${postUser.rating.toStringAsFixed(1)}',
+                              Text(' ${postUser.rating.toStringAsFixed(1)}',
                                   style: TextStyle(
                                       color: Color.fromRGBO(9, 162, 109, 1),
                                       fontWeight: FontWeight.w700,

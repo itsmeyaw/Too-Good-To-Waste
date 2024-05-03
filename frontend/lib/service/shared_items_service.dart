@@ -90,15 +90,14 @@ class SharedItemService {
 
     if (showLiked) {
       return geo
-        .collection(
-            collectionRef: collection
-                .where('liked_by', arrayContains: userId)
-        )
-        .within(
-            center: GeoFirePoint(0, 0),
-            radius: 10000,
-            field: "location",
-            strictMode: true);
+          .collection(
+              collectionRef:
+                  collection.where('liked_by', arrayContains: userId))
+          .within(
+              center: GeoFirePoint(0, 0),
+              radius: 10000,
+              field: "location",
+              strictMode: true);
     }
 
     if (category != null) {
@@ -134,7 +133,8 @@ class SharedItemService {
     });
   }
 
-  Stream<List<DocumentSnapshot>> getLikedSharedItemOfUser({required String userId}) {
+  Stream<List<DocumentSnapshot>> getLikedSharedItemOfUser(
+      {required String userId}) {
     logger.d('Start querying for shared item');
     analytics.logEvent(name: "Search Item");
 
@@ -142,15 +142,13 @@ class SharedItemService {
 
     return geo
         .collection(
-            collectionRef: collection
-                .where('liked_by', arrayContains: userId)
-        )
+            collectionRef: collection.where('liked_by', arrayContains: userId))
         .within(
             center: GeoFirePoint(0, 0),
             radius: 10000,
             field: "location",
             strictMode: true);
-    // return 
+    // return
     //     .where('liked_by', arrayContains: userId)
     //     .get()
     //     .then((querySnapshot) {
@@ -159,14 +157,16 @@ class SharedItemService {
     // });
   }
 
-  Future<Iterable<SharedItem>> getSharedItemOfUserWithReservation(String userId) {
+  Future<Iterable<SharedItem>> getSharedItemOfUserWithReservation(
+      String userId) {
     return db
         .collection(SHARED_ITEM_COLLECTION)
         .where('user', isEqualTo: userId)
         .where('shared_item_reservation.reserver', isNotEqualTo: null)
         .get()
         .then((querySnapshot) {
-      logger.d("Got ${querySnapshot.size} shared items of user $userId with reservation");
+      logger.d(
+          "Got ${querySnapshot.size} shared items of user $userId with reservation");
       return querySnapshot.docs.map((doc) => SharedItem.fromJson(doc.data()));
     });
   }
@@ -176,7 +176,8 @@ class SharedItemService {
   }
 
   Future<bool> setLikedBy(String sharedItemId, String userId) async {
-    final DocumentSnapshot<Map<String, dynamic>> sharedItemDoc = await db.collection(SHARED_ITEM_COLLECTION).doc(sharedItemId).get();
+    final DocumentSnapshot<Map<String, dynamic>> sharedItemDoc =
+        await db.collection(SHARED_ITEM_COLLECTION).doc(sharedItemId).get();
 
     if (!sharedItemDoc.exists) {
       throw Error();

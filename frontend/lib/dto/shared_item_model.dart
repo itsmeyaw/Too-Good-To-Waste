@@ -20,7 +20,6 @@ class SharedItem {
   final ItemCategory category;
   final String user;
   SharedItemReservation? sharedItemReservation;
- 
 
   @JsonKey(defaultValue: true)
   bool isAvailable = true;
@@ -29,7 +28,6 @@ class SharedItem {
   // bool isLiked = false;
   @JsonKey(defaultValue: [])
   List<String> likedBy = [];
-
 
   @GeoFirePointConverter()
   GeoFirePoint location = GeoFirePoint(0.0, 0.0);
