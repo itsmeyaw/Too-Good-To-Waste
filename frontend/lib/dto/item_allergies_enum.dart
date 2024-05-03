@@ -1,7 +1,1 @@
-enum ItemAllergy {
-  Peanut,
-  Egg,
-  Prawn,
-  Wheat,
-  Lactose
-}
+enum ItemAllergy { Peanut, Egg, Prawn, Wheat, Lactose }

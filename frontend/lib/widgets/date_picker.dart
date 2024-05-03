@@ -21,7 +21,7 @@ class _DataPickerState extends State<DataPicker> {
   int expireDate = -1;
   ValueChanged<int> getdatePicker(int expireDate) {
     // TODO: implement getdatePicker
-    
+
     //return expireDate;
     throw UnimplementedError();
   }
@@ -59,10 +59,10 @@ class _DataPickerState extends State<DataPicker> {
                 if (value != selectedDate) {
                   setState(() {
                     selectedDate = value;
-                  
+
                     int timestamp = selectedDate.millisecondsSinceEpoch;
                     expireDate = timestamp;
-        
+
                     getdatePicker(expireDate);
                     // Navigator.pop(context)
                     //記錄下用戶選擇的時間 ------> 存入數據庫

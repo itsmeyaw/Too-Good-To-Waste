@@ -16,7 +16,8 @@ class StorageService {
   Future<String> uploadImage(String imagePath) async {
     String randomId = const UuidV4().generate();
     File sourceImage = File(imagePath);
-    Reference imageRef = storage.ref().child(STORAGE_DIRECTORY).child('/$randomId.jpg');
+    Reference imageRef =
+        storage.ref().child(STORAGE_DIRECTORY).child('/$randomId.jpg');
     Image? sourceImageObj = decodeImage(sourceImage.readAsBytesSync());
 
     if (sourceImageObj == null) {
@@ -24,11 +25,7 @@ class StorageService {
     }
 
     final metadata = SettableMetadata(
-      contentType: 'image/jpeg',
-      customMetadata: {
-        'path': imagePath
-      }
-    );
+        contentType: 'image/jpeg', customMetadata: {'path': imagePath});
 
     // Resize image to be smaller
     Image destImageObj = copyResize(sourceImageObj, width: 300);

@@ -15,19 +15,16 @@ class UserItem {
   String state;
   double consumeState;
 
-UserItem(
-  {
-    required this.id,
-    required this.name,
-    required this.category,
-    required this.buyDate,
-    required this.expiryDate,
-    required this.quantityType,
-    required this.quantityNum,
-    required this.consumeState,
-    required this.state
-  }
-);
+  UserItem(
+      {required this.id,
+      required this.name,
+      required this.category,
+      required this.buyDate,
+      required this.expiryDate,
+      required this.quantityType,
+      required this.quantityNum,
+      required this.consumeState,
+      required this.state});
 
   //Convert a Food into a Map. The keys must correspond to the names
   //of the columns in the database.

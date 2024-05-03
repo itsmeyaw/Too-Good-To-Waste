@@ -11,13 +11,11 @@ void main() {
   const String userCollection = 'users';
   const String itemsCollection = 'items';
 
-
   group('Get Items', () {
     setUp(() {
       mockFirestore.collection(userCollection);
     });
 
-    test('Getting user items normally', () {
-    });
+    test('Getting user items normally', () {});
   });
 }

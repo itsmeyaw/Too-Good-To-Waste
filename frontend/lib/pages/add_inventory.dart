@@ -131,7 +131,7 @@
 
 //   @override
 //   Widget build(BuildContext context) {
-   
+
 //     final category = [
 //       "Vegetable",
 //       "Meat",
@@ -437,7 +437,7 @@
 //             } on FormatException {
 //               print('Format Error!');
 //             }
-          
+
 //             // close route
 //             // when push is used, it pushes new item on stack of navigator
 //             // simply pop off stack and it goes back
@@ -452,7 +452,7 @@
 //           tooltip: 'Add item',
 //           label: Text('Add item'),
 //           icon: const Icon(Icons.add),
-         
+
 //         ),
 //         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
 //       ),

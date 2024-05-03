@@ -49,7 +49,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '686754712481',
     projectId: 'sc2024-96b48',
     authDomain: 'sc2024-96b48.firebaseapp.com',
-    databaseURL: 'https://sc2024-96b48-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://sc2024-96b48-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'sc2024-96b48.appspot.com',
     measurementId: 'G-TZM3DY13K1',
   );
@@ -59,7 +60,8 @@ class DefaultFirebaseOptions {
     appId: '1:686754712481:android:53ff9bd3df9f9d622459e0',
     messagingSenderId: '686754712481',
     projectId: 'sc2024-96b48',
-    databaseURL: 'https://sc2024-96b48-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://sc2024-96b48-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'sc2024-96b48.appspot.com',
   );
 
@@ -68,7 +70,8 @@ class DefaultFirebaseOptions {
     appId: '1:686754712481:ios:1daf5773783c5c272459e0',
     messagingSenderId: '686754712481',
     projectId: 'sc2024-96b48',
-    databaseURL: 'https://sc2024-96b48-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://sc2024-96b48-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'sc2024-96b48.appspot.com',
     iosBundleId: 'com.example.frontend',
   );
@@ -78,7 +81,8 @@ class DefaultFirebaseOptions {
     appId: '1:686754712481:ios:9b01b5553a4d55272459e0',
     messagingSenderId: '686754712481',
     projectId: 'sc2024-96b48',
-    databaseURL: 'https://sc2024-96b48-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://sc2024-96b48-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'sc2024-96b48.appspot.com',
     iosBundleId: 'com.example.frontend.RunnerTests',
   );

@@ -31,7 +31,8 @@ class _PostPageState extends State<PostPage> {
   final User? currentUser = FirebaseAuth.instance.currentUser;
   double userRating = 0;
 
-  Future<bool?> showConfirmDialog(BuildContext context, String sharedItemId) async {
+  Future<bool?> showConfirmDialog(
+      BuildContext context, String sharedItemId) async {
     return showDialog<bool>(
         barrierDismissible: false,
         context: context,
@@ -42,7 +43,9 @@ class _PostPageState extends State<PostPage> {
               child: Column(
                 children: [
                   const Text("Please rate your experience and confirm"),
-                  const SizedBox(height: 10,),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   RatingBar.builder(
                     minRating: 1,
                     maxRating: 5,
@@ -65,22 +68,23 @@ class _PostPageState extends State<PostPage> {
             ),
             actions: [
               FilledButton(
-                  style: FilledButton.styleFrom(backgroundColor: Theme.of(context).buttonTheme.colorScheme!.error),
+                  style: FilledButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).buttonTheme.colorScheme!.error),
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
-                  child: const Text('Cancel')
-              ),
+                  child: const Text('Cancel')),
               FilledButton(
                   onPressed: () async {
                     if (userRating == 0) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Please input your rating"))
-                      );
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text("Please input your rating")));
                       return;
                     }
 
-                    await userService.rateUser(widget.postData.user, userRating, sharedItemId);
+                    await userService.rateUser(
+                        widget.postData.user, userRating, sharedItemId);
                     await sharedItemService.confirmPickUp(sharedItemId);
 
                     Navigator.of(context).pop(true);
@@ -88,8 +92,7 @@ class _PostPageState extends State<PostPage> {
                   child: const Text("Confirm"))
             ],
           );
-        }
-    );
+        });
   }
 
   @override
@@ -97,90 +100,89 @@ class _PostPageState extends State<PostPage> {
     String sharedItemId = widget.postData.id!;
 
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: const Text('Shared Item Information'),
-          actions: const [],
-        ),
-        body: FutureBuilder(
-          future: userService.getUserData(widget.postData.user),
-          builder:
-              (BuildContext context, AsyncSnapshot<TGTWUser> userDataSnapshot) {
-            if (userDataSnapshot.connectionState == ConnectionState.done &&
-                userDataSnapshot.hasData) {
-              TGTWUser postUser = userDataSnapshot.requireData;
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text('Shared Item Information'),
+        actions: const [],
+      ),
+      body: FutureBuilder(
+        future: userService.getUserData(widget.postData.user),
+        builder:
+            (BuildContext context, AsyncSnapshot<TGTWUser> userDataSnapshot) {
+          if (userDataSnapshot.connectionState == ConnectionState.done &&
+              userDataSnapshot.hasData) {
+            TGTWUser postUser = userDataSnapshot.requireData;
 
-              return Container(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        FractionallySizedBox(
-                          widthFactor: 1.0,
-                          child: SizedBox(
-                              height: 160,
-                              child: GoogleMap(
-                                onMapCreated: (event) {},
-                                initialCameraPosition: CameraPosition(
-                                  target: LatLng(
-                                      widget.postData.location.latitude,
-                                      widget.postData.location.longitude),
-                                  zoom: 15.0,
-                                ),
-                                circles: <Circle>{
-                                  Circle(
-                                      circleId: CircleId(widget.postData.id!),
-                                      center: LatLng(
-                                          widget.postData.location.latitude,
-                                          widget.postData.location.longitude),
-                                      fillColor: const Color.fromRGBO(
-                                          79, 195, 247, 0.5),
-                                      strokeWidth: 1,
-                                      strokeColor:
-                                          const Color.fromRGBO(79, 195, 247, 1),
-                                      radius: 200)
-                                },
-                              )),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Text(
-                          widget.postData.name,
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        Text(
-                            'Amount: ${widget.postData.amount.nominal} ${widget.postData.amount.unit}',
-                            style: Theme.of(context).textTheme.bodyMedium),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Shared by: ${postUser.name.first} ${postUser.name.last}',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.grade,
-                                      color: Theme.of(context).colorScheme.primary),
-                                  Text(
-                                    'User rating: ${postUser.rating.toStringAsFixed(1)}',
-                                    style: Theme.of(context).textTheme.bodySmall,
-                                  ),
-                                ],
-                              )
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        widget.postData.imageUrl != null
-                            ? Hero(
-                        transitionOnUserGestures: true,
-                        tag: widget.postData.name,
-                        child:
-                            Center(
+            return Container(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      FractionallySizedBox(
+                        widthFactor: 1.0,
+                        child: SizedBox(
+                            height: 160,
+                            child: GoogleMap(
+                              onMapCreated: (event) {},
+                              initialCameraPosition: CameraPosition(
+                                target: LatLng(
+                                    widget.postData.location.latitude,
+                                    widget.postData.location.longitude),
+                                zoom: 15.0,
+                              ),
+                              circles: <Circle>{
+                                Circle(
+                                    circleId: CircleId(widget.postData.id!),
+                                    center: LatLng(
+                                        widget.postData.location.latitude,
+                                        widget.postData.location.longitude),
+                                    fillColor:
+                                        const Color.fromRGBO(79, 195, 247, 0.5),
+                                    strokeWidth: 1,
+                                    strokeColor:
+                                        const Color.fromRGBO(79, 195, 247, 1),
+                                    radius: 200)
+                              },
+                            )),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        widget.postData.name,
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      Text(
+                          'Amount: ${widget.postData.amount.nominal} ${widget.postData.amount.unit}',
+                          style: Theme.of(context).textTheme.bodyMedium),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Shared by: ${postUser.name.first} ${postUser.name.last}',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(Icons.grade,
+                                  color: Theme.of(context).colorScheme.primary),
+                              Text(
+                                'User rating: ${postUser.rating.toStringAsFixed(1)}',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      widget.postData.imageUrl != null
+                          ? Hero(
+                              transitionOnUserGestures: true,
+                              tag: widget.postData.name,
+                              child: Center(
                                 child: Container(
                                     height: 200,
                                     padding: const EdgeInsets.all(0.0),
@@ -205,112 +207,154 @@ class _PostPageState extends State<PostPage> {
                                       },
                                     )),
                               ))
-                            : const Text('No image provided'),
-                        const Spacer(),
-                        StreamBuilder(
-                          stream: sharedItemService.streamSharedItem(sharedItemId),
-                          builder: (BuildContext context, AsyncSnapshot<SharedItem?> sharedItemSnapshot) {
-                            if (sharedItemSnapshot.hasData && sharedItemSnapshot.data != null) {
+                          : const Text('No image provided'),
+                      const Spacer(),
+                      StreamBuilder(
+                          stream:
+                              sharedItemService.streamSharedItem(sharedItemId),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<SharedItem?> sharedItemSnapshot) {
+                            if (sharedItemSnapshot.hasData &&
+                                sharedItemSnapshot.data != null) {
                               SharedItem sharedItem = sharedItemSnapshot.data!;
                               if (currentUser != null &&
                                   currentUser!.uid != sharedItem.user) {
-                                return
-                                  Column(
-                                    children: <Widget>[
-                                      FilledButton.tonal(
-                                          onPressed: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) => ChatroomPage(
-                                                      secondUserId:
-                                                      sharedItem.user,
-                                                      sharedItem: sharedItem,
-                                                    )));
-                                          },
-                                          child: FractionallySizedBox(
-                                            widthFactor: 1,
-                                            child: Text(
-                                              'Chat with ${postUser.name.last}',
-                                              textAlign: TextAlign.center,
+                                return Column(
+                                  children: <Widget>[
+                                    FilledButton.tonal(
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ChatroomPage(
+                                                        secondUserId:
+                                                            sharedItem.user,
+                                                        sharedItem: sharedItem,
+                                                      )));
+                                        },
+                                        child: FractionallySizedBox(
+                                          widthFactor: 1,
+                                          child: Text(
+                                            'Chat with ${postUser.name.last}',
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        )),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Builder(builder: (BuildContext context) {
+                                      if (sharedItem.isAvailable &&
+                                          sharedItem.sharedItemReservation ==
+                                              null) {
+                                        return FilledButton(
+                                            onPressed: () async {
+                                              try {
+                                                if (await sharedItemService
+                                                    .reserveItem(
+                                                        sharedItemId)) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(SnackBar(
+                                                          content: Text(
+                                                              "Succesfully reserved item")));
+                                                } else {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(SnackBar(
+                                                          content: Text(
+                                                              "Cannot reserved item")));
+                                                }
+                                              } catch (e) {
+                                                logger.e(
+                                                    "Error when trying to reserve item",
+                                                    error: e);
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(SnackBar(
+                                                        content: Text(
+                                                            "There was error while reserving item")));
+                                              }
+                                            },
+                                            child: const FractionallySizedBox(
+                                                widthFactor: 1,
+                                                child: Text(
+                                                  'Reserve',
+                                                  textAlign: TextAlign.center,
+                                                )));
+                                      } else if (sharedItem
+                                                  .sharedItemReservation !=
+                                              null &&
+                                          sharedItem.sharedItemReservation!
+                                                  .reserver ==
+                                              currentUser!.uid) {
+                                        // The item is reserved by this user
+                                        return Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: <Widget>[
+                                            IntrinsicWidth(
+                                                child: SizedBox(
+                                                    child: FilledButton(
+                                                        style: FilledButton.styleFrom(
+                                                            backgroundColor:
+                                                                Theme.of(
+                                                                        context)
+                                                                    .buttonTheme
+                                                                    .colorScheme!
+                                                                    .error),
+                                                        onPressed: () async {
+                                                          if (await sharedItemService
+                                                              .cancelReserveItem(
+                                                                  sharedItemId)) {
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                                    SnackBar(
+                                                                        content:
+                                                                            Text("Succesfully cancelled reservation")));
+                                                          } else {
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                                    SnackBar(
+                                                                        content:
+                                                                            Text("Cannot cancel reservation")));
+                                                          }
+                                                        },
+                                                        child: const Text(
+                                                            'Cancel')))),
+                                            const SizedBox(
+                                              width: 10,
                                             ),
-                                          )
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      Builder(builder: (BuildContext context) {
-                                        if (sharedItem.isAvailable && sharedItem.sharedItemReservation == null) {
-                                          return
-                                            FilledButton(
-                                                onPressed: () async {
-                                                  try {
-                                                    if (await sharedItemService.reserveItem(sharedItemId)) {
-                                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Succesfully reserved item")));
-                                                    } else {
-                                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Cannot reserved item")));
-                                                    }
-                                                  } catch (e) {
-                                                    logger.e("Error when trying to reserve item", error: e);
-                                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("There was error while reserving item")));
-                                                  }
-                                                },
-                                                child: const FractionallySizedBox(
-                                                    widthFactor: 1,
-                                                    child: Text(
-                                                      'Reserve',
-                                                      textAlign: TextAlign.center,
-                                                    )
-                                                )
-                                            );
-                                        } else if (sharedItem.sharedItemReservation != null && sharedItem.sharedItemReservation!.reserver == currentUser!.uid) {
-                                          // The item is reserved by this user
-                                          return Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                            children: <Widget>[
-                                              IntrinsicWidth(
-                                                  child: SizedBox(
-                                                      child: FilledButton(
-                                                          style: FilledButton.styleFrom(backgroundColor: Theme.of(context).buttonTheme.colorScheme!.error),
-                                                          onPressed: () async {
-                                                            if (await sharedItemService.cancelReserveItem(sharedItemId)) {
-                                                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Succesfully cancelled reservation")));
-                                                            } else {
-                                                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Cannot cancel reservation")));
-                                                            }
-                                                          },
-                                                          child: const Text('Cancel')
-                                                      )
-                                                  )
-                                              ),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              Expanded(
-                                                  child: SizedBox(
-                                                      child: FilledButton (
-                                                          onPressed: () async {
-                                                            bool? confirm = await showConfirmDialog(context, sharedItemId);
-                                                            if (confirm != null && confirm) {
-                                                              Navigator.of(context).pop();
-                                                            }
-                                                          },
-                                                          child: const Text('Confirm Pick Up')
-                                                      )
-                                                  )
-                                              )
-                                            ],
-                                          );
-                                        } else {
-                                          return FilledButton(onPressed: null, child: const FractionallySizedBox(
-                                            widthFactor: 1.0,
-                                            child: Text('Item is already reserved'),
-                                          ));
-                                        }
-                                      })
-                                    ],
-
-                                  );
+                                            Expanded(
+                                                child: SizedBox(
+                                                    child: FilledButton(
+                                                        onPressed: () async {
+                                                          bool? confirm =
+                                                              await showConfirmDialog(
+                                                                  context,
+                                                                  sharedItemId);
+                                                          if (confirm != null &&
+                                                              confirm) {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                          }
+                                                        },
+                                                        child: const Text(
+                                                            'Confirm Pick Up'))))
+                                          ],
+                                        );
+                                      } else {
+                                        return FilledButton(
+                                            onPressed: null,
+                                            child: const FractionallySizedBox(
+                                              widthFactor: 1.0,
+                                              child: Text(
+                                                  'Item is already reserved'),
+                                            ));
+                                      }
+                                    })
+                                  ],
+                                );
                               } else {
                                 return const FilledButton(
                                     onPressed: null,
@@ -323,16 +367,15 @@ class _PostPageState extends State<PostPage> {
                               }
                             }
                             return const CircularProgressIndicator();
-                        }),
-                      ]));
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          },
-        ),
-      
-      );
+                          }),
+                    ]));
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
+      ),
+    );
   }
 }
