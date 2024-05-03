@@ -62,12 +62,6 @@ Speed: 1.4
         <break time="300ms"/>
         Additionally, we use the new Google Vertex AI for extracting
         information from receipt and suggesting expiry date.
-        <break time="300ms"/>
-        With Google Cloud Scheduler and Firebase Cloud Messaging, we
-        can can send notification to our users.
-        <break time="300ms"/>
-        We also use Google Maps Platform to show our users
-        the location of shared items.
     </voice>
 
     <!-- Story -->
