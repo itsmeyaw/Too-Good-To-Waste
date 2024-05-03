@@ -56,7 +56,8 @@ class AiService {
             name: item["item"],
             category: ItemCategory.parse(item["category"]),
             buyDate: DateTime.parse(item["buy_date"]).millisecondsSinceEpoch,
-            expiryDate: DateTime.parse(item["suggested_expiry_date"]).millisecondsSinceEpoch,
+            expiryDate: DateTime.parse(item["suggested_expiry_date"])
+                .millisecondsSinceEpoch,
             quantityType: item["amount_unit"],
             quantityNum: (item["amount_count"] as num).toDouble(),
             consumeState: 0,

@@ -12,8 +12,8 @@ class GeoUtils {
     final deltaLambda = (p2.longitude - p2.longitude) * pi / 180;
 
     final a = pow(sin(deltaPi / 2), 2) +
-              cos(pi1) * cos(pi2) * sin(deltaLambda / 2) * sin(deltaLambda / 2);
-    final c = 2 * atan2(sqrt(a), sqrt(1- a));
+        cos(pi1) * cos(pi2) * sin(deltaLambda / 2) * sin(deltaLambda / 2);
+    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
 
     return EARTH_MEAN_RADIUS * c;
   }

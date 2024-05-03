@@ -12,7 +12,7 @@ class UserItemAmount {
   const UserItemAmount({required this.nominal, required this.unit});
 
   factory UserItemAmount.fromJson(Map<String, dynamic> json) =>
-   _$UserItemAmountFromJson(json);
+      _$UserItemAmountFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserItemAmountToJson(this);
 }

@@ -25,20 +25,20 @@ class _MyAccountPageState extends State<AccountPage> {
 
   UserService userService = UserService();
 
-  Future<dynamic> asyncMethod()  async {
+  Future<dynamic> asyncMethod() async {
     currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser == null) {
       logger.e('Fetching user data but user is null');
     } else {
       TGTWUser user = await userService.getUserData(currentUser!.uid);
-        setState(() {
-            userData = user;
-          });
+      setState(() {
+        userData = user;
+      });
       return [currentUser, userData];
     }
     // return null;
-  }  
+  }
 
   @override
   void initState() {
@@ -49,17 +49,16 @@ class _MyAccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _future, 
-      builder:(context, AsyncSnapshot<dynamic> snapshot)  {
-        
-        if (snapshot.hasError || snapshot.data == null) {
-          //throw Exception('User is null but accessing account page');
-          return const Center(child: CircularProgressIndicator());
-        } else {
-          return AccountSettingPage(user: snapshot.data[0], userData: snapshot.data[1]);
-        }
-      }
-    );
+        future: _future,
+        builder: (context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.hasError || snapshot.data == null) {
+            //throw Exception('User is null but accessing account page');
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            return AccountSettingPage(
+                user: snapshot.data[0], userData: snapshot.data[1]);
+          }
+        });
   }
 }
 
@@ -67,7 +66,8 @@ class AccountSettingPage extends StatefulWidget {
   final User user;
   final TGTWUser userData;
 
-  const AccountSettingPage({super.key, required this.user, required this.userData});
+  const AccountSettingPage(
+      {super.key, required this.user, required this.userData});
 
   @override
   _AccountSettingPageState createState() => _AccountSettingPageState();
@@ -101,7 +101,6 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
   late double currentCarbonEmission;
   late double currentRating;
 
-
   @override
   void initState() {
     super.initState();
@@ -109,7 +108,8 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
     if (widget.user.displayName == null) {
       currentName = const UserName(first: '', last: '');
     } else {
-      currentName = UserName(first: widget.userData.name.first, last:widget.userData.name.last);
+      currentName = UserName(
+          first: widget.userData.name.first, last: widget.userData.name.last);
     }
     currentEmail = widget.user.email ?? '';
     currentPhoneNumber = widget.user.phoneNumber ?? '';
@@ -123,17 +123,25 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
     currentCarbonEmission = widget.userData.reducedCarbonKg;
     currentRating = widget.userData.rating;
 
-    nameController = TextEditingController(text: '${widget.userData.name.first} ${widget.userData.name.last}');
+    nameController = TextEditingController(
+        text: '${widget.userData.name.first} ${widget.userData.name.last}');
     emailController = TextEditingController(text: widget.user.email ?? '');
-    phoneNumberController = TextEditingController(text: widget.userData.phoneNumber);
-    address1Controller = TextEditingController(text: widget.userData.address.line1);
-    address2Controller = TextEditingController(text:  widget.userData.address.line2);
+    phoneNumberController =
+        TextEditingController(text: widget.userData.phoneNumber);
+    address1Controller =
+        TextEditingController(text: widget.userData.address.line1);
+    address2Controller =
+        TextEditingController(text: widget.userData.address.line2);
     cityController = TextEditingController(text: widget.userData.address.city);
-    zipCodeController = TextEditingController(text: widget.userData.address.zipCode);
-    countryController = TextEditingController(text: widget.userData.address.country);
+    zipCodeController =
+        TextEditingController(text: widget.userData.address.zipCode);
+    countryController =
+        TextEditingController(text: widget.userData.address.country);
     allergiesController = TextEditingController(text: currentAllergies);
-    goodPointsController = TextEditingController(text: currentGoodPoints.toString());
-    carbonEmissionController = TextEditingController(text: currentCarbonEmission.toString());
+    goodPointsController =
+        TextEditingController(text: currentGoodPoints.toString());
+    carbonEmissionController =
+        TextEditingController(text: currentCarbonEmission.toString());
     ratingController = TextEditingController(text: currentRating.toString());
   }
 
@@ -176,7 +184,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
 
   Future<void> updateUser() async {
     final UserService userService = UserService();
-    
+
     TGTWUser newUser = TGTWUser(
       name: currentName,
       rating: currentRating,
@@ -193,7 +201,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
     );
 
     await userService.updateUserData(widget.user.uid, newUser);
-  
+
     //  Navigator.pop(context);
   }
 
@@ -204,7 +212,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
     final UserService userService = UserService();
     final _media = MediaQuery.of(context).size;
 
-    // return 
+    // return
     // FutureBuilder(
     //     future: userService.getUserData(widget.user.uid),
     //     builder:
@@ -219,80 +227,74 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
     //         );
     //       }
 
-        
-          return 
-          DefaultTabController(
-              length: 3,
-              child: Scaffold(
-                appBar: AppBar(
-                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                  toolbarHeight: 0,
-                  bottom: const TabBar(
-                    tabs: [
-                      Tab(
-                        icon: Icon(Icons.person_outline),
-                        text: 'Pers. Info',
-                      ),
-                      Tab(
-                        icon: Icon(Icons.chat_bubble_outline),
-                        text: 'Messages',
-                      ),
-                      Tab(
-                        icon: Icon(Icons.notifications_active_outlined),
-                        text: 'Active Posts',
-                      )
-                    ],
+    return DefaultTabController(
+        length: 3,
+        child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+              toolbarHeight: 0,
+              bottom: const TabBar(
+                tabs: [
+                  Tab(
+                    icon: Icon(Icons.person_outline),
+                    text: 'Pers. Info',
+                  ),
+                  Tab(
+                    icon: Icon(Icons.chat_bubble_outline),
+                    text: 'Messages',
+                  ),
+                  Tab(
+                    icon: Icon(Icons.notifications_active_outlined),
+                    text: 'Active Posts',
+                  )
+                ],
+              ),
+            ),
+            body: Stack(clipBehavior: Clip.none, children: [
+              Container(
+                height: _media.height,
+                width: _media.width,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: FractionalOffset(0.5, 0.0),
+                    end: FractionalOffset(0.6, 0.8),
+                    stops: [0.0, 0.9],
+                    colors: [YELLOW, BLUE],
                   ),
                 ),
-                body: Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Container(
-          height: _media.height,
-          width: _media.width,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: FractionalOffset(0.5, 0.0),
-              end: FractionalOffset(0.6, 0.8),
-              stops: [0.0, 0.9],
-              colors: [YELLOW, BLUE],
-            ),
-          ),
-        ),
-        Positioned(
-            top: 5.0,
-            right: 10.0,
-            child: 
-            // const SwitchButton(),
-              IconButton(
-                icon: Icon(isEditMode ? Icons.done : Icons.edit),
-                onPressed: () {
-                  setState(() {
-                    isEditMode = !isEditMode;
-                    if (!isEditMode) {
-                      // Save changes
-                      currentAddress1 = address1Controller.text;
-                      currentAddress2 = address2Controller.text;
-                      currentName = UserName(
-                              first: nameController.text.split(' ')[0],
-                              last: nameController.text.split(' ')[1]);
-                      currentEmail = emailController.text;
-                      currentPhoneNumber = phoneNumberController.text;
-                      currentCity = cityController.text;
-                      currentZipCode = zipCodeController.text;
-                      currentCountry = countryController.text;
-                      currentAllergies = allergiesController.text;                  
-                      showUpdateDialog();
-                     
-                    }
-                  });
-                },
               ),
-          ),
-            Container(
-            padding: EdgeInsets.only(top: 20, bottom: 40),
-            child:
-                TabBarView(
+              Positioned(
+                top: 5.0,
+                right: 10.0,
+                child:
+                    // const SwitchButton(),
+                    IconButton(
+                  icon: Icon(isEditMode ? Icons.done : Icons.edit),
+                  onPressed: () {
+                    setState(() {
+                      isEditMode = !isEditMode;
+                      if (!isEditMode) {
+                        // Save changes
+                        currentAddress1 = address1Controller.text;
+                        currentAddress2 = address2Controller.text;
+                        currentName = UserName(
+                            first: nameController.text.split(' ')[0],
+                            last: nameController.text.split(' ')[1]);
+                        currentEmail = emailController.text;
+                        currentPhoneNumber = phoneNumberController.text;
+                        currentCity = cityController.text;
+                        currentZipCode = zipCodeController.text;
+                        currentCountry = countryController.text;
+                        currentAllergies = allergiesController.text;
+                        showUpdateDialog();
+                      }
+                    });
+                  },
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(top: 20, bottom: 40),
+                child: TabBarView(
                   children: [
                     Container(
                       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
@@ -308,8 +310,8 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                         const SizedBox(
                           height: 10,
                         ),
-                        
-                         TextField(   
+
+                        TextField(
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Name',
@@ -320,12 +322,12 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                             fontFamily: 'Roboto',
                             fontSize: 20,
                           ),
-                         ),
+                        ),
                         const SizedBox(
                           height: 10,
                         ),
-                       
-                        TextField(   
+
+                        TextField(
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Email',
@@ -336,12 +338,12 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                             fontFamily: 'Roboto',
                             fontSize: 20,
                           ),
-                         ),
+                        ),
                         const SizedBox(
                           height: 10,
                         ),
-                      
-                       TextField(   
+
+                        TextField(
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Phone Number',
@@ -352,7 +354,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                             fontFamily: 'Roboto',
                             fontSize: 20,
                           ),
-                         ),
+                        ),
 
                         const SizedBox(
                           height: 20,
@@ -365,8 +367,8 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                         const SizedBox(
                           height: 10,
                         ),
-                       
-                        TextField(   
+
+                        TextField(
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Address Line 1',
@@ -377,12 +379,12 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                             fontFamily: 'Roboto',
                             fontSize: 20,
                           ),
-                         ),
+                        ),
                         const SizedBox(
                           height: 10,
                         ),
-                     
-                       TextField(   
+
+                        TextField(
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Address Line 2',
@@ -393,12 +395,12 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                             fontFamily: 'Roboto',
                             fontSize: 20,
                           ),
-                         ),
+                        ),
                         const SizedBox(
                           height: 10,
                         ),
-                       
-                        TextField(   
+
+                        TextField(
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'City',
@@ -409,12 +411,12 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                             fontFamily: 'Roboto',
                             fontSize: 20,
                           ),
-                         ),
+                        ),
                         const SizedBox(
                           height: 10,
                         ),
-                      
-                        TextField(   
+
+                        TextField(
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Zip Code',
@@ -425,12 +427,12 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                             fontFamily: 'Roboto',
                             fontSize: 20,
                           ),
-                         ),
+                        ),
                         const SizedBox(
                           height: 10,
                         ),
-                     
-                        TextField(   
+
+                        TextField(
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Country',
@@ -441,7 +443,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                             fontFamily: 'Roboto',
                             fontSize: 20,
                           ),
-                         ),
+                        ),
 
                         const SizedBox(
                           height: 20,
@@ -454,7 +456,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                           height: 10,
                         ),
 
-                        TextField(   
+                        TextField(
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Allergies',
@@ -465,13 +467,13 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                             fontFamily: 'Roboto',
                             fontSize: 20,
                           ),
-                         ),
-                        
+                        ),
+
                         // Text(
                         //   widget.userData.allergies.isEmpty
                         //       ? 'No allergies listed'
                         //       : widget.userData.allergies.join(', '),
-                          
+
                         //   style: Theme.of(context).textTheme.bodyLarge,
                         // ),
                         const SizedBox(
@@ -484,7 +486,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                         const SizedBox(
                           height: 10,
                         ),
-                        TextField(   
+                        TextField(
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Rating',
@@ -495,11 +497,11 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                             fontFamily: 'Roboto',
                             fontSize: 20,
                           ),
-                         ),
+                        ),
                         const SizedBox(
                           height: 10,
                         ),
-                        TextField(   
+                        TextField(
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Good Points',
@@ -510,7 +512,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                             fontFamily: 'Roboto',
                             fontSize: 20,
                           ),
-                         ),
+                        ),
                         // Text(
                         //   '${widget.userData.goodPoints}',
                         //   style: Theme.of(context).textTheme.bodyLarge,
@@ -518,7 +520,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                         const SizedBox(
                           height: 10,
                         ),
-                        TextField(   
+                        TextField(
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Carbon Emission',
@@ -529,7 +531,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                             fontFamily: 'Roboto',
                             fontSize: 20,
                           ),
-                         ),
+                        ),
                         // Text(
                         //   '${widget.userData.reducedCarbonKg} kg',
                         //   style: Theme.of(context).textTheme.bodyLarge,
@@ -554,10 +556,9 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                       ]),
                     ),
                     Container(
-                      padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                      height: MediaQuery.of(context).size.height,
-                      child: const MessageThreadList()
-                    ),
+                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                        height: MediaQuery.of(context).size.height,
+                        child: const MessageThreadList()),
                     Container(
                       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                       height: MediaQuery.of(context).size.height,
@@ -566,11 +567,9 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                   ],
                 ),
               ),
-              ]))
-          );
-            }
-        }
-
+            ])));
+  }
+}
 
 class PostPageWidget extends StatelessWidget {
   final SharedItemService sharedItemService = SharedItemService();

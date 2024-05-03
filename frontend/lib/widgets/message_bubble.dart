@@ -50,7 +50,8 @@ class MessageBubble extends StatelessWidget {
                                 return Container(
                                   decoration: BoxDecoration(
                                     color: Theme.of(context).primaryColorLight,
-                                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(10)),
                                   ),
                                   padding: const EdgeInsets.all(5),
                                   child: sharedItem != null

@@ -79,9 +79,7 @@ class _LoginSignUpState extends State<LoginSignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    return 
-    
-    Scaffold(
+    return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
           child: Container(
@@ -182,150 +180,150 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget emailTextFieldWidget() {
-  return Container(
-    margin: EdgeInsets.only(left: 16.0, right: 32.0, top: 32.0),
-    decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black12,
-              blurRadius: 15,
-              spreadRadius: 0,
-              offset: Offset(0.0, 16.0)),
-        ],
-        borderRadius: BorderRadius.circular(12.0),
-        gradient: LinearGradient(
-            begin: FractionalOffset(0.0, 0.4),
-            end: FractionalOffset(0.9, 0.7),
-            // Add one stop for each color. Stops should increase from 0 to 1
-            stops: [
-              0.2,
-              0.9
-            ],
-            colors: [
-              Color(0xffFFC3A0),
-              Color(0xffFFAFBD),
-            ])),
-    child: TextField(
-      controller: _emailController,
-      onChanged: (input) {
-        setState(() {
-          _emailErrorMessage = _emailValidator(input);
-        });
-      },
-      style: hintAndValueStyle,
-      decoration: InputDecoration(
-          suffixIcon: Icon(Icons.email_rounded,
-              color: Color(0xff35AA90), size: 20.0),
-          contentPadding: EdgeInsets.fromLTRB(40.0, 30.0, 10.0, 10.0),
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.0),
-              borderSide: BorderSide.none),
-          hintText: 'Email',
-          errorText: _emailErrorMessage,
-          hintStyle: hintAndValueStyle),
-    ),
-  );
-}
+    return Container(
+      margin: EdgeInsets.only(left: 16.0, right: 32.0, top: 32.0),
+      decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black12,
+                blurRadius: 15,
+                spreadRadius: 0,
+                offset: Offset(0.0, 16.0)),
+          ],
+          borderRadius: BorderRadius.circular(12.0),
+          gradient: LinearGradient(
+              begin: FractionalOffset(0.0, 0.4),
+              end: FractionalOffset(0.9, 0.7),
+              // Add one stop for each color. Stops should increase from 0 to 1
+              stops: [
+                0.2,
+                0.9
+              ],
+              colors: [
+                Color(0xffFFC3A0),
+                Color(0xffFFAFBD),
+              ])),
+      child: TextField(
+        controller: _emailController,
+        onChanged: (input) {
+          setState(() {
+            _emailErrorMessage = _emailValidator(input);
+          });
+        },
+        style: hintAndValueStyle,
+        decoration: InputDecoration(
+            suffixIcon:
+                Icon(Icons.email_rounded, color: Color(0xff35AA90), size: 20.0),
+            contentPadding: EdgeInsets.fromLTRB(40.0, 30.0, 10.0, 10.0),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12.0),
+                borderSide: BorderSide.none),
+            hintText: 'Email',
+            errorText: _emailErrorMessage,
+            hintStyle: hintAndValueStyle),
+      ),
+    );
+  }
 
   Widget passwordTextFieldWidget() {
-  return Container(
-    margin: EdgeInsets.only(left: 32.0, right: 16.0),
-    child: TextField(
-      style: hintAndValueStyle,
-      onChanged: (input) {
-        setState(() {
-          _passwordErrorMessage = _passwordValidator(input);
-        });
-      },
-      controller: _passwordController,
-      obscureText: _isPasswordObscured,
-      decoration:  InputDecoration(
-        suffixIcon: Padding(
-          padding: const EdgeInsets.only(right: 30.0),
-          child: Icon(Icons.lock_rounded,
-              color: Color(0xff35AA90), size: 20.0),
-        ),
-          fillColor: Color(0x3305756D),
-          filled: true,
-          contentPadding: EdgeInsets.fromLTRB(40.0, 30.0, 10.0, 10.0),
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.0),
-              borderSide: BorderSide.none),
-          hintText: 'Password',
-          errorText: _passwordErrorMessage,
-          hintStyle: hintAndValueStyle),
-          
-    ),
-  );
-}
+    return Container(
+      margin: EdgeInsets.only(left: 32.0, right: 16.0),
+      child: TextField(
+        style: hintAndValueStyle,
+        onChanged: (input) {
+          setState(() {
+            _passwordErrorMessage = _passwordValidator(input);
+          });
+        },
+        controller: _passwordController,
+        obscureText: _isPasswordObscured,
+        decoration: InputDecoration(
+            suffixIcon: Padding(
+              padding: const EdgeInsets.only(right: 30.0),
+              child: Icon(Icons.lock_rounded,
+                  color: Color(0xff35AA90), size: 20.0),
+            ),
+            fillColor: Color(0x3305756D),
+            filled: true,
+            contentPadding: EdgeInsets.fromLTRB(40.0, 30.0, 10.0, 10.0),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12.0),
+                borderSide: BorderSide.none),
+            hintText: 'Password',
+            errorText: _passwordErrorMessage,
+            hintStyle: hintAndValueStyle),
+      ),
+    );
+  }
 
   Widget loginButtonWidget() {
-  return Container(
-    margin: EdgeInsets.only(left: 32.0, top: 32.0),
-    child: Row(
-      children: <Widget>[
-        InkWell(
-          onTap: () {
-            // if (!_formKey.currentState!.validate()) {
-            //       return;
-            //     }
-                FirebaseAuth.instance
-                    .signInWithEmailAndPassword(
-                        email: _emailController.value.text,
-                        password: _passwordController.value.text)
-                    .then((user) {
-                  // On success login
-                  logger.d('Successfully logged in with ${user.toString()}');
-                  FirebaseAnalytics.instance
-                      .logLogin(loginMethod: "EmailPassword");
-                }).catchError((error) {
-                  logger.e('Cannot sign in with username and password',
-                      error: error);
-                  String errorMessage = 'Unknown error occurred ${error.code}';
-                  if (error.message != null) {
-                    errorMessage = '${error.message}';
-                  }
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(errorMessage),
-                    showCloseIcon: true,
-                    closeIconColor:
-                        Theme.of(context).colorScheme.inversePrimary,
-                  ));
-                });
-          },
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 36.0, vertical: 16.0),
-            decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 15,
-                      spreadRadius: 0,
-                      offset: Offset(0.0, 32.0)),
-                ],
-                borderRadius: new BorderRadius.circular(36.0),
-                gradient: LinearGradient(begin: FractionalOffset.centerLeft,
+    return Container(
+      margin: EdgeInsets.only(left: 32.0, top: 32.0),
+      child: Row(
+        children: <Widget>[
+          InkWell(
+            onTap: () {
+              // if (!_formKey.currentState!.validate()) {
+              //       return;
+              //     }
+              FirebaseAuth.instance
+                  .signInWithEmailAndPassword(
+                      email: _emailController.value.text,
+                      password: _passwordController.value.text)
+                  .then((user) {
+                // On success login
+                logger.d('Successfully logged in with ${user.toString()}');
+                FirebaseAnalytics.instance
+                    .logLogin(loginMethod: "EmailPassword");
+              }).catchError((error) {
+                logger.e('Cannot sign in with username and password',
+                    error: error);
+                String errorMessage = 'Unknown error occurred ${error.code}';
+                if (error.message != null) {
+                  errorMessage = '${error.message}';
+                }
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(errorMessage),
+                  showCloseIcon: true,
+                  closeIconColor: Theme.of(context).colorScheme.inversePrimary,
+                ));
+              });
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 36.0, vertical: 16.0),
+              decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 15,
+                        spreadRadius: 0,
+                        offset: Offset(0.0, 32.0)),
+                  ],
+                  borderRadius: new BorderRadius.circular(36.0),
+                  gradient: LinearGradient(
+                      begin: FractionalOffset.centerLeft,
 // Add one stop for each color. Stops should increase from 0 to 1
-                    stops: [
-                      0.2,
-                      1
-                    ], colors: [
-                  Color(0xff000000),
-                  Color(0xff434343),
-                ])),
-            child: Text(
-              'LOGIN',
-              style: TextStyle(
-                  color: Color(0xffF1EA94),
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Montserrat'),
+                      stops: [
+                        0.2,
+                        1
+                      ],
+                      colors: [
+                        Color(0xff000000),
+                        Color(0xff434343),
+                      ])),
+              child: Text(
+                'LOGIN',
+                style: TextStyle(
+                    color: Color(0xffF1EA94),
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Montserrat'),
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -467,7 +465,7 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
     });
   }
 
-   @override
+  @override
   void initState() {
     _pageController = PageController();
 
@@ -488,18 +486,18 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
     _countryController.dispose();
     super.dispose();
   }
+
   Widget emailTextFieldWidget() {
-    return
-    TextField(
+    return TextField(
       onChanged: (input) {
-              _putIntoStorage(_LAST_NAME_KEY, input);
-            },
+        _putIntoStorage(_LAST_NAME_KEY, input);
+      },
       controller: _emailController,
       decoration: new InputDecoration(
         suffixIcon: Padding(
           padding: const EdgeInsets.only(right: 30.0),
-          child: Icon(Icons.email_rounded,
-              color: Color(0xff35AA90), size: 20.0),
+          child:
+              Icon(Icons.email_rounded, color: Color(0xff35AA90), size: 20.0),
         ),
         hintText: 'Email',
         labelStyle: TextStyle(
@@ -514,17 +512,17 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
       ),
     );
   }
+
   Widget passwordTextFieldWidget() {
     return TextField(
       onChanged: (input) {
-              _putIntoStorage(_PASSWORD_KEY, input);
-            },
+        _putIntoStorage(_PASSWORD_KEY, input);
+      },
       controller: _passwordController,
       decoration: new InputDecoration(
         suffixIcon: Padding(
           padding: const EdgeInsets.only(right: 30.0),
-          child: Icon(Icons.lock_rounded,
-              color: Color(0xff35AA90), size: 20.0),
+          child: Icon(Icons.lock_rounded, color: Color(0xff35AA90), size: 20.0),
         ),
         hintText: 'Password',
         labelStyle: TextStyle(
@@ -542,17 +540,16 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
   }
 
   Widget firstNameTextFieldWidget() {
-    return
-    TextField(
+    return TextField(
       onChanged: (input) {
-              _putIntoStorage(_FIRST_NAME_KEY, input);
-            },
+        _putIntoStorage(_FIRST_NAME_KEY, input);
+      },
       controller: _firstNameController,
       decoration: new InputDecoration(
         suffixIcon: Padding(
           padding: const EdgeInsets.only(right: 30.0),
-          child: Icon(Icons.person_rounded,
-              color: Color(0xff35AA90), size: 20.0),
+          child:
+              Icon(Icons.person_rounded, color: Color(0xff35AA90), size: 20.0),
         ),
         hintText: 'First Name',
         labelStyle: TextStyle(
@@ -567,12 +564,12 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
       ),
     );
   }
+
   Widget lastNameTextFieldWidget() {
-    return
-    TextField(
+    return TextField(
       onChanged: (input) {
-              _putIntoStorage(_LAST_NAME_KEY, input);
-            },
+        _putIntoStorage(_LAST_NAME_KEY, input);
+      },
       controller: _lastNameController,
       decoration: new InputDecoration(
         suffixIcon: Padding(
@@ -593,19 +590,18 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
       ),
     );
   }
+
   Widget phoneNumTextFieldWidget() {
-    return
-    TextField(
+    return TextField(
       onChanged: (input) {
-              _putIntoStorage(_PHONE_NUM_KEY, input);
-            },
+        _putIntoStorage(_PHONE_NUM_KEY, input);
+      },
       controller: _phoneController,
       decoration: InputDecoration(
-       
         suffixIcon: Padding(
           padding: const EdgeInsets.only(right: 30.0),
-          child: Icon(Icons.phone_rounded,
-              color: Color(0xff35AA90), size: 20.0),
+          child:
+              Icon(Icons.phone_rounded, color: Color(0xff35AA90), size: 20.0),
         ),
         hintText: 'Phone Number',
         labelStyle: TextStyle(
@@ -620,16 +616,15 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
       ),
     );
   }
-  
+
   Widget add1TextFieldWidget() {
-    return
-    TextField(
+    return TextField(
       onChanged: (input) {
-              _putIntoStorage(_ADDRESS_LINE_1_KEY, input);
-              setState(() {
-                _addressLine1Controller.text = input;
-              });
-            },
+        _putIntoStorage(_ADDRESS_LINE_1_KEY, input);
+        setState(() {
+          _addressLine1Controller.text = input;
+        });
+      },
       controller: _addressLine1Controller,
       decoration: new InputDecoration(
         suffixIcon: Padding(
@@ -650,17 +645,18 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
       ),
     );
   }
+
   Widget add2TextFieldWidget() {
     return TextField(
       onChanged: (input) {
-              _putIntoStorage(_ADDRESS_LINE_2_KEY, input);
-            },
+        _putIntoStorage(_ADDRESS_LINE_2_KEY, input);
+      },
       controller: _addressLine2Controller,
       decoration: new InputDecoration(
         suffixIcon: Padding(
           padding: const EdgeInsets.only(right: 30.0),
-          child: Icon(Icons.house_rounded,
-              color: Color(0xff35AA90), size: 20.0),
+          child:
+              Icon(Icons.house_rounded, color: Color(0xff35AA90), size: 20.0),
         ),
         hintText: 'Address Line 2',
         labelStyle: TextStyle(
@@ -678,12 +674,10 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
   }
 
   Widget zipTextFieldWidget() {
-    return
-    TextField(
+    return TextField(
       onChanged: (input) {
-              _putIntoStorage(_ZIP_CODE_KEY, input);
-            },
-            
+        _putIntoStorage(_ZIP_CODE_KEY, input);
+      },
       controller: _zipCodeController,
       decoration: new InputDecoration(
         suffixIcon: Padding(
@@ -704,13 +698,12 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
       ),
     );
   }
+
   Widget cityTextFieldWidget() {
-    return
-    TextField(
+    return TextField(
       onChanged: (input) {
-              _putIntoStorage(_CITY_KEY, input);
-            },
-            
+        _putIntoStorage(_CITY_KEY, input);
+      },
       controller: _cityController,
       decoration: new InputDecoration(
         suffixIcon: Padding(
@@ -731,19 +724,17 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
       ),
     );
   }
+
   Widget countryTextFieldWidget() {
-    return
-    TextField(
+    return TextField(
       onChanged: (input) {
-              _putIntoStorage(_COUNTRY_KEY, input);
-            },
-            
+        _putIntoStorage(_COUNTRY_KEY, input);
+      },
       controller: _countryController,
       decoration: new InputDecoration(
         suffixIcon: Padding(
           padding: const EdgeInsets.only(right: 30.0),
-          child: Icon(Icons.map_rounded,
-              color: Color(0xff35AA90), size: 20.0),
+          child: Icon(Icons.map_rounded, color: Color(0xff35AA90), size: 20.0),
         ),
         hintText: 'Country',
         labelStyle: TextStyle(
@@ -758,7 +749,7 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
       ),
     );
   }
-  
+
   Column PersonalColumn() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -896,10 +887,10 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
     ];
 
     return Scaffold(
-    appBar: SignupApbar(
+      appBar: SignupApbar(
         title: "SIGNUP",
       ),
-    body: Stack(
+      body: Stack(
         children: <Widget>[
           Container(
             height: double.infinity,
@@ -981,8 +972,8 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
                               Column(
                                 children: <Widget>[
                                   Container(
-                                    height:
-                                        MediaQuery.of(context).size.height / 1.8,
+                                    height: MediaQuery.of(context).size.height /
+                                        1.8,
                                     width: double.infinity,
                                     child: Stack(
                                       children: <Widget>[
@@ -1089,57 +1080,57 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
                       iconSize: 20,
                       onTap: () {
                         logger.d('Pressed sign up button');
-                setState(() {
-                  if (!_formKey.currentState!.validate()) {
-                    return;
-                  }
+                        setState(() {
+                          if (!_formKey.currentState!.validate()) {
+                            return;
+                          }
 
-                  FirebaseAuth.instance
-                      .createUserWithEmailAndPassword(
-                    email: _emailController.value.text,
-                    password: _passwordController.value.text,
-                  )
-                      .then((cred) {
-                    logger.d('Created user with credential $cred');
+                          FirebaseAuth.instance
+                              .createUserWithEmailAndPassword(
+                            email: _emailController.value.text,
+                            password: _passwordController.value.text,
+                          )
+                              .then((cred) {
+                            logger.d('Created user with credential $cred');
 
-                    if (cred.user == null) {
-                      throw Exception('User UID is null');
-                    }
+                            if (cred.user == null) {
+                              throw Exception('User UID is null');
+                            }
 
-                    TGTWUser user = TGTWUser(
-                        name: UserName(
-                            first: _firstNameController.value.text,
-                            last: _lastNameController.value.text),
-                        rating: 0,
-                        phoneNumber: _phoneController.value.text,
-                        address: UserAddress(
-                            line1: _addressLine1Controller.value.text,
-                            line2: _addressLine2Controller.value.text,
-                            zipCode: _zipCodeController.value.text,
-                            city: _cityController.value.text,
-                            country: _countryController.value.text),
-                        allergies: const [],
-                        goodPoints: 0,
-                        reducedCarbonKg: 0.0);
+                            TGTWUser user = TGTWUser(
+                                name: UserName(
+                                    first: _firstNameController.value.text,
+                                    last: _lastNameController.value.text),
+                                rating: 0,
+                                phoneNumber: _phoneController.value.text,
+                                address: UserAddress(
+                                    line1: _addressLine1Controller.value.text,
+                                    line2: _addressLine2Controller.value.text,
+                                    zipCode: _zipCodeController.value.text,
+                                    city: _cityController.value.text,
+                                    country: _countryController.value.text),
+                                allergies: const [],
+                                goodPoints: 0,
+                                reducedCarbonKg: 0.0);
 
-                    return FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(cred.user!.uid)
-                        .set(user.toJson());
-                  }).then((_) {
-                    logger.d(
-                        'Successfully created user in database with uid: ${FirebaseAuth.instance.currentUser?.uid}');
-                    FirebaseAnalytics.instance
-                        .logSignUp(signUpMethod: "EmailPassword");
-                  }).catchError((e) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text('${e.message}'),
-                      showCloseIcon: true,
-                      closeIconColor:
-                          Theme.of(context).colorScheme.inversePrimary,
-                    ));
-                  });
-                });
+                            return FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(cred.user!.uid)
+                                .set(user.toJson());
+                          }).then((_) {
+                            logger.d(
+                                'Successfully created user in database with uid: ${FirebaseAuth.instance.currentUser?.uid}');
+                            FirebaseAnalytics.instance
+                                .logSignUp(signUpMethod: "EmailPassword");
+                          }).catchError((e) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('${e.message}'),
+                              showCloseIcon: true,
+                              closeIconColor:
+                                  Theme.of(context).colorScheme.inversePrimary,
+                            ));
+                          });
+                        });
                       },
                     ),
                   ),

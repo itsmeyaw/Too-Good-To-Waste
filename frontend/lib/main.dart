@@ -26,7 +26,7 @@ Future<void> main() async {
 
   // Pass all uncaught "fatal" errors from the framework to Crashlytics
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
- 
+
   runApp(const TooGoodToWaste());
 }
 
@@ -68,7 +68,8 @@ class _HomePageState extends State<HomePage> {
           return StreamBuilder(
               stream: FirebaseAuth.instance.authStateChanges(),
               builder: (authChangeContext, authChangeSnapshot) {
-                if (authChangeSnapshot.connectionState == ConnectionState.active) {
+                if (authChangeSnapshot.connectionState ==
+                    ConnectionState.active) {
                   User? user = authChangeSnapshot.data;
 
                   user ??= userChangeSnapshot.data;
@@ -104,7 +105,8 @@ class MyApp extends StatelessWidget {
       title: 'Too Good To Waste',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 210, 252, 194)),
+        colorScheme:
+            ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 210, 252, 194)),
         useMaterial3: true,
       ),
       home: const Frame(),
@@ -125,9 +127,8 @@ class MyApp extends StatelessWidget {
         1,
       );
       strength = strength == .05 ? 0.1 : strength + 0.1;
-    } while(strength < 1.0);
+    } while (strength < 1.0);
 
     return MaterialColor(color.value, swatch);
   }
-  
 }

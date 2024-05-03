@@ -28,7 +28,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:tooGoodToWaste/widgets/appbar.dart';
 
 class itemDetailPage extends StatefulWidget {
-    // Declare a field that holds the food.
+  // Declare a field that holds the food.
   final UserItemDetail foodDetail;
 
   const itemDetailPage({super.key, required this.foodDetail});
@@ -38,11 +38,10 @@ class itemDetailPage extends StatefulWidget {
 }
 
 class _ItemDetailPage extends State<itemDetailPage> {
-
-   @override
+  @override
   Widget build(BuildContext context) {
     final _media = MediaQuery.of(context).size;
-  
+
     String categoryIconImagePath;
 
     if (GlobalCateIconMap[widget.foodDetail.category] == null) {
@@ -51,111 +50,102 @@ class _ItemDetailPage extends State<itemDetailPage> {
       categoryIconImagePath = GlobalCateIconMap[widget.foodDetail.category]!;
     }
 
-
-
     //toast contains 'Alert! Your *** has already expired and cannot be shared!'
-  showExpiredDialog(String foodname, String category) {
-    String? categoryIconImagePath;
+    showExpiredDialog(String foodname, String category) {
+      String? categoryIconImagePath;
 
-    if (GlobalCateIconMap[category] == null) {
-      categoryIconImagePath = GlobalCateIconMap["Others"];
-    } else {
-      categoryIconImagePath = GlobalCateIconMap[category];
-    }
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-    AlertDialog dialog = AlertDialog(
-      title: const Text("Alert!", textAlign: TextAlign.center),
-      content: Container(
-        width: 3 * width / 5,
-        height: height / 2.5,
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          children: [
-            Image.asset(categoryIconImagePath!),
-            //Expanded(child: stateIndex>-1? Image.asset(imageList[stateIndex]):Image.asset(imageList[12])),
-            Text('Your $foodname is already expired and cannot be shared!',
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.bold))
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
-          child: const Text('OK'),
-        ),
-      ],
-    );
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return dialog;
+      if (GlobalCateIconMap[category] == null) {
+        categoryIconImagePath = GlobalCateIconMap["Others"];
+      } else {
+        categoryIconImagePath = GlobalCateIconMap[category];
       }
-    );
-  }
+      double width = MediaQuery.of(context).size.width;
+      double height = MediaQuery.of(context).size.height;
+      AlertDialog dialog = AlertDialog(
+        title: const Text("Alert!", textAlign: TextAlign.center),
+        content: Container(
+          width: 3 * width / 5,
+          height: height / 2.5,
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            children: [
+              Image.asset(categoryIconImagePath!),
+              //Expanded(child: stateIndex>-1? Image.asset(imageList[stateIndex]):Image.asset(imageList[12])),
+              Text('Your $foodname is already expired and cannot be shared!',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontWeight: FontWeight.bold))
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      );
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return dialog;
+          });
+    }
 
+    Future<void> uploadImgToFirebase(XFile image) async {
+      if (image == null) logger.e('Image is null');
 
-   Future<void> uploadImgToFirebase(XFile image) async {
-    if (image == null) logger.e('Image is null');
+      List<int> pickedImageData = await image.readAsBytes();
+      Reference ref =
+          FirebaseStorage.instance.ref().child('images').child('image.jpg');
+      // While the file names are the same, the references point to different files
+      // assert(ref.name == ref.name);
+      // assert(ref.fullPath != ref.fullPath);
 
-    List<int> pickedImageData = await image.readAsBytes();
-    Reference ref = FirebaseStorage.instance.ref().child('images').child('image.jpg');
-    // While the file names are the same, the references point to different files
-    // assert(ref.name == ref.name);
-    // assert(ref.fullPath != ref.fullPath);
+      Uint8List bytes = Uint8List.fromList(pickedImageData);
+      UploadTask uploadTask = ref.putData(bytes);
 
-    Uint8List bytes = Uint8List.fromList(pickedImageData);
-    UploadTask uploadTask = ref.putData(bytes);
-
-    // Listen for state changes, errors, and completion of the upload.
-    uploadTask.snapshotEvents.listen((TaskSnapshot taskSnapshot) {
-     switch (taskSnapshot.state) {
-    case TaskState.running:
-      final progress =
-          100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes);
-      logger.f("Upload is $progress% complete.");
-      break;
-    case TaskState.paused:
-      logger.f("Upload is paused.");
-      break;
-    case TaskState.canceled:
-      logger.f("Upload was canceled");
-      break;
-    case TaskState.error:
-      // Handle unsuccessful uploads
-      logger.e('Upload failed');
-      break;
-    case TaskState.success:
-      // Handle successful uploads on complete
-      logger.d('Upload complete');
-      break;
-  }
-});
-
-    uploadTask.whenComplete(() async {
-      String url = await ref.getDownloadURL();
-      logger.d('imgDownloadUrl $url');
-      setState(() {
-        //imgDownloadUrl = url;
+      // Listen for state changes, errors, and completion of the upload.
+      uploadTask.snapshotEvents.listen((TaskSnapshot taskSnapshot) {
+        switch (taskSnapshot.state) {
+          case TaskState.running:
+            final progress = 100.0 *
+                (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes);
+            logger.f("Upload is $progress% complete.");
+            break;
+          case TaskState.paused:
+            logger.f("Upload is paused.");
+            break;
+          case TaskState.canceled:
+            logger.f("Upload was canceled");
+            break;
+          case TaskState.error:
+            // Handle unsuccessful uploads
+            logger.e('Upload failed');
+            break;
+          case TaskState.success:
+            // Handle successful uploads on complete
+            logger.d('Upload complete');
+            break;
+        }
       });
-    });
-    
 
+      uploadTask.whenComplete(() async {
+        String url = await ref.getDownloadURL();
+        logger.d('imgDownloadUrl $url');
+        setState(() {
+          //imgDownloadUrl = url;
+        });
+      });
+    }
 
-   }
-   
-
-  showLocationDialog(){
-    
-    Dialog dialog = Dialog(
-
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-       child:
-      //   children: [
-          UserLocationAwareWidget(
+    showLocationDialog() {
+      Dialog dialog = Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child:
+              //   children: [
+              UserLocationAwareWidget(
             loader: (BuildContext context) => FractionallySizedBox(
               widthFactor: 1.0,
               child: SizedBox(
@@ -168,30 +158,29 @@ class _ItemDetailPage extends State<itemDetailPage> {
                 ),
               ),
             ),
-            builder: (BuildContext context, GeoPoint userLocation) => _DialogContent(
+            builder: (BuildContext context, GeoPoint userLocation) =>
+                _DialogContent(
               foodDetail: widget.foodDetail,
               userLocation: userLocation,
-            ),   
-          )
-    );
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // dialogContext = context;
-        return dialog;
-      }
-    );
-  }
+            ),
+          ));
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            // dialogContext = context;
+            return dialog;
+          });
+    }
 
-     return Scaffold(
-        appBar: SignupApbar(
-              //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-              title: 'Item Detail Page'),
-        body: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: Stack(
-            children: <Widget>[
-                Container(
+    return Scaffold(
+      appBar: SignupApbar(
+          //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: 'Item Detail Page'),
+      body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+        child: Stack(
+          children: <Widget>[
+            Container(
               height: _media.height,
               width: _media.width,
               decoration: BoxDecoration(
@@ -203,54 +192,52 @@ class _ItemDetailPage extends State<itemDetailPage> {
                 ),
               ),
             ),
-              Expanded(
-                child:
-                    DetailsList(
-                      foodDetail: widget.foodDetail,
-                      imagePth: categoryIconImagePath,
-                    ),
+            Expanded(
+              child: DetailsList(
+                foodDetail: widget.foodDetail,
+                imagePth: categoryIconImagePath,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () async {
-            try {
-      
-              //check if the state is still good
-              if(widget.foodDetail.state == 'good'){
-                
-                showLocationDialog();
-                // Navigator.pop(context);
-              } else {
-                showExpiredDialog(widget.foodDetail.name, widget.foodDetail.category);
-              }
-            } catch (e) {
-              logger.e(e);
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          try {
+            //check if the state is still good
+            if (widget.foodDetail.state == 'good') {
+              showLocationDialog();
+              // Navigator.pop(context);
+            } else {
+              showExpiredDialog(
+                  widget.foodDetail.name, widget.foodDetail.category);
             }
-          },
-          tooltip: 'Publish Item',
-          label: const Text('Publish Item'),
-          icon: const Icon(Icons.add),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-       );
+          } catch (e) {
+            logger.e(e);
+          }
+        },
+        tooltip: 'Publish Item',
+        label: const Text('Publish Item'),
+        icon: const Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
   }
 }
 
 class _DialogContent extends StatefulWidget {
   // const _DialogContent({Key? key}) : super(key: key);
-   final UserItemDetail foodDetail;
-   final GeoPoint userLocation;
+  final UserItemDetail foodDetail;
+  final GeoPoint userLocation;
 
-  const _DialogContent({super.key, required this.foodDetail, required this.userLocation});
+  const _DialogContent(
+      {super.key, required this.foodDetail, required this.userLocation});
 
   @override
   __DialogContentState createState() => __DialogContentState();
 }
 
 class __DialogContentState extends State<_DialogContent> {
-
   File? imageFile;
   String localPath = '';
   String imagePath = '';
@@ -258,8 +245,6 @@ class __DialogContentState extends State<_DialogContent> {
   TextEditingController locationController = TextEditingController();
   Future<dto_user.TGTWUser> getUserFromDatabase(String uid) async {
     Logger logger = Logger();
-
-   
 
     return FirebaseFirestore.instance
         .collection('users')
@@ -271,9 +256,9 @@ class __DialogContentState extends State<_DialogContent> {
     });
   }
 
-
   Future<void> pickImage() async {
-    final pickedImage = await ImagePicker().pickImage(source: ImageSource.camera);
+    final pickedImage =
+        await ImagePicker().pickImage(source: ImageSource.camera);
 
     setState(() {
       if (pickedImage != null) {
@@ -286,57 +271,54 @@ class __DialogContentState extends State<_DialogContent> {
     });
   }
 
-   Future<void> uploadImage(String localPath) async {
-      imagePath = await storageService.uploadImage(localPath);
-      // imgDownloadUrl = await storageService.getImageUrlOfSharedItem(imagePath);
-      logger.d('imagePath $imagePath');
-      setState(() {
-        imagePath = imagePath;
-      });
-   }
+  Future<void> uploadImage(String localPath) async {
+    imagePath = await storageService.uploadImage(localPath);
+    // imgDownloadUrl = await storageService.getImageUrlOfSharedItem(imagePath);
+    logger.d('imagePath $imagePath');
+    setState(() {
+      imagePath = imagePath;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-
     DBHelper dbhelper = DBHelper();
 
-    return  SizedBox(
-                height: 420,
-                child: Column(
-                  children: <Widget>[
-                    const Padding(
-                      padding: EdgeInsets.all(10.0),
-                      child: Text('Are you sure to share this item?',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                    Container(
-                      height: 250,
-                      padding: const EdgeInsets.all(10.0),
-                      child: 
-                        // Image.asset('assets/mock/milk.JPG'),
-                       imageFile == null
-                        ? Image.asset('assets/images/uploadImg.jpeg')
-                        : Image.file(imageFile!),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
+    return SizedBox(
+        height: 420,
+        child: Column(children: <Widget>[
+          const Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Text('Are you sure to share this item?',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+          ),
+          Container(
+            height: 250,
+            padding: const EdgeInsets.all(10.0),
+            child:
+                // Image.asset('assets/mock/milk.JPG'),
+                imageFile == null
+                    ? Image.asset('assets/images/uploadImg.jpeg')
+                    : Image.file(imageFile!),
+          ),
+          Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                           ElevatedButton(
-                            onPressed: () async {
-                              //Extract Location information
-                              await pickImage();
-                          
-                            },
-                            // child: const Icon(Icons.camera_alt),
-                            child: const Text('Take Photo'),
-                          ),
-                          const SizedBox(width: 7),
-                           ElevatedButton(
+                      ElevatedButton(
+                        onPressed: () async {
+                          //Extract Location information
+                          await pickImage();
+                        },
+                        // child: const Icon(Icons.camera_alt),
+                        child: const Text('Take Photo'),
+                      ),
+                      const SizedBox(width: 7),
+                      ElevatedButton(
                         onPressed: () async {
                           setState(() {
                             localPath = '';
@@ -346,72 +328,70 @@ class __DialogContentState extends State<_DialogContent> {
                         // child: const Icon(Icons.camera_alt),
                         child: const Text('Cancel'),
                       ),
-                        ],
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          //Extract Location information
-                          locationController.value.text;  
+                    ],
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      //Extract Location information
+                      locationController.value.text;
 
-                           //Extract Location information
-                          if (localPath != '') {
-                            await uploadImage(localPath);
-                            
-                           // await uploadImgToFirebase(image!);
-                          } else {
-                            logger.e('Please choose an image first!');
-                          }            
-            
-                          SharedItemService sharedItemService = SharedItemService();
+                      //Extract Location information
+                      if (localPath != '') {
+                        await uploadImage(localPath);
 
-                          User? currentUser = FirebaseAuth.instance.currentUser;
-                            if (currentUser == null) {
-                              throw Exception('User is null but want to publish item');
-                            } else {
-                              getUserFromDatabase(currentUser.uid).then((dto_user.TGTWUser userData) {
-                                SharedItem sharedItem = SharedItem(
-                                  name: widget.foodDetail.name,
-                                  category: ItemCategory.parse(widget.foodDetail.category),
-                                  amount:  UserItemAmount(
-                                    nominal: widget.foodDetail.quantitynum,
-                                    unit: widget.foodDetail.quantitytype
-                                  ),
-                                  buyDate: widget.foodDetail.remainDays,
-                                  expireDate: widget.foodDetail.remainDays,
-                                  user: currentUser.uid,
-                                  isAvailable: true,
-                                  imageUrl: imagePath,
-                                );
-                                sharedItemService.postSharedItem(widget.userLocation, sharedItem);
+                        // await uploadImgToFirebase(image!);
+                      } else {
+                        logger.e('Please choose an image first!');
+                      }
 
-                              });
-                            }
+                      SharedItemService sharedItemService = SharedItemService();
 
-                              UserItemService userItemService = UserItemService();
-                              
-                              await userItemService.deleteUserItem(currentUser.uid, widget.foodDetail.id);
-                         
-                              await dbhelper.deleteFood(widget.foodDetail.id);
-                              
-                              // Navigator.of(context, rootNavigator: true).pop();
-                              // Navigator.pop(context);
-                              setState(() {
-                                Navigator.of(context).pushNamedAndRemoveUntil('/', ModalRoute.withName('/'));
-                              });
-                             
-                        },
-                        child: const Text('Publish'),
-                      )
-                  
-                      ],)
-                     ),
-                  ]
+                      User? currentUser = FirebaseAuth.instance.currentUser;
+                      if (currentUser == null) {
+                        throw Exception(
+                            'User is null but want to publish item');
+                      } else {
+                        getUserFromDatabase(currentUser.uid)
+                            .then((dto_user.TGTWUser userData) {
+                          SharedItem sharedItem = SharedItem(
+                            name: widget.foodDetail.name,
+                            category:
+                                ItemCategory.parse(widget.foodDetail.category),
+                            amount: UserItemAmount(
+                                nominal: widget.foodDetail.quantitynum,
+                                unit: widget.foodDetail.quantitytype),
+                            buyDate: widget.foodDetail.remainDays,
+                            expireDate: widget.foodDetail.remainDays,
+                            user: currentUser.uid,
+                            isAvailable: true,
+                            imageUrl: imagePath,
+                          );
+                          sharedItemService.postSharedItem(
+                              widget.userLocation, sharedItem);
+                        });
+                      }
+
+                      UserItemService userItemService = UserItemService();
+
+                      await userItemService.deleteUserItem(
+                          currentUser.uid, widget.foodDetail.id);
+
+                      await dbhelper.deleteFood(widget.foodDetail.id);
+
+                      // Navigator.of(context, rootNavigator: true).pop();
+                      // Navigator.pop(context);
+                      setState(() {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                            '/', ModalRoute.withName('/'));
+                      });
+                    },
+                    child: const Text('Publish'),
                   )
-              );
+                ],
+              )),
+        ]));
   }
 }
-
-
 
 class SwitchButton extends StatefulWidget {
   const SwitchButton({super.key});
@@ -456,14 +436,14 @@ class _SwitchExampleState extends State<SwitchButton> {
 
 class DetailsList extends StatefulWidget {
   // const DetailsList({super.key, required this.buyDate, required this.expiryDate, required this.quantitynum, required this.quantitytype, required this.category, required this.remainDays, required this.imagePth});
-  const DetailsList({super.key, required this.imagePth, required this.foodDetail});
+  const DetailsList(
+      {super.key, required this.imagePth, required this.foodDetail});
 
   final UserItemDetail foodDetail;
   final String imagePth;
 
   @override
   _DetailsListState createState() => _DetailsListState();
-
 }
 
 class _DetailsListState extends State<DetailsList> {
@@ -491,19 +471,30 @@ class _DetailsListState extends State<DetailsList> {
     currentRemainDays = widget.foodDetail.remainDays.toString();
     currentBuyDate = widget.foodDetail.buyDate;
     currentExpiryDate = widget.foodDetail.expiryDate;
-    quantityTypeController = TextEditingController(text: widget.foodDetail.quantitytype);
-    categoryController = TextEditingController(text: widget.foodDetail.category);
-    remainDaysController = TextEditingController(text: widget.foodDetail.remainDays.toString());
-    expireTimeController = TextEditingController(text: "${DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.expiryDate).year}-${DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.expiryDate).month}-${DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.expiryDate).day}");
-    buyTimeController = TextEditingController(text: "${DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.buyDate).year}-${DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.buyDate).month}-${DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.buyDate).day}");
-    quantityNumController = TextEditingController(text: widget.foodDetail.quantitynum.toString());
-    quanNumAndTypeController = TextEditingController(text: "${widget.foodDetail.quantitynum} ${widget.foodDetail.quantitytype}");
+    quantityTypeController =
+        TextEditingController(text: widget.foodDetail.quantitytype);
+    categoryController =
+        TextEditingController(text: widget.foodDetail.category);
+    remainDaysController =
+        TextEditingController(text: widget.foodDetail.remainDays.toString());
+    expireTimeController = TextEditingController(
+        text:
+            "${DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.expiryDate).year}-${DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.expiryDate).month}-${DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.expiryDate).day}");
+    buyTimeController = TextEditingController(
+        text:
+            "${DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.buyDate).year}-${DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.buyDate).month}-${DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.buyDate).day}");
+    quantityNumController =
+        TextEditingController(text: widget.foodDetail.quantitynum.toString());
+    quanNumAndTypeController = TextEditingController(
+        text:
+            "${widget.foodDetail.quantitynum} ${widget.foodDetail.quantitytype}");
   }
 
   Future<void> _showCategoryDialog() async {
     final ItemCategory? selectedCategory = await showDialog<ItemCategory>(
         context: context,
-        builder: (context) => CategoryPicker(initialCategory: ItemCategory.parse(widget.foodDetail.category)));
+        builder: (context) => CategoryPicker(
+            initialCategory: ItemCategory.parse(widget.foodDetail.category)));
 
     if (selectedCategory != null) {
       setState(() {
@@ -552,25 +543,23 @@ class _DetailsListState extends State<DetailsList> {
         });
   }
 
-
   Future<void> updateFood() async {
     DBHelper dbhelper = DBHelper();
 
     UserItem newFood = UserItem(
-      id: widget.foodDetail.id,
-      name: widget.foodDetail.name,
-      category: ItemCategory.parse(currentCategory),
-      quantityType: currentQuantityType,
-      quantityNum: double.parse(currentQuantityNum),
-      buyDate: currentBuyDate,
-      expiryDate: currentExpiryDate,
-      consumeState: widget.foodDetail.consumestate,
-      state: widget.foodDetail.state
-    );
-   
+        id: widget.foodDetail.id,
+        name: widget.foodDetail.name,
+        category: ItemCategory.parse(currentCategory),
+        quantityType: currentQuantityType,
+        quantityNum: double.parse(currentQuantityNum),
+        buyDate: currentBuyDate,
+        expiryDate: currentExpiryDate,
+        consumeState: widget.foodDetail.consumestate,
+        state: widget.foodDetail.state);
+
     await dbhelper.updateFood(newFood);
 
-     //insert new data into cloud firebase first and get the auto-generated id
+    //insert new data into cloud firebase first and get the auto-generated id
     UserItemService userItemService = UserItemService();
     User? currentUser = FirebaseAuth.instance.currentUser;
 
@@ -578,10 +567,10 @@ class _DetailsListState extends State<DetailsList> {
       throw Exception('You should Login first!');
     } else {
       await userItemService.updateUserItem(
-        currentUser.uid, newFood.id!, newFood);
+          currentUser.uid, newFood.id!, newFood);
     }
 
-     Navigator.pop(context);
+    Navigator.pop(context);
   }
 
   final nums = List.generate(10, (index) => index);
@@ -590,36 +579,34 @@ class _DetailsListState extends State<DetailsList> {
   var quanType = "";
   List<Widget> numList = List.generate(10, (index) => Text("$index"));
   final quanTypes = ["g", "kg", "piece", "bag", "bottle", "num"];
- 
- 
+
   @override
   Widget build(BuildContext context) {
-    
     return Column(
       children: [
         SizedBox(
           height: 30,
         ),
         SignUpArrowButton(
-            height: 70,
-            width: 70,
-            icon: isEditMode ? Icons.done : Icons.edit,
-            iconSize: 30, 
-            onTap: () { 
-              setState(() {
-                    isEditMode = !isEditMode;
-                    if (!isEditMode) {
-                      // Save changes
-                      currentCategory = categoryController.text;
-                      currentQuantityNum = quantityNumController.text;
-                      currentQuantityType = quantityTypeController.text;
-                      currentRemainDays = remainDaysController.text;
-                    
-                      showUpdateDialog();
-                      // updateFood();
-                    }
-                  });
-            },
+          height: 70,
+          width: 70,
+          icon: isEditMode ? Icons.done : Icons.edit,
+          iconSize: 30,
+          onTap: () {
+            setState(() {
+              isEditMode = !isEditMode;
+              if (!isEditMode) {
+                // Save changes
+                currentCategory = categoryController.text;
+                currentQuantityNum = quantityNumController.text;
+                currentQuantityType = quantityTypeController.text;
+                currentRemainDays = remainDaysController.text;
+
+                showUpdateDialog();
+                // updateFood();
+              }
+            });
+          },
         ),
         SizedBox(
           height: 30,
@@ -633,33 +620,29 @@ class _DetailsListState extends State<DetailsList> {
         SizedBox(
           height: 20,
         ),
-      Container(
-        padding: EdgeInsets.only(top: 20, bottom: 40),
-        child:
-          Center(
+        Container(
+          padding: EdgeInsets.only(top: 20, bottom: 40),
+          child: Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: <Widget>[
                   QuantityColorBox(SIGNUP_BACKGROUND, "STORAGE DETAILS"),
-                  
                   CategoryColorBox(SIGNUP_BACKGROUND, "CATEGORY"),
-                  
                   BuyDateColorBox(SIGNUP_BACKGROUND, "BUY DATE"),
-                
                   ExpiryDateColorBox(SIGNUP_BACKGROUND, "EXPIRES IN"),
                 ],
-                  ),
-                  ),
+              ),
+            ),
           ),
-      ),
-                ],
-              );
+        ),
+      ],
+    );
   }
 
-  Widget QuantityColorBox( Gradient gradient, String title ) {
+  Widget QuantityColorBox(Gradient gradient, String title) {
     List<Widget> quanTypeList =
-      List<Widget>.generate(6, (index) => Text(quanTypes[index]));
+        List<Widget>.generate(6, (index) => Text(quanTypes[index]));
 
     return Padding(
       padding: const EdgeInsets.only(
@@ -695,83 +678,82 @@ class _DetailsListState extends State<DetailsList> {
             ),
             Expanded(
               flex: 5,
-              child:        
-               TextField(   
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Quantity',
-                  ),
-                  enabled: isEditMode,
-                  controller: quanNumAndTypeController,
-                  style: const TextStyle(
-                    fontSize: TEXT_NORMAL_SIZE,
-                    color: Colors.black,
-                  ),
-                  onTap: () {
-                    FocusScope.of(context).requestFocus(FocusNode());
-                    showCupertinoModalPopup(
-                        context: context,
-                        builder: (context) {
-                          return Container(
-                              height: 200,
-                              color: Colors.white,
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    flex: 2,
-                                    child: CupertinoPicker(
-                                      itemExtent: 24.0,
-                                      onSelectedItemChanged: (value) {
-                                        setState(() {
-                                          quanNum = nums[value];
-                                          quantityNumController.text =
-                                              "$quanNum.$quanSmallNum";
-                                          quanNumAndTypeController.text =
-                                              "$quanNum.$quanSmallNum $quanType";
-                                        });
-                                      },
-                                      children: numList,
-                                    ),
+              child: TextField(
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Quantity',
+                ),
+                enabled: isEditMode,
+                controller: quanNumAndTypeController,
+                style: const TextStyle(
+                  fontSize: TEXT_NORMAL_SIZE,
+                  color: Colors.black,
+                ),
+                onTap: () {
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  showCupertinoModalPopup(
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                            height: 200,
+                            color: Colors.white,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: CupertinoPicker(
+                                    itemExtent: 24.0,
+                                    onSelectedItemChanged: (value) {
+                                      setState(() {
+                                        quanNum = nums[value];
+                                        quantityNumController.text =
+                                            "$quanNum.$quanSmallNum";
+                                        quanNumAndTypeController.text =
+                                            "$quanNum.$quanSmallNum $quanType";
+                                      });
+                                    },
+                                    children: numList,
                                   ),
-                                  Expanded(
-                                    flex: 2,
-                                    child: CupertinoPicker(
-                                      itemExtent: 24.0,
-                                      onSelectedItemChanged: (value) {
-                                        setState(() {
-                                          quanSmallNum = nums[value];
-                                          quantityNumController.text =
-                                              "$quanNum.$quanSmallNum";
-                                          quanNumAndTypeController.text =
-                                              "$quanNum.$quanSmallNum $quanType";
-                                        });
-                                      },
-                                      children: numList,
-                                    ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: CupertinoPicker(
+                                    itemExtent: 24.0,
+                                    onSelectedItemChanged: (value) {
+                                      setState(() {
+                                        quanSmallNum = nums[value];
+                                        quantityNumController.text =
+                                            "$quanNum.$quanSmallNum";
+                                        quanNumAndTypeController.text =
+                                            "$quanNum.$quanSmallNum $quanType";
+                                      });
+                                    },
+                                    children: numList,
                                   ),
-                                  Expanded(
-                                    flex: 3,
-                                    child: CupertinoPicker(
-                                      itemExtent: 24.0,
-                                      onSelectedItemChanged: (value) {
-                                        setState(() {
-                                          quantityTypeController.text =
-                                              quanTypes[value];
-                                          quanType = quanTypes[value];
-                                          quanNumAndTypeController.text =
-                                              "$quanNum.$quanSmallNum $quanType";
-                                        });
-                                      },
-                                      children: quanTypeList,
-                                    ),
-                                  )
-                                ],
-                              ));
-                            });
-                          },
-                        ),
-            )
-            ,SizedBox(
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: CupertinoPicker(
+                                    itemExtent: 24.0,
+                                    onSelectedItemChanged: (value) {
+                                      setState(() {
+                                        quantityTypeController.text =
+                                            quanTypes[value];
+                                        quanType = quanTypes[value];
+                                        quanNumAndTypeController.text =
+                                            "$quanNum.$quanSmallNum $quanType";
+                                      });
+                                    },
+                                    children: quanTypeList,
+                                  ),
+                                )
+                              ],
+                            ));
+                      });
+                },
+              ),
+            ),
+            SizedBox(
               width: 10,
             ),
           ],
@@ -780,8 +762,7 @@ class _DetailsListState extends State<DetailsList> {
     );
   }
 
-  Widget CategoryColorBox(
-      Gradient gradient, String title) {
+  Widget CategoryColorBox(Gradient gradient, String title) {
     return Padding(
       padding: const EdgeInsets.only(
         left: 10.0,
@@ -840,9 +821,10 @@ class _DetailsListState extends State<DetailsList> {
     );
   }
 
-  Widget BuyDateColorBox( Gradient gradient, String title) {
-    DateTime selectedBuyDate = DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.buyDate);
-  
+  Widget BuyDateColorBox(Gradient gradient, String title) {
+    DateTime selectedBuyDate =
+        DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.buyDate);
+
     return Padding(
       padding: const EdgeInsets.only(
         left: 10.0,
@@ -883,51 +865,51 @@ class _DetailsListState extends State<DetailsList> {
                 ),
                 onTap: () {
                   FocusScope.of(context).requestFocus(FocusNode());
-                        showCupertinoModalPopup(
-                            context: context,
-                            builder: (context) {
-                              return Container(
-                                  height: 200,
+                  showCupertinoModalPopup(
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                            height: 200,
+                            color: Colors.white,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                    child: Container(
+                                  height: MediaQuery.of(context)
+                                          .copyWith()
+                                          .size
+                                          .height *
+                                      0.25,
                                   color: Colors.white,
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                          child: Container(
-                                        height: MediaQuery.of(context)
-                                                .copyWith()
-                                                .size
-                                                .height *
-                                            0.25,
-                                        color: Colors.white,
-                                        child: CupertinoDatePicker(
-                                          mode: CupertinoDatePickerMode.date,
-                                          onDateTimeChanged: (value) {
-                                            if (value != selectedBuyDate) {
-                                              setState(() {
-                                                selectedBuyDate = value;
-                                                int year = selectedBuyDate.year;
-                                                int month = selectedBuyDate.month;
-                                                int day = selectedBuyDate.day;
-                                                int timestamp = selectedBuyDate
-                                                    .millisecondsSinceEpoch;
+                                  child: CupertinoDatePicker(
+                                    mode: CupertinoDatePickerMode.date,
+                                    onDateTimeChanged: (value) {
+                                      if (value != selectedBuyDate) {
+                                        setState(() {
+                                          selectedBuyDate = value;
+                                          int year = selectedBuyDate.year;
+                                          int month = selectedBuyDate.month;
+                                          int day = selectedBuyDate.day;
+                                          int timestamp = selectedBuyDate
+                                              .millisecondsSinceEpoch;
 
-                                                currentBuyDate = timestamp;
-                                                
-                                                buyTimeController.text =
-                                                    "$year-$month-$day";
-                                                // Navigator.pop(context)
-                                                //記錄下用戶選擇的時間 ------> 存入數據庫
-                                              });
-                                            }
-                                          },
-                                          initialDateTime: DateTime.now(),
-                                          minimumYear: 2000,
-                                          maximumYear: 2025,
-                                        ),
-                                      ))
-                                    ],
-                                  ));
-                            });
+                                          currentBuyDate = timestamp;
+
+                                          buyTimeController.text =
+                                              "$year-$month-$day";
+                                          // Navigator.pop(context)
+                                          //記錄下用戶選擇的時間 ------> 存入數據庫
+                                        });
+                                      }
+                                    },
+                                    initialDateTime: DateTime.now(),
+                                    minimumYear: 2000,
+                                    maximumYear: 2025,
+                                  ),
+                                ))
+                              ],
+                            ));
+                      });
                 },
               ),
             ),
@@ -940,8 +922,9 @@ class _DetailsListState extends State<DetailsList> {
     );
   }
 
-  Widget ExpiryDateColorBox( Gradient gradient, String title) {
-    DateTime selectedExpiryDate= DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.expiryDate);
+  Widget ExpiryDateColorBox(Gradient gradient, String title) {
+    DateTime selectedExpiryDate =
+        DateTime.fromMillisecondsSinceEpoch(widget.foodDetail.expiryDate);
 
     return Padding(
       padding: const EdgeInsets.only(
@@ -972,19 +955,19 @@ class _DetailsListState extends State<DetailsList> {
               flex: 5,
               child: Wrap(
                 children: <Widget>[
-                TextField(
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Expiry Date',
-                ),
-                enabled: isEditMode,
-                controller: expireTimeController,
-                style: const TextStyle(
-                  fontSize: TEXT_NORMAL_SIZE,
-                  color: Colors.black,
-                ),
-                onTap: () {
-                    FocusScope.of(context).requestFocus(FocusNode());
+                  TextField(
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Expiry Date',
+                      ),
+                      enabled: isEditMode,
+                      controller: expireTimeController,
+                      style: const TextStyle(
+                        fontSize: TEXT_NORMAL_SIZE,
+                        color: Colors.black,
+                      ),
+                      onTap: () {
+                        FocusScope.of(context).requestFocus(FocusNode());
                         showCupertinoModalPopup(
                             context: context,
                             builder: (context) {
@@ -1007,11 +990,15 @@ class _DetailsListState extends State<DetailsList> {
                                             if (value != selectedExpiryDate) {
                                               setState(() {
                                                 selectedExpiryDate = value;
-                                                int year = selectedExpiryDate.year;
-                                                int month = selectedExpiryDate.month;
-                                                int day = selectedExpiryDate.day;
-                                                int timestamp = selectedExpiryDate
-                                                    .millisecondsSinceEpoch;
+                                                int year =
+                                                    selectedExpiryDate.year;
+                                                int month =
+                                                    selectedExpiryDate.month;
+                                                int day =
+                                                    selectedExpiryDate.day;
+                                                int timestamp =
+                                                    selectedExpiryDate
+                                                        .millisecondsSinceEpoch;
 
                                                 currentExpiryDate = timestamp;
 
@@ -1030,8 +1017,7 @@ class _DetailsListState extends State<DetailsList> {
                                     ],
                                   ));
                             });
-                }
-              ),
+                      }),
                 ],
               ),
             ),
@@ -1043,7 +1029,4 @@ class _DetailsListState extends State<DetailsList> {
       ),
     );
   }
-
 }
-
-

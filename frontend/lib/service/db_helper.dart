@@ -29,11 +29,10 @@ class DBHelper {
 
     return openDatabase(path, version: 1,
         onCreate: (Database db, int newerVersion) async {
-          await db.execute(
-              'CREATE TABLE foods(id TEXT PRIMARY KEY, name TEXT, category TEXT, buy_date INTEGER, expiry_date INTEGER, quantity_type TEXT, quantity_num REAL, state TEXT, consume_state REAL)');
-        });
+      await db.execute(
+          'CREATE TABLE foods(id TEXT PRIMARY KEY, name TEXT, category TEXT, buy_date INTEGER, expiry_date INTEGER, quantity_type TEXT, quantity_num REAL, state TEXT, consume_state REAL)');
+    });
   }
-
 
   //Define the function that inserts food into the 'foods' table
   Future<void> insertFood(UserItem food) async {
@@ -69,7 +68,7 @@ class DBHelper {
           state: maps[i]['state'],
         );
       });
-    } 
+    }
     return List.empty();
   }
 
@@ -79,8 +78,8 @@ class DBHelper {
 
     //Query table for all the foods.
     if (object == "foods") {
-      final List<Map<String, dynamic>> maps = await dbHelper
-          .rawQuery('SELECT * FROM foods WHERE id = ?', [id]);
+      final List<Map<String, dynamic>> maps =
+          await dbHelper.rawQuery('SELECT * FROM foods WHERE id = ?', [id]);
       //Convert the List<Map<String, dynamic> into a List<Food>
 
       //shoud be only one row, how to simplfy the code?
@@ -97,7 +96,7 @@ class DBHelper {
           consumeState: maps[0]['consume_state'],
         );
       });
-    } 
+    }
     return List.empty();
   }
 
@@ -202,7 +201,7 @@ class DBHelper {
   }
 
   //Define method that retrieves all the foods from food table
-  //value = 
+  //value =
   Future<List<String>> getAllUncosumedFoodStringValues(String value) async {
     //Get a reference to the database.
     Database dbHelper = await db;
@@ -260,7 +259,8 @@ class DBHelper {
   }
 
   //Define method that retrieves all the foods with certain state from food table
-  Future<List<double>> getAllGoodFoodDoubleValues(String value, String state) async {
+  Future<List<double>> getAllGoodFoodDoubleValues(
+      String value, String state) async {
     //Get a reference to the database.
     Database dbHelper = await db;
     //Query table for all the foods.
@@ -376,7 +376,6 @@ class DBHelper {
     await dbHelper.rawUpdate(
         'UPDATE foods SET consume_state = ?, state = ? WHERE id = ?',
         [1.0, 'wasted', id]);
-
   }
 
   Future<void> updateFoodConsumed(String id, String status) async {
@@ -385,14 +384,13 @@ class DBHelper {
     await dbHelper.rawUpdate(
         'UPDATE foods SET consume_state = ?, state = ? WHERE id = ?',
         [1.0, status, id]);
-
   }
 
   Future<void> updateFoodExpiring(String id) async {
     Database dbHelper = await db;
 
-    await dbHelper.rawUpdate(
-        'UPDATE foods SET state = ? WHERE id = ?', ['expiring', id]);
+    await dbHelper
+        .rawUpdate('UPDATE foods SET state = ? WHERE id = ?', ['expiring', id]);
   }
 
   //Define method to delete food
