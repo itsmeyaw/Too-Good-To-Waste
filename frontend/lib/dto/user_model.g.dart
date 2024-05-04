@@ -15,6 +15,7 @@ TGTWUser _$TGTWUserFromJson(Map<String, dynamic> json) => TGTWUser(
           (json['allergies'] as List<dynamic>).map((e) => e as String).toList(),
       goodPoints: json['good_points'] as int,
       reducedCarbonKg: (json['reduced_carbon_kg'] as num).toDouble(),
+      points: (json['points'] as num).toDouble(),
       userPreference: json['user_preference'] == null
           ? const UserPreference()
           : UserPreference.fromJson(
@@ -30,6 +31,7 @@ Map<String, dynamic> _$TGTWUserToJson(TGTWUser instance) => <String, dynamic>{
       'good_points': instance.goodPoints,
       'reduced_carbon_kg': instance.reducedCarbonKg,
       'user_preference': instance.userPreference.toJson(),
+      'points': instance.points,
     };
 
 UserAddress _$UserAddressFromJson(Map<String, dynamic> json) => UserAddress(
