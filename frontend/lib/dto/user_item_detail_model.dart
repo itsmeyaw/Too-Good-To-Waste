@@ -1,7 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:flutter/material.dart';
 
-
 @immutable
 @JsonSerializable()
 class UserItemDetail {
@@ -16,20 +15,17 @@ class UserItemDetail {
   double consumestate;
   String state;
 
-UserItemDetail(
-  {
-    required this.id,
-    required this.name,
-    required this.category,
-    required this.quantitytype,
-    required this.quantitynum,
-    required this.consumestate,
-    required this.remainDays,
-    required this.buyDate,
-    required this.expiryDate,
-    required this.state
-  }
-);
+  UserItemDetail(
+      {required this.id,
+      required this.name,
+      required this.category,
+      required this.quantitytype,
+      required this.quantitynum,
+      required this.consumestate,
+      required this.remainDays,
+      required this.buyDate,
+      required this.expiryDate,
+      required this.state});
 
   //Convert a Food into a Map. The keys must correspond to the names
   //of the columns in the databse.

@@ -42,7 +42,8 @@ class UserItemService {
       logger.d('Successfully updated item $itemUid for user $userUid');
       return true;
     }).catchError((err) {
-      logger.e('Got error when updating item $itemUid for user $userUid with detail: $err');
+      logger.e(
+          'Got error when updating item $itemUid for user $userUid with detail: $err');
       return false;
     });
   }
@@ -59,7 +60,8 @@ class UserItemService {
       logger.d('Successfully deleted item $itemUid for user $userUid');
       return true;
     }).catchError((err) {
-      logger.e('Got error when deleting item $itemUid for user $userUid with detail: $err');
+      logger.e(
+          'Got error when deleting item $itemUid for user $userUid with detail: $err');
       return false;
     });
   }
@@ -76,7 +78,8 @@ class UserItemService {
       analytics.logEvent(name: 'Add USer Item');
       return docRef.id;
     }).catchError((err) {
-      logger.e('Got error when adding item for user $userUid with detail: $err');
+      logger
+          .e('Got error when adding item for user $userUid with detail: $err');
       return null;
     });
   }

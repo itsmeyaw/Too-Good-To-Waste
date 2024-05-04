@@ -6,9 +6,13 @@ import 'package:logger/logger.dart';
 import 'package:tooGoodToWaste/dto/item_allergies_enum.dart';
 import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
+import 'package:tooGoodToWaste/dto/user_model.dart';
+import 'package:tooGoodToWaste/dto/user_preference_model.dart';
+import 'package:tooGoodToWaste/service/user_service.dart';
 import 'package:tooGoodToWaste/util/geo_utils.dart';
 import 'package:tooGoodToWaste/widgets/allergies_picker.dart';
 import 'package:tooGoodToWaste/widgets/category_picker.dart';
+import 'package:tooGoodToWaste/widgets/food_preference_picker.dart';
 import 'package:tooGoodToWaste/widgets/posts_card.dart';
 import 'package:tooGoodToWaste/widgets/user_location_aware_widget.dart';
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
@@ -28,13 +32,25 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   final SharedItemService sharedItemService = SharedItemService();
+  final UserService userService = UserService();
 
   double radius = 1;
   ItemCategory? category;
+  FoodPreference? foodPreference;
   List<ItemAllergy> allergies = [];
   List<SharedItem> sharedItems = [];
   bool showLikedPosts = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _getInitFoodPreference();
+  }
+
+  Future<void> _getInitFoodPreference() async {
+    TGTWUser userData = await userService.getUserData(userId);
+    foodPreference = userData.userPreference.foodPreference;
+  }
 
   void _resetSharedItems() {
     sharedItems = [];
@@ -85,6 +101,20 @@ class _HomeState extends State<Home> {
     //final List<SharedItem> likedItems = await sharedItemService.getLikedItems(userId);
     setState(() {
       showLikedPosts = true;
+    });
+  }
+
+  Future<void> _showFoodPreferenceDialog(FoodPreference? initPref) async {
+    final FoodPreference? foodPreference = await showDialog<FoodPreference>(
+        context: context,
+        builder: (context) => FoodPreferencePicker(
+              initialFoodPreference: initPref,
+            ));
+
+    setState(() {
+      _resetSharedItems();
+      this.foodPreference = foodPreference;
+      userService.setUserFoodPreference(foodPreference);
     });
   }
 
@@ -186,42 +216,65 @@ class _HomeState extends State<Home> {
           const SizedBox(
             height: 10,
           ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: <Widget>[
-                ActionChip(
-                  onPressed: _showCategoryDialog,
-                  avatar: const Icon(Icons.tune, size: 16),
-                  label: category != null
-                      ? Text('Category: ${category!.name}')
-                      : const Text('Category: Any'),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                ActionChip(
-                  onPressed: _showRangeDialog,
-                  avatar: const Icon(Icons.location_pin, size: 16),
-                  label: Text('Range (${radius.round().toString()} km)'),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                ActionChip(
-                    onPressed: _showAllergyDialog,
-                    avatar: const Icon(Icons.warning),
-                    label: Text('Allergies (${allergies.length})')),
-                const SizedBox(
-                  width: 10,
-                ),
-                ActionChip(
-                    onPressed: _showLikedPosts,
-                    avatar: const Icon(Icons.favorite),
-                    label: Text('Liked Posts (${allergies.length})'))
-              ],
-            ),
-          ),
+          FutureBuilder(
+              future: userService.getUserData(userId),
+              builder: (BuildContext context,
+                  AsyncSnapshot<TGTWUser> userDataSnapshot) {
+                if (userDataSnapshot.connectionState == ConnectionState.done &&
+                    userDataSnapshot.hasData) {
+                  TGTWUser userData = userDataSnapshot.requireData;
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: <Widget>[
+                        ActionChip(
+                          onPressed: _showCategoryDialog,
+                          avatar: const Icon(Icons.tune, size: 16),
+                          label: category != null
+                              ? Text('Category: ${category!.name}')
+                              : const Text('Category: Any'),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        ActionChip(
+                          onPressed: _showRangeDialog,
+                          avatar: const Icon(Icons.location_pin, size: 16),
+                          label:
+                              Text('Range (${radius.round().toString()} km)'),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        ActionChip(
+                            onPressed: _showAllergyDialog,
+                            avatar: const Icon(Icons.warning),
+                            label: Text('Allergies (${allergies.length})')),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        ActionChip(
+                            onPressed: () {
+                              _showFoodPreferenceDialog(this.foodPreference ??
+                                  userData.userPreference.foodPreference);
+                            },
+                            avatar: const Icon(Icons.rice_bowl),
+                            label: Text(
+                                'Preference (${foodPreference?.name ?? "None"})')),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        ActionChip(
+                            onPressed: _showLikedPosts,
+                            avatar: const Icon(Icons.favorite),
+                            label: Text('Liked Posts (${allergies.length})'))
+                      ],
+                    ),
+                  );
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              }),
           const SizedBox(
             height: 10,
           ),
@@ -259,26 +312,24 @@ class _HomeState extends State<Home> {
                                 child: Text("There is no item in your area"));
                           }
 
-                        return Expanded(
-                          child: 
-                            GridView.builder(
-                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 4.0,
-                                mainAxisSpacing: 4.0,
-                              ),
-                              itemCount: sharedItems.length,
-                              itemBuilder: (_, index) {
-                                if (sharedItems[index] != null) {
-                                  logger.d(
-                                      'Got items: ${sharedItems[index].toJson()}');
-                                  return Post(postData: sharedItems[index]);
-                                }
-                                return null;
-                              },
-                            )
-                        );
-                        
+                          return Expanded(
+                              child: GridView.builder(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 4.0,
+                              mainAxisSpacing: 4.0,
+                            ),
+                            itemCount: sharedItems.length,
+                            itemBuilder: (_, index) {
+                              if (sharedItems[index] != null) {
+                                logger.d(
+                                    'Got items: ${sharedItems[index].toJson()}');
+                                return Post(postData: sharedItems[index]);
+                              }
+                              return null;
+                            },
+                          ));
                         } else if (sharedItemSnapshot.connectionState ==
                             ConnectionState.active) {
                           return const Center(
@@ -345,7 +396,7 @@ class _RadiusPickerState extends State<RadiusPicker> {
 
 class Post extends StatefulWidget {
   final SharedItem postData;
-  
+
   const Post({super.key, required this.postData});
 
   @override
@@ -356,14 +407,14 @@ class _PostState extends State<Post> {
   final SharedItemService sharedItemService = SharedItemService();
   final String userId = FirebaseAuth.instance.currentUser!.uid;
 
-
   @override
   Widget build(BuildContext context) {
     String? categoryIconImagePath;
 
-    int remainDays = DateTime.fromMillisecondsSinceEpoch(widget.postData.expireDate)
-          .difference(DateTime.now())
-          .inDays;
+    int remainDays =
+        DateTime.fromMillisecondsSinceEpoch(widget.postData.expireDate)
+            .difference(DateTime.now())
+            .inDays;
     if (GlobalCateIconMap[widget.postData.category.name] == null) {
       categoryIconImagePath = GlobalCateIconMap["Others"];
     } else {
@@ -373,20 +424,22 @@ class _PostState extends State<Post> {
     final String userId = FirebaseAuth.instance.currentUser!.uid;
 
     bool isLiked = widget.postData.likedBy.contains(userId);
-
-    return foodItem(widget.postData, remainDays, onTapped: () {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => PostPage(postData: widget.postData)));
-    },
+    return foodItem(
+      widget.postData,
+      remainDays,
+      onTapped: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => PostPage(postData: widget.postData)));
+      },
       onLike: () {
         sharedItemService.setLikedBy(widget.postData.id!, userId);
         setState(() {
           isLiked = !isLiked;
         });
-    },
+      },
       isLiked: isLiked,
-      );     
-   }
+    );
+  }
 }

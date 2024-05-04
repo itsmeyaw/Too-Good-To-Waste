@@ -7,12 +7,11 @@ class SharedItemReservation {
   final String reserver;
   final int reservationTime;
 
-  SharedItemReservation({
-    required this.reserver,
-    required this.reservationTime
-  });
+  SharedItemReservation(
+      {required this.reserver, required this.reservationTime});
 
-  factory SharedItemReservation.fromJson(Map<String, dynamic> json) => _$SharedItemReservationFromJson(json);
+  factory SharedItemReservation.fromJson(Map<String, dynamic> json) =>
+      _$SharedItemReservationFromJson(json);
 
   Map<String, dynamic> toJson() => _$SharedItemReservationToJson(this);
 }

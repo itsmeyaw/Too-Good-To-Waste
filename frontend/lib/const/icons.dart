@@ -1,5 +1,3 @@
-
-
 const arrow_left = 0xe900;
 const arrow_right = 0xe901;
 const check = 0xe902;

@@ -41,8 +41,8 @@ class Line_Chart extends StatelessWidget {
         handleBuiltInTouches: true,
         touchTooltipData: LineTouchTooltipData(
 
-          //tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
-        ),
+            //tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+            ),
       );
 
   FlTitlesData get titlesData1 => FlTitlesData(
@@ -60,7 +60,7 @@ class Line_Chart extends StatelessWidget {
         ),
       );
 
-   List<LineChartBarData> get lineBarsData1 => [
+  List<LineChartBarData> get lineBarsData1 => [
         lineChartBarData1_1,
         lineChartBarData1_2,
         lineChartBarData1_3,
@@ -186,8 +186,7 @@ class Line_Chart extends StatelessWidget {
   FlBorderData get borderData => FlBorderData(
         show: true,
         border: Border(
-          bottom:
-              BorderSide(color: Colors.black, width: 4),
+          bottom: BorderSide(color: Colors.black, width: 4),
           left: const BorderSide(color: Colors.transparent),
           right: const BorderSide(color: Colors.transparent),
           top: const BorderSide(color: Colors.transparent),
@@ -262,7 +261,7 @@ class Line_Chart extends StatelessWidget {
           FlSpot(11, 1),
           FlSpot(12, 1),
         ],
-      ); 
+      );
 
   LineChartBarData get lineChartBarData2_1 => LineChartBarData(
         isCurved: true,

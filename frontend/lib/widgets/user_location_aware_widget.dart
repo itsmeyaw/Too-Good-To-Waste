@@ -7,7 +7,8 @@ class UserLocationAwareWidget extends StatefulWidget {
   final Widget Function(BuildContext context, GeoPoint userLocation) builder;
   final Widget Function(BuildContext context)? loader;
 
-  const UserLocationAwareWidget({super.key, required this.builder, this.loader});
+  const UserLocationAwareWidget(
+      {super.key, required this.builder, this.loader});
 
   @override
   State<StatefulWidget> createState() => _UserLocationAwareState();
