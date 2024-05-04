@@ -30,6 +30,70 @@ class _PostPageState extends State<PostPage> {
   final Logger logger = Logger();
   final User? currentUser = FirebaseAuth.instance.currentUser;
   double userRating = 0;
+  double range = 1;
+
+  Future<bool?> showPaymentDialog(
+      BuildContext context, String sharedItemId, TGTWUser counterparty) async {
+       
+
+    return showDialog<bool>(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Pay With Points"),
+            content: IntrinsicHeight(
+              child: Column(
+                children: [
+                  Text("Please reach an agreement with the Giver and confirm this payment with the below points:"),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Slider(
+                    value: 1,
+                    max: 10,
+                    min: 1,
+                    divisions: 5,
+                    label: range.round().toString(),
+                    onChanged: (double newValue) {
+                      logger.d('Slided value to $newValue');
+                      setState(() {
+                        range = newValue.roundToDouble();
+                      });
+                    },
+                  )
+                ],
+              ),
+            ),
+            
+            actions: [
+              FilledButton(
+                  style: FilledButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).buttonTheme.colorScheme!.error),
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: const Text('Cancel')),
+              FilledButton(
+                  onPressed: () async {
+                    await userService.updateUserPoints(counterparty, range, true);
+                    Navigator.of(context).pop(true);
+
+                    bool? confirm =
+                        await showConfirmDialog(
+                            context,
+                            sharedItemId);
+                    if (confirm != null && confirm) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: const Text("Confirm"))
+            ],
+          );
+        });
+  }
+
 
   Future<bool?> showConfirmDialog(
       BuildContext context, String sharedItemId) async {
@@ -328,16 +392,21 @@ class _PostPageState extends State<PostPage> {
                                                 child: SizedBox(
                                                     child: FilledButton(
                                                         onPressed: () async {
-                                                          bool? confirm =
-                                                              await showConfirmDialog(
+                                                          bool? payment =
+                                                              await showPaymentDialog(
                                                                   context,
-                                                                  sharedItemId);
-                                                          if (confirm != null &&
-                                                              confirm) {
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
+                                                                  sharedItemId, postUser);
+                                                         
+                                                          if (payment != null &&
+                                                              payment) {
+                                                            Navigator.of(context).pop();
                                                           }
+
+                                                          // bool? confirm =
+                                                          //     await showConfirmDialog(
+                                                          //         context,
+                                                          //         sharedItemId);
+                                                           
                                                         },
                                                         child: const Text(
                                                             'Confirm Pick Up'))))

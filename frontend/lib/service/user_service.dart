@@ -113,4 +113,49 @@ class UserService {
 
     await db.collection(COLLECTION).doc(user.uid).update(modifiedUser);
   }
+
+  Future<void> updateUserPoints(TGTWUser counterparty, double points, bool isBuy) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception("User is not logged in but want to use points");
+    }
+
+    analytics.logEvent(name: "Points Transfer");
+
+    double userPoints = await db.collection(COLLECTION).doc(user.uid).get().then((querySnapshot) {
+      if (!querySnapshot.exists) {
+        throw Exception('Cannot find user $user.uid');
+      }
+      logger.d('Got data ${querySnapshot.data()}');
+      return querySnapshot.data()!['points'] as double;
+    });
+
+    
+    if (isBuy) {
+      if (userPoints < points) {
+        throw Exception("User $user.uid does not have enough points to buy");
+      }
+      else {
+        await db.collection(COLLECTION).doc(user.uid).update({
+          'points': FieldValue.increment(-points),
+        });
+      
+        // await db.collection(COLLECTION).doc(counterpartyUserId).update({
+        //   'points': FieldValue.increment(points),
+        // });
+      }
+    } else {
+      if (counterparty.points < points) {
+        throw Exception("User ${counterparty.name.first} ${counterparty.name.last} does not have enough points to give");
+      }
+      else {
+        await db.collection(COLLECTION).doc(user.uid).update({
+          'points': FieldValue.increment(points),
+        });
+        // await db.collection(COLLECTION).doc(counterpartyUserId).update({
+        //   'points': FieldValue.increment(-points),
+        // });
+      }
+    }
+  }
 }
