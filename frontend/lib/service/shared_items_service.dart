@@ -129,29 +129,29 @@ class SharedItemService {
     });
   }
 
-  Stream<List<DocumentSnapshot>> getLikedSharedItemOfUser({required String userId}) {
+  Future<Iterable<SharedItem>> getLikedSharedItemOfUser({required String userId}) {
     logger.d('Start querying for shared item');
     analytics.logEvent(name: "Search Item");
 
     var collection = db.collection(SHARED_ITEM_COLLECTION);
 
-    return geo
-        .collection(
-            collectionRef: collection
-                .where('liked_by', arrayContains: userId)
-        )
-        .within(
-            center: GeoFirePoint(0, 0),
-            radius: 10000,
-            field: "location",
-            strictMode: true);
-    // return 
-    //     .where('liked_by', arrayContains: userId)
-    //     .get()
-    //     .then((querySnapshot) {
-    //   logger.d("Got ${querySnapshot.size} liked shared items of user $userId");
-    //   return querySnapshot.docs;
-    // });
+    // return geo
+    //     .collection(
+    //         collectionRef: collection
+    //             .where('liked_by', arrayContains: userId)
+    //     )
+    //     .within(
+    //         center: GeoFirePoint(0, 0),
+    //         radius: 10000,
+    //         field: "location",
+    //         strictMode: true);
+    return collection
+        .where('liked_by', arrayContains: userId)
+        .get()
+        .then((querySnapshot) {
+      logger.d("Got ${querySnapshot.size} liked shared items of user $userId");
+      return querySnapshot.docs.map((doc) => SharedItem.fromJson(doc.data()) );
+    });
   }
 
   Future<Iterable<SharedItem>> getSharedItemOfUserWithReservation(String userId) {

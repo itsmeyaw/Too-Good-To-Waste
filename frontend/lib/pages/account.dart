@@ -648,27 +648,20 @@ class LikedPostPageWidget extends StatelessWidget {
     }
 
     final String userId = user!.uid;
+    logger.d('User id: $userId');
     List<SharedItem> sharedItems = [];
 
     return 
-      StreamBuilder(
-        stream: sharedItemService.getLikedSharedItemOfUser(userId: userId),
+      FutureBuilder(
+        future: sharedItemService.getLikedSharedItemOfUser(userId: userId),
         builder: (BuildContext context,
-            AsyncSnapshot<List<DocumentSnapshot>>
-                sharedItemSnapshot) {
-          if (sharedItemSnapshot.connectionState ==
-                  ConnectionState.active &&
-              sharedItemSnapshot.hasData) {
-            if (sharedItemSnapshot.data != null) {
-              List<SharedItem?> results = sharedItemService
-                  .createSharedItemList(sharedItemSnapshot.data!);
-              for (var res in results) {
-                if (res != null) {
-                  logger.d('Got items: ${res.toJson()}');
-                  sharedItems.add(res);
-                }
-              }
-            }
+            AsyncSnapshot<Iterable<SharedItem>> sharedItemsSnapshot) {
+          if (!sharedItemsSnapshot.hasData) {
+            return const CircularProgressIndicator();
+          }
+
+          final List<SharedItem> sharedItems =
+              sharedItemsSnapshot.data!.toList();
 
             if (sharedItems.isEmpty) {
               return const Center(
@@ -677,7 +670,12 @@ class LikedPostPageWidget extends StatelessWidget {
 
             return Expanded(
               child: 
-              ListView.builder(
+              GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 4.0,
+                  mainAxisSpacing: 4.0,
+                ),
                 itemCount: sharedItems.length,
                 itemBuilder: (_, index) {
                   if (sharedItems[index] != null) {
@@ -690,16 +688,8 @@ class LikedPostPageWidget extends StatelessWidget {
               )
             );
                         
-          } else if (sharedItemSnapshot.connectionState ==
-              ConnectionState.active) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else {
-            return const Center(
-                child: Text("There is no liked item"));
-          }
-        }
+          } 
+        
       );  
     }
   }
