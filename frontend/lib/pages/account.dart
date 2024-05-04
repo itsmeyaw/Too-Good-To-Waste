@@ -643,18 +643,13 @@ class LikedPostPageWidget extends StatelessWidget {
 
             return Expanded(
               child: 
-              GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 4.0,
-                  mainAxisSpacing: 4.0,
-                ),
+              ListView.builder(
                 itemCount: sharedItems.length,
                 itemBuilder: (_, index) {
                   if (sharedItems[index] != null) {
                     logger.d(
                         'Got items: ${sharedItems[index].toJson()}');
-                    return Post(postData: sharedItems[index]);
+                    return Post(postData: sharedItems[index], isLikedPage: true, context: context,);
                   }
                   return null;
                 },

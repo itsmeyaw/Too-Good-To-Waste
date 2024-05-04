@@ -81,24 +81,11 @@ class SharedItemService {
       {required GeoPoint userLocation,
       required double radiusInKm,
       required String userId,
-      ItemCategory? category,
-      required bool showLiked}) {
+      ItemCategory? category,}) {
     logger.d('Start querying for shared item');
     analytics.logEvent(name: "Search Item");
 
     var collection = db.collection(SHARED_ITEM_COLLECTION);
-
-    if (showLiked) {
-      return geo
-          .collection(
-              collectionRef:
-                  collection.where('liked_by', arrayContains: userId))
-          .within(
-              center: GeoFirePoint(0, 0),
-              radius: 10000,
-              field: "location",
-              strictMode: true);
-    }
 
     if (category != null) {
       String categoryString = category.name;
@@ -188,7 +175,7 @@ class SharedItemService {
       bool isLiked = sharedItem.likedBy.contains(userId);
 
       List<String> likedBy = sharedItem.likedBy;
-      if (likedBy.contains(userId)) {
+      if (isLiked) {
         likedBy.remove(userId);
         isLiked = false;
       } else {
