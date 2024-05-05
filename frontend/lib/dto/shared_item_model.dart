@@ -10,7 +10,7 @@ part 'shared_item_model.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class SharedItem {
-  @JsonKey(includeToJson: false)
+  @JsonKey(includeToJson: false, includeFromJson: false)
   String? id;
   final UserItemAmount amount;
   final int buyDate;

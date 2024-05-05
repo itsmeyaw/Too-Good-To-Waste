@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:form_validator/form_validator.dart';
+import 'package:logger/logger.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
 import 'package:tooGoodToWaste/service/message_service.dart';
 import 'package:tooGoodToWaste/service/user_service.dart';
@@ -20,6 +23,7 @@ class ChatroomPage extends StatefulWidget {
 }
 
 class _ChatroomPageState extends State<ChatroomPage> {
+  Logger logger = Logger();
   final MessageService messageService = MessageService();
   final UserService userService = UserService();
   final TextEditingController _messageController = TextEditingController();
@@ -35,6 +39,12 @@ class _ChatroomPageState extends State<ChatroomPage> {
   void dispose() {
     _messageController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    logger.i("Start message with item ${widget.sharedItem?.id} ");
   }
 
   @override

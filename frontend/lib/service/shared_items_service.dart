@@ -46,20 +46,23 @@ class SharedItemService {
     });
   }
 
+  SharedItem? createSharedItem(DocumentSnapshot<Object?> doc) {
+    if (doc.exists) {
+      logger.d(
+          'Converting shared item ${doc.id} data: ${doc.data() as Map<String, dynamic>}');
+      SharedItem sharedItem =
+      SharedItem.fromJson(doc.data() as Map<String, dynamic>);
+      sharedItem.id = doc.id;
+      logger.d('Shared item is ${sharedItem.id}');
+      return sharedItem;
+    } else {
+      return null;
+    }
+  }
+
   List<SharedItem?> createSharedItemList(
       List<DocumentSnapshot<Object?>> docList) {
-    return docList.map((e) {
-      if (e.exists) {
-        logger.d(
-            'Converting shared item data: ${e.data() as Map<String, dynamic>}');
-        final SharedItem sharedItem =
-            SharedItem.fromJson(e.data() as Map<String, dynamic>);
-        sharedItem.id = e.id;
-        return sharedItem;
-      } else {
-        return null;
-      }
-    }).toList();
+    return docList.map((e) => createSharedItem(e)).toList();
   }
 
   Future<SharedItem?> getSharedItem(String sharedItemId) async {
@@ -75,7 +78,7 @@ class SharedItemService {
         .doc(sharedItemId)
         .snapshots()
         .map((event) =>
-            event.exists ? SharedItem.fromJson(event.data()!) : null);
+            event.exists ? createSharedItem(event) : null);
   }
 
   Stream<List<DocumentSnapshot>> getSharedItemsWithinRadius({

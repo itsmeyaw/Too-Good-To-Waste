@@ -297,7 +297,7 @@ class _HomeState extends State<Home> {
                             itemBuilder: (_, index) {
                               if (sharedItems[index] != null) {
                                 logger.d(
-                                    'Got items: ${sharedItems[index].toJson()}');
+                                    'Got items: ${sharedItems[index].id}');
                                 return Post(
                                     postData: sharedItems[index],
                                     isLikedPage: false);
