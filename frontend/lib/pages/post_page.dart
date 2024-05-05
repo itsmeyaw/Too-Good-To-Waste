@@ -251,7 +251,19 @@ class _PostPageState extends State<PostPage> {
                                       },
                                     )),
                               ))
-                          : const Text('No image provided'),
+                          : Hero(
+                              transitionOnUserGestures: true,
+                              tag: widget.postData.name,
+                              child: Center(
+                                child: Container(
+                                    height: 200,
+                                    padding: const EdgeInsets.all(0.0),
+                                    child: Image.asset(
+                                      'assets/images/no-image-placeholder.png',
+                                      height: 200,
+                                      width: 250,
+                                    )),
+                              )),
                       const Spacer(),
                       StreamBuilder(
                           stream:

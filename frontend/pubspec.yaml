@@ -104,13 +104,11 @@ flutter:
     - assets/anime/fly.riv
     - assets/anime/wasted.riv
     - assets/anime/noWasted.riv
-    - assets/images/backyard.png
-    - assets/images/tree.png
-    - assets/images/sharedItem.png
     - assets/images/foodWaste.png
     - assets/images/uploadImg.jpeg
     - assets/images/detail_page.png
     - assets/images/logo_signup.png
+    - assets/images/no-image-placeholder.png
     - assets/achievements/initialization.png
     - assets/achievements/first_encounter.png
     - assets/achievements/nesting.png
