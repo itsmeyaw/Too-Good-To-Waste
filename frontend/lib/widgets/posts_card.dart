@@ -190,6 +190,7 @@ class LikedItem extends StatefulWidget {
   final SharedItem postData;
   final int remainDays;
 
+
   const LikedItem(
       {super.key, required this.postData, required this.remainDays});
 
@@ -294,7 +295,8 @@ class _LikedItemState extends State<LikedItem> {
                         child: Icon(
                           (isLiked) ? Icons.favorite : Icons.favorite_border,
                           color: (isLiked) ? Colors.black : Colors.grey,
-                          size: 20,
+                          size: 30,
+
                         ),
                       )),
                   Positioned(
@@ -306,10 +308,10 @@ class _LikedItemState extends State<LikedItem> {
                         children: <Widget>[
                           Text(widget.postData.name,
                               style: TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.bold)),
+                                  fontSize: 20, fontWeight: FontWeight.bold)),
                           Text(
                               'Amount: ${widget.postData.amount.nominal} ${widget.postData.amount.unit}',
-                              style: const TextStyle(fontSize: 10)),
+                              style: const TextStyle(fontSize: 15)),
                         ],
                       )),
                   Positioned(
@@ -345,7 +347,7 @@ class _LikedItemState extends State<LikedItem> {
                                     style: TextStyle(
                                         color: Color.fromRGBO(9, 162, 109, 1),
                                         fontWeight: FontWeight.w700,
-                                        fontSize: 15)),
+                                        fontSize: 20)),
                               ]))
                           : SizedBox(width: 0))
                 ],

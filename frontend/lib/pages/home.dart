@@ -267,6 +267,7 @@ class _HomeState extends State<Home> {
                         userId: userId,
                         category: category,
                         foodPreference: foodPreference,
+
                       ),
                       builder: (BuildContext context,
                           AsyncSnapshot<List<DocumentSnapshot>>

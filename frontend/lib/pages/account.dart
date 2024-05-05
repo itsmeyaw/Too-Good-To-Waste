@@ -89,6 +89,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
   late TextEditingController goodPointsController;
   late TextEditingController carbonEmissionController;
   late TextEditingController ratingController;
+  late TextEditingController pointsController;
 
   late UserName currentName;
   late String currentEmail;
@@ -102,6 +103,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
   late int currentGoodPoints;
   late double currentCarbonEmission;
   late double currentRating;
+  late double currentPoints;
 
   @override
   void initState() {
@@ -124,6 +126,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
     currentGoodPoints = widget.userData.goodPoints;
     currentCarbonEmission = widget.userData.reducedCarbonKg;
     currentRating = widget.userData.rating;
+    currentPoints = widget.userData.points;
 
     nameController = TextEditingController(
         text: '${widget.userData.name.first} ${widget.userData.name.last}');
@@ -145,6 +148,8 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
     carbonEmissionController =
         TextEditingController(text: currentCarbonEmission.toString());
     ratingController = TextEditingController(text: currentRating.toString());
+    pointsController =
+        TextEditingController(text: widget.userData.points.toString());
   }
 
   showUpdateDialog() {
@@ -200,6 +205,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
       allergies: currentAllergies.split(', ').toList(),
       goodPoints: currentGoodPoints,
       reducedCarbonKg: currentCarbonEmission,
+      points: currentPoints,
     );
 
     await userService.updateUserData(widget.user.uid, newUser);
@@ -432,6 +438,21 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                           TextField(
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
+                              labelText: 'Purchasing Points',
+                            ),
+                            enabled: false,
+                            controller: pointsController,
+                            style: const TextStyle(
+                              fontFamily: 'Roboto',
+                              fontSize: 20,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          TextField(
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
                               labelText: 'Rating',
                             ),
                             enabled: isEditMode,
@@ -511,6 +532,8 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                                 currentZipCode = zipCodeController.text;
                                 currentCountry = countryController.text;
                                 currentAllergies = allergiesController.text;
+                                currentGoodPoints =
+                                    int.parse(goodPointsController.text);
                                 showUpdateDialog();
                               }
                             });

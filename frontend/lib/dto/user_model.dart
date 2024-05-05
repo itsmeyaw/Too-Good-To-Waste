@@ -16,6 +16,7 @@ class TGTWUser extends PublicUser {
   final int goodPoints;
   final double reducedCarbonKg;
   final UserPreference userPreference;
+  final double points;
 
   const TGTWUser(
       {required super.name,
@@ -25,6 +26,7 @@ class TGTWUser extends PublicUser {
       required this.allergies,
       required this.goodPoints,
       required this.reducedCarbonKg,
+      required this.points,
       this.userPreference = const UserPreference()});
 
   factory TGTWUser.fromJson(Map<String, dynamic> json) =>

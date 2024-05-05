@@ -49,7 +49,7 @@ class UserService {
 
   /// Rate a user with id @param userId and with the value of @param rating
   /// Rating is 0 - 5;
-  Future<void> rateUser(
+  Future<bool> rateUser(
       String userId, double rating, String sharedItemId) async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -95,6 +95,8 @@ class UserService {
         .collection(COLLECTION)
         .doc(userId)
         .update({'rating': calculatedRating});
+
+    return true;
   }
 
   Future<void> setUserFoodPreference(FoodPreference? foodPreference) async {
@@ -112,5 +114,57 @@ class UserService {
         FoodPreferenceEnumMap[foodPreference];
 
     await db.collection(COLLECTION).doc(user.uid).update(modifiedUser);
+  }
+
+  Future<bool> updateUserPoints(TGTWUser counterparty,
+      String counterpartyUserId, double points, bool isBuy) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception("User is not logged in but want to use points");
+    }
+
+    analytics.logEvent(name: "Points Transfer");
+
+    double userPoints = await db
+        .collection(COLLECTION)
+        .doc(user.uid)
+        .get()
+        .then((querySnapshot) {
+      if (!querySnapshot.exists) {
+        throw Exception('Cannot find user $user.uid');
+      }
+      logger.d('Got data ${querySnapshot.data()}');
+      return querySnapshot.data()!['points'] as double;
+    });
+
+    if (isBuy) {
+      if (userPoints < points) {
+        throw Exception("User $user.uid does not have enough points to buy");
+      } else {
+        await db.collection(COLLECTION).doc(user.uid).update({
+          'points': FieldValue.increment(-points),
+        });
+
+        await db.collection(COLLECTION).doc(counterpartyUserId).update({
+          'points': FieldValue.increment(points),
+        });
+
+        return true;
+      }
+    } else {
+      if (counterparty.points < points) {
+        throw Exception(
+            "The Buyer ${counterparty.name.first} ${counterparty.name.last} does not have enough points to give");
+      } else {
+        await db.collection(COLLECTION).doc(user.uid).update({
+          'points': FieldValue.increment(points),
+        });
+        await db.collection(COLLECTION).doc(counterpartyUserId).update({
+          'points': FieldValue.increment(-points),
+        });
+
+        return true;
+      }
+    }
   }
 }

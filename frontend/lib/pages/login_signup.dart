@@ -1111,7 +1111,8 @@ class _SignUpInformationState extends State<SignUpInformationPage> {
                                     country: _countryController.value.text),
                                 allergies: const [],
                                 goodPoints: 0,
-                                reducedCarbonKg: 0.0);
+                                reducedCarbonKg: 0.0,
+                                points: 1000.00);
 
                             return FirebaseFirestore.instance
                                 .collection('users')
