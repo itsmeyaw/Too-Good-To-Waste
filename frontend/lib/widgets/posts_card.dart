@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
@@ -6,18 +7,20 @@ import 'package:tooGoodToWaste/pages/post_page.dart';
 import 'package:tooGoodToWaste/service/shared_items_service.dart';
 import 'package:tooGoodToWaste/service/storage_service.dart';
 import 'package:tooGoodToWaste/service/user_service.dart';
+import 'package:tooGoodToWaste/util/geo_utils.dart';
+import 'package:tooGoodToWaste/widgets/user_location_aware_widget.dart';
 
-class foodItem extends StatefulWidget {
+class FoodItem extends StatefulWidget {
   final SharedItem postData;
   final int remainDays;
 
-  const foodItem({super.key, required this.postData, required this.remainDays});
+  const FoodItem({super.key, required this.postData, required this.remainDays});
 
   @override
-  State<StatefulWidget> createState() => _foodItem();
+  State<StatefulWidget> createState() => _FoodItemState();
 }
 
-class _foodItem extends State<foodItem> {
+class _FoodItemState extends State<FoodItem> {
   final UserService userService = UserService();
   final StorageService storageService = StorageService();
   final String userId = FirebaseAuth.instance.currentUser!.uid;
@@ -140,19 +143,22 @@ class _foodItem extends State<foodItem> {
                   Positioned(
                       top: 5,
                       left: 5,
-                      child: Container(
-                        padding: EdgeInsets.only(
-                            top: 5, left: 10, right: 10, bottom: 5),
-                        decoration: BoxDecoration(
-                            color: Colors.grey[600],
-                            borderRadius: BorderRadius.circular(50)),
-                        child: Text(
-                            '${widget.postData.distance.toStringAsFixed(2)} m',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13)),
-                      )),
+                      child: UserLocationAwareWidget(builder:
+                          (BuildContext context, GeoPoint userLocation) {
+                        return Container(
+                          padding: EdgeInsets.only(
+                              top: 5, left: 10, right: 10, bottom: 5),
+                          decoration: BoxDecoration(
+                              color: Colors.grey[600],
+                              borderRadius: BorderRadius.circular(50)),
+                          child: Text(
+                              '${GeoUtils.calculateDistance(userLocation, widget.postData.location.geoPoint).toStringAsFixed(2)}  m',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13)),
+                        );
+                      })),
                   Positioned(
                       top: 0,
                       right: 10,
@@ -180,18 +186,19 @@ class _foodItem extends State<foodItem> {
   }
 }
 
-class likedItem extends StatefulWidget {
+class LikedItem extends StatefulWidget {
   final SharedItem postData;
   final int remainDays;
 
-  const likedItem(
+
+  const LikedItem(
       {super.key, required this.postData, required this.remainDays});
 
   @override
-  State<StatefulWidget> createState() => _likedItem();
+  State<StatefulWidget> createState() => _LikedItemState();
 }
 
-class _likedItem extends State<likedItem> {
+class _LikedItemState extends State<LikedItem> {
   final UserService userService = UserService();
   final StorageService storageService = StorageService();
   final String userId = FirebaseAuth.instance.currentUser!.uid;
@@ -289,6 +296,7 @@ class _likedItem extends State<likedItem> {
                           (isLiked) ? Icons.favorite : Icons.favorite_border,
                           color: (isLiked) ? Colors.black : Colors.grey,
                           size: 30,
+
                         ),
                       )),
                   Positioned(
@@ -309,19 +317,22 @@ class _likedItem extends State<likedItem> {
                   Positioned(
                       top: 5,
                       left: 5,
-                      child: Container(
-                        padding: EdgeInsets.only(
-                            top: 5, left: 10, right: 10, bottom: 5),
-                        decoration: BoxDecoration(
-                            color: Colors.grey[600],
-                            borderRadius: BorderRadius.circular(50)),
-                        child: Text(
-                            '${widget.postData.distance.toStringAsFixed(2)} m',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13)),
-                      )),
+                      child: UserLocationAwareWidget(builder:
+                          (BuildContext context, GeoPoint userLocation) {
+                        return Container(
+                          padding: EdgeInsets.only(
+                              top: 5, left: 10, right: 10, bottom: 5),
+                          decoration: BoxDecoration(
+                              color: Colors.grey[600],
+                              borderRadius: BorderRadius.circular(50)),
+                          child: Text(
+                              '${GeoUtils.calculateDistance(userLocation, widget.postData.location.geoPoint).toStringAsFixed(2)} m',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13)),
+                        );
+                      })),
                   Positioned(
                       top: 0,
                       right: 10,

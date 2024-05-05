@@ -32,9 +32,6 @@ class SharedItem {
   @GeoFirePointConverter()
   GeoFirePoint location = GeoFirePoint(0.0, 0.0);
 
-  @JsonKey(includeToJson: false, defaultValue: double.infinity)
-  double distance = double.infinity;
-
   SharedItem(
       {this.id,
       required this.amount,

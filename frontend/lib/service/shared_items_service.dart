@@ -9,6 +9,7 @@ import 'package:dart_geohash/dart_geohash.dart';
 import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
 import 'package:tooGoodToWaste/dto/shared_item_reservation_model.dart';
+import 'package:tooGoodToWaste/dto/user_preference_model.dart';
 
 class SharedItemService {
   static const String SHARED_ITEM_COLLECTION = "shared_items";
@@ -82,32 +83,38 @@ class SharedItemService {
     required double radiusInKm,
     required String userId,
     ItemCategory? category,
+    FoodPreference? foodPreference,
   }) {
     logger.d('Start querying for shared item');
     analytics.logEvent(name: "Search Item");
 
-    var collection = db.collection(SHARED_ITEM_COLLECTION);
+    Query collection = db.collection(SHARED_ITEM_COLLECTION);
 
-    if (category != null) {
-      String categoryString = category.name;
-      logger.d("Adding category filter: $categoryString");
-      return geo
-          .collection(
-              collectionRef:
-                  collection.where("category", isEqualTo: categoryString))
-          .within(
-              center:
-                  GeoFirePoint(userLocation.latitude, userLocation.longitude),
-              radius: radiusInKm,
-              field: "location",
-              strictMode: true);
-    } else {
-      return geo.collection(collectionRef: collection).within(
-          center: GeoFirePoint(userLocation.latitude, userLocation.longitude),
-          radius: radiusInKm,
-          field: "location",
-          strictMode: true);
+    if (category != null && foodPreference == null) {
+      collection = collection.where("category", isEqualTo: category.name);
+    } else if (foodPreference != null) {
+      switch (foodPreference) {
+        case FoodPreference.Vegetarian:
+          collection = collection.where("category", whereIn: [
+            ItemCategory.Egg,
+            ItemCategory.Vegetable,
+            ItemCategory.Fruit,
+            ItemCategory.Diaries
+          ].map((e) => e.name));
+        case FoodPreference.Vegan:
+          collection = collection.where("category", whereIn: [
+            ItemCategory.Vegetable,
+            ItemCategory.Fruit,
+          ].map((e) => e.name));
+      }
     }
+
+    return geo.collection(collectionRef: collection).within(
+        center: GeoFirePoint(userLocation.latitude, userLocation.longitude),
+        radius: radiusInKm,
+        field: "location",
+        strictMode: true);
+
   }
 
   Future<Iterable<SharedItem>> getSharedItemOfUser(String userId) {
@@ -126,19 +133,8 @@ class SharedItemService {
     logger.d('Start querying for shared item');
     analytics.logEvent(name: "Search Item");
 
-    var collection = db.collection(SHARED_ITEM_COLLECTION);
-
-    // return geo
-    //     .collection(
-    //         collectionRef: collection
-    //             .where('liked_by', arrayContains: userId)
-    //     )
-    //     .within(
-    //         center: GeoFirePoint(0, 0),
-    //         radius: 10000,
-    //         field: "location",
-    //         strictMode: true);
-    return collection
+    return db
+        .collection(SHARED_ITEM_COLLECTION)
         .where('liked_by', arrayContains: userId)
         .get()
         .then((querySnapshot) {

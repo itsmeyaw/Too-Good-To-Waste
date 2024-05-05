@@ -154,6 +154,7 @@ class _HomeState extends State<Home> {
                         radiusInKm: radius,
                         userId: userId,
                         category: category,
+                        foodPreference: foodPreference
                       ),
                       builder: (BuildContext context,
                           AsyncSnapshot<List<DocumentSnapshot>>
@@ -162,18 +163,9 @@ class _HomeState extends State<Home> {
                                 ConnectionState.active &&
                             sharedItemSnapshot.hasData) {
                           if (sharedItemSnapshot.data != null) {
-                            List<SharedItem?> results = sharedItemService
-                                .createSharedItemList(sharedItemSnapshot.data!);
-                            for (var res in results) {
-                              if (res != null) {
-                                res.distance = GeoUtils.calculateDistance(
-                                    userLocation,
-                                    GeoPoint(res.location.latitude,
-                                        res.location.longitude));
-                                sharedItems.add(res);
-                              }
+                            sharedItems = sharedItemService
+                                .createSharedItemList(sharedItemSnapshot.requireData).nonNulls.toList();
                             }
-                          }
 
                           return FractionallySizedBox(
                             widthFactor: 1.0,
@@ -274,6 +266,8 @@ class _HomeState extends State<Home> {
                         radiusInKm: radius,
                         userId: userId,
                         category: category,
+                        foodPreference: foodPreference,
+
                       ),
                       builder: (BuildContext context,
                           AsyncSnapshot<List<DocumentSnapshot>>
@@ -282,17 +276,8 @@ class _HomeState extends State<Home> {
                                 ConnectionState.active &&
                             sharedItemSnapshot.hasData) {
                           if (sharedItemSnapshot.data != null) {
-                            List<SharedItem?> results = sharedItemService
-                                .createSharedItemList(sharedItemSnapshot.data!);
-                            for (var res in results) {
-                              if (res != null) {
-                                res.distance = GeoUtils.calculateDistance(
-                                    userLocation,
-                                    GeoPoint(res.location.latitude,
-                                        res.location.longitude));
-                                sharedItems.add(res);
-                              }
-                            }
+                            sharedItems = sharedItemService
+                                .createSharedItemList(sharedItemSnapshot.requireData).nonNulls.toList();
                           }
 
                           if (sharedItems.isEmpty) {
@@ -422,7 +407,7 @@ class _PostState extends State<Post> {
 
     bool isLiked = widget.postData.likedBy.contains(userId);
     return widget.isLikedPage
-        ? likedItem(postData: widget.postData, remainDays: remainDays)
-        : foodItem(postData: widget.postData, remainDays: remainDays);
+        ? LikedItem(postData: widget.postData, remainDays: remainDays)
+        : FoodItem(postData: widget.postData, remainDays: remainDays);
   }
 }
