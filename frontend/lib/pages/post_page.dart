@@ -97,6 +97,7 @@ class _PostPageState extends State<PostPage> {
                     maxRating: 5,
                     allowHalfRating: true,
                     updateOnDrag: true,
+                    itemSize: 30,
                     itemBuilder: (BuildContext context, int index) {
                       return const Icon(
                         Icons.star,
@@ -468,12 +469,12 @@ class _PricePickerState extends State<PricePicker> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("Pay With Points"),
+      title: const Text("Pay With Coins"),
       content: IntrinsicHeight(
         child: Column(
           children: [
             Text(
-                "Please reach an agreement with the Giver and confirm this payment with the below points:"),
+                "Please reach an agreement with the Giver and confirm this payment with the below coins:"),
             const SizedBox(
               height: 10,
             ),
@@ -491,7 +492,7 @@ class _PricePickerState extends State<PricePicker> {
               },
             ),
             Text(
-              "You will pay ${range} points to ${widget.counterparty.name.first} ${widget.counterparty.name.last} for ${widget.postData.name}",
+              "You will pay ${range} coins to ${widget.counterparty.name.first} ${widget.counterparty.name.last} for ${widget.postData.name}",
               style: Theme.of(context).textTheme.bodyLarge,
             ),
           ],
@@ -503,7 +504,7 @@ class _PricePickerState extends State<PricePicker> {
                 backgroundColor:
                     Theme.of(context).buttonTheme.colorScheme!.error),
             onPressed: () {
-              Navigator.of(context).pop(false);
+              Navigator.pop(context, null);
             },
             child: const Text('Cancel')),
         FilledButton(
