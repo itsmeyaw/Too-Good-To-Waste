@@ -154,6 +154,7 @@ class _HomeState extends State<Home> {
                         radiusInKm: radius,
                         userId: userId,
                         category: category,
+                        foodPreference: foodPreference
                       ),
                       builder: (BuildContext context,
                           AsyncSnapshot<List<DocumentSnapshot>>
@@ -265,6 +266,7 @@ class _HomeState extends State<Home> {
                         radiusInKm: radius,
                         userId: userId,
                         category: category,
+                        foodPreference: foodPreference,
                       ),
                       builder: (BuildContext context,
                           AsyncSnapshot<List<DocumentSnapshot>>
