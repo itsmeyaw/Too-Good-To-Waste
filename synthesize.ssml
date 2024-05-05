@@ -13,7 +13,7 @@ Speed: 1.4
        xml:lang="en-US">
     <!-- Introduction -->
     <voice name="en-US-Studio-O">
-        Have you ever thrown away groceries?
+        Do you often throw away groceries?
         <break time="100ms"/>
         If yes, use our Too Good To Waste.
         <break time="100ms"/>
@@ -41,42 +41,38 @@ Speed: 1.4
 
     <!-- Add Item -->
     <voice name="en-US-Studio-O">
-        This is Yudhis
+        This is Yudhis.
         <break time="150ms"/>
-        he just went back from grocery shopping
-        <break time="300ms"/>
-        He want to track his item so he used Too Good To Waste,
+        He just went shopping and scans the receipt in the "Too Good To Waste".
         <break time="150ms"/>
-        then he opened the app and simply scan the receipt.
-        <break time="300ms"/>
-        Instantly, each item is categorized, assigned a suggested expiration date, and added to his inventory list.
-        <break time="300ms"/>
-        He then checked his statistic of wasted, consumed, expiring, and shared food.
+        Our app suggests the expiration date and keep track of his pantries.
     </voice>
 
     <!-- Architecture -->
     <voice name="en-US-Studio-O">
-        We use Flutter for our frontend and Firebase for backend.
+        We mainly use Flutter and Firebase.
         <break time="300ms"/>
-        We choose Firebase Storage and Firestore for our data storage.
+        We use Firebase Storage and Firestore for our data storage.
         <break time="300ms"/>
-        Additionally, we use the new Google Vertex AI for extracting
-        information from receipt and suggesting expiry date.
+        With Google Vertex AI, we extract
+        information from receipt and suggest expiry date.
     </voice>
 
     <!-- Story -->
     <voice name="en-US-Studio-O">
-        This is Yudhis.
+        Yudhis also has milks nearing their expiry and decides to share them.
         <break time="150ms"/>
-        He scans a receipt and tracks pantries in "Too Good To Waste".
+        He opens our app and publishes the corresponding item.
         <break time="150ms"/>
-        Our app suggests the expiration date of his pantries.
+        To do that, he needs to take a photo of the item.
         <break time="150ms"/>
-        He has milks nearing their expiry,<break time="75ms"/> with our app,<break time="75ms"/> he can share them instead of throwing them away.
+        On the other hand, his friend Nana runs out of milk.
         <break time="150ms"/>
-        On the other hand, his friend Nana runs out of milk and decides to find it in the app.
+        She searches for milk in our app and find Yudhis post.
         <break time="150ms"/>
-        She finds his post and start chatting with him.
+        And then she reserves the item and contacts him via our chatting feature.
+        <break time="150ms"/>
+        After that, they meet each other and Nana gives Yudhis coins as appreciation.
         <break time="200ms"/>
         By this,<break time="75ms"/> Yudhis doesn’t have to throw the milk and Nana gets the milks she needs.
     </voice>
