@@ -96,7 +96,6 @@ class _HomeState extends State<Home> {
     }
   }
 
-
   Future<void> _showFoodPreferenceDialog(FoodPreference? initPref) async {
     final FoodPreference? foodPreference = await showDialog<FoodPreference>(
         context: context,
@@ -151,11 +150,11 @@ class _HomeState extends State<Home> {
               builder: (BuildContext context, GeoPoint userLocation) =>
                   StreamBuilder(
                       stream: sharedItemService.getSharedItemsWithinRadius(
-                          userLocation: userLocation,
-                          radiusInKm: radius,
-                          userId: userId,
-                          category: category,
-                          ),
+                        userLocation: userLocation,
+                        radiusInKm: radius,
+                        userId: userId,
+                        category: category,
+                      ),
                       builder: (BuildContext context,
                           AsyncSnapshot<List<DocumentSnapshot>>
                               sharedItemSnapshot) {
@@ -271,10 +270,11 @@ class _HomeState extends State<Home> {
               builder: (BuildContext context, GeoPoint userLocation) =>
                   StreamBuilder(
                       stream: sharedItemService.getSharedItemsWithinRadius(
-                          userLocation: userLocation,
-                          radiusInKm: radius,
-                          userId: userId,
-                          category: category,),
+                        userLocation: userLocation,
+                        radiusInKm: radius,
+                        userId: userId,
+                        category: category,
+                      ),
                       builder: (BuildContext context,
                           AsyncSnapshot<List<DocumentSnapshot>>
                               sharedItemSnapshot) {
@@ -313,7 +313,9 @@ class _HomeState extends State<Home> {
                               if (sharedItems[index] != null) {
                                 logger.d(
                                     'Got items: ${sharedItems[index].toJson()}');
-                                return Post(postData: sharedItems[index], isLikedPage: false);
+                                return Post(
+                                    postData: sharedItems[index],
+                                    isLikedPage: false);
                               }
                               return null;
                             },
@@ -384,11 +386,15 @@ class _RadiusPickerState extends State<RadiusPicker> {
 
 class Post extends StatefulWidget {
   final SharedItem postData;
-  
+
   final bool isLikedPage;
   final BuildContext? context;
 
-  const Post({super.key, required this.postData, required this.isLikedPage, this.context});
+  const Post(
+      {super.key,
+      required this.postData,
+      required this.isLikedPage,
+      this.context});
 
   @override
   State<StatefulWidget> createState() => _PostState();
@@ -415,8 +421,8 @@ class _PostState extends State<Post> {
     final String userId = FirebaseAuth.instance.currentUser!.uid;
 
     bool isLiked = widget.postData.likedBy.contains(userId);
-    return widget.isLikedPage ? 
-     likedItem(postData: widget.postData, remainDays: remainDays)
-    : foodItem(postData: widget.postData, remainDays: remainDays);
+    return widget.isLikedPage
+        ? likedItem(postData: widget.postData, remainDays: remainDays)
+        : foodItem(postData: widget.postData, remainDays: remainDays);
   }
 }

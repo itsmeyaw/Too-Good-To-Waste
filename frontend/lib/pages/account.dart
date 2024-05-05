@@ -148,7 +148,8 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
     carbonEmissionController =
         TextEditingController(text: currentCarbonEmission.toString());
     ratingController = TextEditingController(text: currentRating.toString());
-    pointsController = TextEditingController(text: widget.userData.points.toString());
+    pointsController =
+        TextEditingController(text: widget.userData.points.toString());
   }
 
   showUpdateDialog() {
@@ -440,8 +441,7 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                               labelText: 'Purchasing Points',
                             ),
                             enabled: false,
-                            controller: pointsController
-                            ,
+                            controller: pointsController,
                             style: const TextStyle(
                               fontFamily: 'Roboto',
                               fontSize: 20,
@@ -492,7 +492,6 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
                               fontSize: 20,
                             ),
                           ),
-                          
                           const SizedBox(
                             height: 20,
                           ),
@@ -649,8 +648,7 @@ class LikedPostPageWidget extends StatelessWidget {
     logger.d('User id: $userId');
     List<SharedItem> sharedItems = [];
 
-    return 
-      FutureBuilder(
+    return FutureBuilder(
         future: sharedItemService.getLikedSharedItemOfUser(userId: userId),
         builder: (BuildContext context,
             AsyncSnapshot<Iterable<SharedItem>> sharedItemsSnapshot) {
@@ -661,28 +659,25 @@ class LikedPostPageWidget extends StatelessWidget {
           final List<SharedItem> sharedItems =
               sharedItemsSnapshot.data!.toList();
 
-            if (sharedItems.isEmpty) {
-              return const Center(child: Text("There is no liked post yet"));
-            }
+          if (sharedItems.isEmpty) {
+            return const Center(child: Text("There is no liked post yet"));
+          }
 
-            return Expanded(
-              child: 
-              ListView.builder(
-                itemCount: sharedItems.length,
-                itemBuilder: (_, index) {
-                  if (sharedItems[index] != null) {
-                    logger.d(
-                        'Got items: ${sharedItems[index].toJson()}');
-                    return Post(postData: sharedItems[index], isLikedPage: true, context: context,);
-                  }
-                  return null;
-                },
-              )
-            );
-                        
-          } 
-        
-      );  
-    }
+          return Expanded(
+              child: ListView.builder(
+            itemCount: sharedItems.length,
+            itemBuilder: (_, index) {
+              if (sharedItems[index] != null) {
+                logger.d('Got items: ${sharedItems[index].toJson()}');
+                return Post(
+                  postData: sharedItems[index],
+                  isLikedPage: true,
+                  context: context,
+                );
+              }
+              return null;
+            },
+          ));
+        });
   }
-
+}

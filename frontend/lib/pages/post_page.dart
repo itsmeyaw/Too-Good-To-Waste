@@ -4,6 +4,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:rive/rive.dart';
+import 'package:tooGoodToWaste/pages/home.dart';
 import 'package:tooGoodToWaste/service/shared_items_service.dart';
 import 'package:tooGoodToWaste/service/storage_service.dart';
 import 'package:tooGoodToWaste/service/user_service.dart';
@@ -30,70 +31,50 @@ class _PostPageState extends State<PostPage> {
   final Logger logger = Logger();
   final User? currentUser = FirebaseAuth.instance.currentUser;
   double userRating = 0;
-  double range = 1;
+  double range = 0;
 
-  Future<bool?> showPaymentDialog(
-      BuildContext context, String sharedItemId, TGTWUser counterparty) async {
-       
-
-    return showDialog<bool>(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Pay With Points"),
-            content: IntrinsicHeight(
-              child: Column(
-                children: [
-                  Text("Please reach an agreement with the Giver and confirm this payment with the below points:"),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Slider(
-                    value: 1,
-                    max: 10,
-                    min: 1,
-                    divisions: 5,
-                    label: range.round().toString(),
-                    onChanged: (double newValue) {
-                      logger.d('Slided value to $newValue');
-                      setState(() {
-                        range = newValue.roundToDouble();
-                      });
-                    },
-                  )
-                ],
-              ),
-            ),
-            
-            actions: [
-              FilledButton(
-                  style: FilledButton.styleFrom(
-                      backgroundColor:
-                          Theme.of(context).buttonTheme.colorScheme!.error),
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                  child: const Text('Cancel')),
-              FilledButton(
-                  onPressed: () async {
-                    await userService.updateUserPoints(counterparty, range, true);
-                    Navigator.of(context).pop(true);
-
-                    bool? confirm =
-                        await showConfirmDialog(
-                            context,
-                            sharedItemId);
-                    if (confirm != null && confirm) {
-                      Navigator.of(context).pop();
-                    }
-                  },
-                  child: const Text("Confirm"))
-            ],
-          );
-        });
+  @override
+  void initState() {
+    super.initState();
+    range = 1;
   }
 
+  Future<void> showPaymentDialog(TGTWUser counterparty) async {
+    final double? selectedPoints = await showDialog<double>(
+        context: context,
+        builder: (context) => PricePicker(
+            initialRange: range,
+            counterparty: counterparty,
+            postData: widget.postData));
+
+    if (selectedPoints != null) {
+      try {
+        if (await userService.updateUserPoints(
+            counterparty, widget.postData.user, selectedPoints, true)) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+                "Succesfully paid with $selectedPoints points to ${counterparty.name.first} ${counterparty.name.last} for ${widget.postData.name}"),
+            duration: const Duration(seconds: 1),
+          ));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Cannot pay with ${selectedPoints} points"),
+            duration: const Duration(seconds: 1),
+          ));
+        }
+      } catch (e) {
+        logger.e("Error when trying to update user points", error: e);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("There was error while updating user points"),
+          duration: const Duration(seconds: 1),
+        ));
+      }
+      bool? confirm = await showConfirmDialog(context, widget.postData.id!);
+      if (confirm != null && confirm) {
+        Navigator.of(context).pop();
+      }
+    }
+  }
 
   Future<bool?> showConfirmDialog(
       BuildContext context, String sharedItemId) async {
@@ -149,7 +130,6 @@ class _PostPageState extends State<PostPage> {
 
                     await userService.rateUser(
                         widget.postData.user, userRating, sharedItemId);
-                    await sharedItemService.confirmPickUp(sharedItemId);
 
                     Navigator.of(context).pop(true);
                   },
@@ -392,21 +372,13 @@ class _PostPageState extends State<PostPage> {
                                                 child: SizedBox(
                                                     child: FilledButton(
                                                         onPressed: () async {
-                                                          bool? payment =
-                                                              await showPaymentDialog(
-                                                                  context,
-                                                                  sharedItemId, postUser);
-                                                         
-                                                          if (payment != null &&
-                                                              payment) {
-                                                            Navigator.of(context).pop();
-                                                          }
+                                                          await showPaymentDialog(
+                                                              postUser);
 
-                                                          // bool? confirm =
-                                                          //     await showConfirmDialog(
-                                                          //         context,
-                                                          //         sharedItemId);
-                                                           
+                                                          // if (payment != null &&
+                                                          //     payment) {
+                                                          //   Navigator.of(context).pop();
+                                                          // }
                                                         },
                                                         child: const Text(
                                                             'Confirm Pick Up'))))
@@ -445,6 +417,88 @@ class _PostPageState extends State<PostPage> {
           }
         },
       ),
+    );
+  }
+}
+
+//A seperate class for the PricePicker widget, because Slider() requires a seperate StatefulWidget
+class PricePicker extends StatefulWidget {
+  final double initialRange;
+  final TGTWUser counterparty;
+  final SharedItem postData;
+
+  const PricePicker(
+      {super.key,
+      required this.initialRange,
+      required this.counterparty,
+      required this.postData});
+
+  @override
+  State<StatefulWidget> createState() => _PricePickerState();
+}
+
+class _PricePickerState extends State<PricePicker> {
+  final UserService userService = UserService();
+  final StorageService storageService = StorageService();
+  final SharedItemService sharedItemService = SharedItemService();
+  final Logger logger = Logger();
+  final User? currentUser = FirebaseAuth.instance.currentUser;
+  double userRating = 0;
+  double range = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    range = widget.initialRange;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("Pay With Points"),
+      content: IntrinsicHeight(
+        child: Column(
+          children: [
+            Text(
+                "Please reach an agreement with the Giver and confirm this payment with the below points:"),
+            const SizedBox(
+              height: 10,
+            ),
+            Slider(
+              value: range,
+              max: 10,
+              min: 1,
+              divisions: 5,
+              label: range.round().toString(),
+              onChanged: (double newValue) {
+                logger.d('Slided value to $newValue');
+                setState(() {
+                  range = newValue.roundToDouble();
+                });
+              },
+            ),
+            Text(
+              "You will pay ${range} points to ${widget.counterparty.name.first} ${widget.counterparty.name.last} for ${widget.postData.name}",
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        FilledButton(
+            style: FilledButton.styleFrom(
+                backgroundColor:
+                    Theme.of(context).buttonTheme.colorScheme!.error),
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+            child: const Text('Cancel')),
+        FilledButton(
+            onPressed: () async {
+              Navigator.of(context).pop(range);
+            },
+            child: const Text("Confirm"))
+      ],
     );
   }
 }
