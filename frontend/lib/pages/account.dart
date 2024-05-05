@@ -625,8 +625,7 @@ class LikedPostPageWidget extends StatelessWidget {
     logger.d('User id: $userId');
     List<SharedItem> sharedItems = [];
 
-    return 
-      FutureBuilder(
+    return FutureBuilder(
         future: sharedItemService.getLikedSharedItemOfUser(userId: userId),
         builder: (BuildContext context,
             AsyncSnapshot<Iterable<SharedItem>> sharedItemsSnapshot) {
@@ -637,28 +636,25 @@ class LikedPostPageWidget extends StatelessWidget {
           final List<SharedItem> sharedItems =
               sharedItemsSnapshot.data!.toList();
 
-            if (sharedItems.isEmpty) {
-              return const Center(child: Text("There is no liked post yet"));
-            }
+          if (sharedItems.isEmpty) {
+            return const Center(child: Text("There is no liked post yet"));
+          }
 
-            return Expanded(
-              child: 
-              ListView.builder(
-                itemCount: sharedItems.length,
-                itemBuilder: (_, index) {
-                  if (sharedItems[index] != null) {
-                    logger.d(
-                        'Got items: ${sharedItems[index].toJson()}');
-                    return Post(postData: sharedItems[index], isLikedPage: true, context: context,);
-                  }
-                  return null;
-                },
-              )
-            );
-                        
-          } 
-        
-      );  
-    }
+          return Expanded(
+              child: ListView.builder(
+            itemCount: sharedItems.length,
+            itemBuilder: (_, index) {
+              if (sharedItems[index] != null) {
+                logger.d('Got items: ${sharedItems[index].toJson()}');
+                return Post(
+                  postData: sharedItems[index],
+                  isLikedPage: true,
+                  context: context,
+                );
+              }
+              return null;
+            },
+          ));
+        });
   }
-
+}
