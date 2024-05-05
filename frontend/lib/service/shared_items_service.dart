@@ -77,11 +77,12 @@ class SharedItemService {
             event.exists ? SharedItem.fromJson(event.data()!) : null);
   }
 
-  Stream<List<DocumentSnapshot>> getSharedItemsWithinRadius(
-      {required GeoPoint userLocation,
-      required double radiusInKm,
-      required String userId,
-      ItemCategory? category,}) {
+  Stream<List<DocumentSnapshot>> getSharedItemsWithinRadius({
+    required GeoPoint userLocation,
+    required double radiusInKm,
+    required String userId,
+    ItemCategory? category,
+  }) {
     logger.d('Start querying for shared item');
     analytics.logEvent(name: "Search Item");
 
@@ -120,28 +121,18 @@ class SharedItemService {
     });
   }
 
-  Future<Iterable<SharedItem>> getLikedSharedItemOfUser({required String userId}) {
+  Future<Iterable<SharedItem>> getLikedSharedItemOfUser(
+      {required String userId}) {
     logger.d('Start querying for shared item');
     analytics.logEvent(name: "Search Item");
 
-    var collection = db.collection(SHARED_ITEM_COLLECTION);
-
-    // return geo
-    //     .collection(
-    //         collectionRef: collection
-    //             .where('liked_by', arrayContains: userId)
-    //     )
-    //     .within(
-    //         center: GeoFirePoint(0, 0),
-    //         radius: 10000,
-    //         field: "location",
-    //         strictMode: true);
-    return collection
+    return db
+        .collection(SHARED_ITEM_COLLECTION)
         .where('liked_by', arrayContains: userId)
         .get()
         .then((querySnapshot) {
       logger.d("Got ${querySnapshot.size} liked shared items of user $userId");
-      return querySnapshot.docs.map((doc) => SharedItem.fromJson(doc.data()) );
+      return querySnapshot.docs.map((doc) => SharedItem.fromJson(doc.data()));
     });
   }
 
