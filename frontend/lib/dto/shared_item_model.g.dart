@@ -7,7 +7,6 @@ part of 'shared_item_model.dart';
 // **************************************************************************
 
 SharedItem _$SharedItemFromJson(Map<String, dynamic> json) => SharedItem(
-      id: json['id'] as String?,
       amount: UserItemAmount.fromJson(json['amount'] as Map<String, dynamic>),
       buyDate: json['buy_date'] as int,
       expireDate: json['expire_date'] as int,
