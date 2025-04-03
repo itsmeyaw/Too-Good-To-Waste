@@ -1,6 +1,7 @@
 import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:tooGoodToWaste/dto/item_category_enum.dart';
+import 'package:tooGoodToWaste/dto/shared_item_reservation_model.dart';
 import 'package:tooGoodToWaste/util/geo_fire_point_converter.dart';
 
 import './user_item_amount_model.dart';
@@ -9,7 +10,7 @@ part 'shared_item_model.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class SharedItem {
-  @JsonKey(includeToJson: false)
+  @JsonKey(includeToJson: false, includeFromJson: false)
   String? id;
   final UserItemAmount amount;
   final int buyDate;
@@ -18,15 +19,18 @@ class SharedItem {
   final String? imageUrl;
   final ItemCategory category;
   final String user;
+  SharedItemReservation? sharedItemReservation;
 
   @JsonKey(defaultValue: true)
   bool isAvailable = true;
 
+  // @JsonKey(defaultValue: false)
+  // bool isLiked = false;
+  @JsonKey(defaultValue: [])
+  List<String> likedBy = [];
+
   @GeoFirePointConverter()
   GeoFirePoint location = GeoFirePoint(0.0, 0.0);
-
-  @JsonKey(includeToJson: false, defaultValue: double.infinity)
-  double distance = double.infinity;
 
   SharedItem(
       {this.id,
@@ -37,7 +41,9 @@ class SharedItem {
       required this.name,
       required this.category,
       required this.user,
-      required this.isAvailable});
+      required this.isAvailable,
+      required this.likedBy,
+      this.sharedItemReservation});
 
   factory SharedItem.fromJson(Map<String, dynamic> json) =>
       _$SharedItemFromJson(json);

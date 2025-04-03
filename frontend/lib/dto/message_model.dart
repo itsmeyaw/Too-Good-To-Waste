@@ -14,12 +14,11 @@ class Message {
   @JsonKey(defaultValue: null)
   final String? sharedItemId;
 
-  const Message({
-    required this.message,
-    required this.sender,
-    required this.timestamp,
-    this.sharedItemId
-  });
+  const Message(
+      {required this.message,
+      required this.sender,
+      required this.timestamp,
+      this.sharedItemId});
 
   factory Message.fromJson(Map<String, dynamic> json) =>
       _$MessageFromJson(json);

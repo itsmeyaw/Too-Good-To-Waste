@@ -10,10 +10,15 @@ part 'user_rating.g.dart';
 class UserRating {
   final String ratingFrom;
   final double ratingValue;
+  final String sharedItemId;
 
-  const UserRating({required this.ratingFrom, required this.ratingValue});
+  const UserRating(
+      {required this.ratingFrom,
+      required this.ratingValue,
+      required this.sharedItemId});
 
-  factory UserRating.fromJson(Map<String, dynamic> json) => _$UserRatingFromJson(json);
+  factory UserRating.fromJson(Map<String, dynamic> json) =>
+      _$UserRatingFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserRatingToJson(this);
 }

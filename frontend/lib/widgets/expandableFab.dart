@@ -8,20 +8,20 @@ class ExpandableFab extends StatefulWidget {
     this.initialOpen,
     required this.distance,
     required this.children,
-    required this.toClose,
+    //required this.toClose,
   });
 
   final bool? initialOpen;
   final double distance;
   final List<Widget> children;
-  final bool toClose;
+  //final bool toClose;
 
   @override
   State<ExpandableFab> createState() => _ExpandableFabState();
 }
 
-class _ExpandableFabState extends State<ExpandableFab> 
-  with SingleTickerProviderStateMixin {
+class _ExpandableFabState extends State<ExpandableFab>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _expandAnimation;
   bool _open = false;
@@ -41,10 +41,10 @@ class _ExpandableFabState extends State<ExpandableFab>
       parent: _controller,
     );
 
-    if (widget.toClose) {
-      _controller.reverse();
-      _open = false;
-    }
+    // if (widget.toClose) {
+    //   _controller.reverse();
+    //   _open = false;
+    // }
   }
 
   @override
@@ -53,19 +53,19 @@ class _ExpandableFabState extends State<ExpandableFab>
     super.dispose();
   }
 
-  void _toggle(bool toClose) {
+  void _toggle() {
     setState(() {
-      if (toClose) {
-        _open = false;
-        _controller.reverse();
+      // if (toClose) {
+      //   _open = false;
+      //   _controller.reverse();
+      // } else {
+      _open = !_open;
+      if (_open) {
+        _controller.forward();
       } else {
-        _open = !_open;
-        if (_open) {
-          _controller.forward();
-        } else {
-          _controller.reverse();
-        }
+        _controller.reverse();
       }
+      // }
     });
   }
 
@@ -76,15 +76,15 @@ class _ExpandableFabState extends State<ExpandableFab>
         alignment: Alignment.bottomRight,
         clipBehavior: Clip.none,
         children: [
-          _buildTapToCloseFab(widget.toClose),
+          _buildTapToCloseFab(),
           ..._buildExpandingActionButtons(),
-          _buildTapToOpenFab(widget.toClose),
+          _buildTapToOpenFab(),
         ],
       ),
     );
   }
 
-  Widget _buildTapToCloseFab(bool toClose) {
+  Widget _buildTapToCloseFab() {
     return SizedBox(
       width: 56,
       height: 56,
@@ -94,7 +94,7 @@ class _ExpandableFabState extends State<ExpandableFab>
           clipBehavior: Clip.antiAlias,
           elevation: 4,
           child: InkWell(
-            onTap: () => _toggle(toClose),
+            onTap: () => _toggle(),
             child: Padding(
               padding: const EdgeInsets.all(8),
               child: Icon(
@@ -127,7 +127,7 @@ class _ExpandableFabState extends State<ExpandableFab>
     return children;
   }
 
-  Widget _buildTapToOpenFab(bool toClose) {
+  Widget _buildTapToOpenFab() {
     return IgnorePointer(
       ignoring: _open,
       child: AnimatedContainer(
@@ -144,7 +144,7 @@ class _ExpandableFabState extends State<ExpandableFab>
           curve: const Interval(0.25, 1.0, curve: Curves.easeInOut),
           duration: const Duration(milliseconds: 250),
           child: FloatingActionButton(
-            onPressed: () => _toggle(toClose),
+            onPressed: () => _toggle(),
             child: const Icon(Icons.create),
           ),
         ),

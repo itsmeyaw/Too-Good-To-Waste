@@ -35,10 +35,11 @@ class PickupProcessService {
     sharedItemService.setSharedItemIsAvailable(sharedItemId, false);
 
     PickupProcess pickupProcess = PickupProcess(
-        receiver: user.uid,
-        giver: sharedItem.user,
-        sharedItemId: sharedItemId,
-        isActive: true);
+      receiver: user.uid,
+      giver: sharedItem.user,
+      sharedItemId: sharedItemId,
+      isActive: true,
+    );
 
     DocumentReference docRef =
         await db.collection(PICKUP_COLLECTION).add(pickupProcess.toJson());

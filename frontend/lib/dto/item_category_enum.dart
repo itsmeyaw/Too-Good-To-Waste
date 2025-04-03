@@ -18,13 +18,20 @@ enum ItemCategory {
 
   static ItemCategory parse(String value) {
     switch (value) {
-      case "Vegetable" : return ItemCategory.Vegetable;
-      case "Meat": return ItemCategory.Meat;
-      case "Fruit": return ItemCategory.Fruit;
-      case "Diaries": return ItemCategory.Diaries;
-      case "Seafood": return ItemCategory.Seafood;
-      case "Egg": return ItemCategory.Egg;
-      default: return ItemCategory.Others;
+      case "Vegetable":
+        return ItemCategory.Vegetable;
+      case "Meat":
+        return ItemCategory.Meat;
+      case "Fruit":
+        return ItemCategory.Fruit;
+      case "Diaries":
+        return ItemCategory.Diaries;
+      case "Seafood":
+        return ItemCategory.Seafood;
+      case "Egg":
+        return ItemCategory.Egg;
+      default:
+        return ItemCategory.Others;
     }
   }
 }

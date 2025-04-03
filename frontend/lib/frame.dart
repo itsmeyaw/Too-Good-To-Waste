@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tooGoodToWaste/const/color_const.dart';
 import 'package:mime/mime.dart';
 import 'package:tooGoodToWaste/Pages/home.dart';
 import 'package:tooGoodToWaste/Pages/account.dart';
@@ -20,7 +21,7 @@ class _FrameState extends State<Frame> {
   bool b = false;
   final Logger logger = Logger();
 
-   // Create Database Object
+  // Create Database Object
   DBHelper dbHelper = DBHelper();
   DateTime timeNowDate = DateTime.now();
   int timeNow = DateTime.now().millisecondsSinceEpoch;
@@ -47,17 +48,20 @@ class _FrameState extends State<Frame> {
       var foodID = foods[i].id;
       if (expiretime < timeNow) {
         if (foodID == null) {
-          throw Exception('Failed to fetch this expired food id from local database');
+          throw Exception(
+              'Failed to fetch this expired food id from local database');
         } else {
           if (foodState == 'good' || foodState == 'expiring') {
             await dbHelper.updateFoodWaste(foodID);
           }
           String category = await dbHelper.getOneFoodValue(foodID, 'category');
           //showExpiredDialog(foodName, category);
-          pushLocalNotification('Expired Food Alert!', foodName, 'is already expired');
+          pushLocalNotification(
+              'Expired Food Alert!', foodName, 'is already expired');
         }
-   
-        logger.e('###########################$foodName is wasted###########################');
+
+        logger.e(
+            '###########################$foodName is wasted###########################');
       }
     }
     for (int i = 0; i < foods.length; i++) {
@@ -68,16 +72,18 @@ class _FrameState extends State<Frame> {
       int remainDays = DateTime.fromMillisecondsSinceEpoch(expiretime)
           .difference(timeNowDate)
           .inDays;
-    
+
       if (remainDays < 2 && foodState == 'good' && remainDays > 0) {
         //pop up a toast
         if (foodID == null) {
-          throw Exception('Failed to fetch this expiring food id from local database');
+          throw Exception(
+              'Failed to fetch this expiring food id from local database');
         } else {
           await dbHelper.updateFoodExpiring(foodID);
           String category = await dbHelper.getOneFoodValue(foodID, 'category');
           //showExpiringDialog(foodName, category);
-          pushLocalNotification('Expiring Food Alert!', foodName, 'will expire in one day!');
+          pushLocalNotification(
+              'Expiring Food Alert!', foodName, 'will expire in one day!');
         }
         logger.e(
             '###########################$foodName is expiring!!!###########################');
@@ -89,9 +95,9 @@ class _FrameState extends State<Frame> {
   pushLocalNotification(String title, String foodName, String text) {
     //push local notification
     PushNotificationsManager().showNotification(
-        title: title,
-        body: 'Your $foodName $text!',
-      );
+      title: title,
+      body: 'Your $foodName $text!',
+    );
   }
 
   //toast contains 'Alert! Your ***  will expire in two days'
@@ -106,7 +112,7 @@ class _FrameState extends State<Frame> {
 
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-   
+
     AlertDialog dialog = AlertDialog(
       title: const Text("Alert!", textAlign: TextAlign.center),
       content: Container(
@@ -126,8 +132,7 @@ class _FrameState extends State<Frame> {
       actions: [
         TextButton(
           onPressed: () {
-            if(mounted) {
-             
+            if (mounted) {
               Navigator.of(context, rootNavigator: true).pop();
             } else {
               logger.e('This page is not mounted');
@@ -154,9 +159,9 @@ class _FrameState extends State<Frame> {
       categoryIconImagePath = GlobalCateIconMap[category];
     }
 
-    double  width = MediaQuery.of(context).size.width;
+    double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-   
+
     AlertDialog dialog = AlertDialog(
       title: const Text("Alert!", textAlign: TextAlign.center),
       content: Container(
@@ -176,8 +181,7 @@ class _FrameState extends State<Frame> {
       actions: [
         TextButton(
           onPressed: () {
-            if(mounted) {
-             
+            if (mounted) {
               Navigator.of(context, rootNavigator: true).pop();
             } else {
               logger.e('This page is not mounted');
@@ -193,6 +197,7 @@ class _FrameState extends State<Frame> {
           return dialog;
         });
   }
+
   int currentPage = 1;
 
   GlobalKey bottomNavigationKey = GlobalKey();
@@ -214,7 +219,8 @@ class _FrameState extends State<Frame> {
     Timer timer = Timer.periodic(oneDay, (Timer timer) {
       autocheckWaste();
       //pop up  a propmt
-      logger.d("Repeat task every day");  // This statement will be printed after every one second
+      logger.d(
+          "Repeat task every day"); // This statement will be printed after every one second
     });
   }
 
@@ -239,6 +245,14 @@ class _FrameState extends State<Frame> {
           actions: const [],
         ),
         body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: FractionalOffset(0.5, 0.0),
+              end: FractionalOffset(0.6, 0.8),
+              stops: [0.0, 0.9],
+              colors: [YELLOW, BLUE],
+            ),
+          ),
           child: _getPage(currentPage),
         ),
         bottomNavigationBar: NavigationBar(

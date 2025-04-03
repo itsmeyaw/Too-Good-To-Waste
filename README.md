@@ -30,6 +30,7 @@ Our application has the following features:
 - Automatically suggest the expiry date based on the category of item using AI
 
 Watch our video on YouTube [here](https://youtu.be/2UFMf3brnmo?si=ah2QfhD9QQyfoTTI).
+One minute version [here](https://youtu.be/NjBVE1rQNMo).
 
 ## Architecture
 

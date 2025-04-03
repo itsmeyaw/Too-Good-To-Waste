@@ -17,24 +17,15 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -52,12 +43,47 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyBToN6M9t6a_0zJ58lmPo8bUbBqLMDGETk',
+    appId: '1:686754712481:web:232c24e8399ae1682459e0',
+    messagingSenderId: '686754712481',
+    projectId: 'sc2024-96b48',
+    authDomain: 'sc2024-96b48.firebaseapp.com',
+    databaseURL:
+        'https://sc2024-96b48-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'sc2024-96b48.appspot.com',
+    measurementId: 'G-TZM3DY13K1',
+  );
+
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCP8A9ut7Q7ZtfkMbKGSNpj6fC07Plu63M',
     appId: '1:686754712481:android:53ff9bd3df9f9d622459e0',
     messagingSenderId: '686754712481',
     projectId: 'sc2024-96b48',
-    databaseURL: 'https://sc2024-96b48-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://sc2024-96b48-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'sc2024-96b48.appspot.com',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyBABMSx8zj0W5evvNO45BDDZb2aF0d7scI',
+    appId: '1:686754712481:ios:1daf5773783c5c272459e0',
+    messagingSenderId: '686754712481',
+    projectId: 'sc2024-96b48',
+    databaseURL:
+        'https://sc2024-96b48-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'sc2024-96b48.appspot.com',
+    iosBundleId: 'com.example.frontend',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyBABMSx8zj0W5evvNO45BDDZb2aF0d7scI',
+    appId: '1:686754712481:ios:9b01b5553a4d55272459e0',
+    messagingSenderId: '686754712481',
+    projectId: 'sc2024-96b48',
+    databaseURL:
+        'https://sc2024-96b48-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'sc2024-96b48.appspot.com',
+    iosBundleId: 'com.example.frontend.RunnerTests',
   );
 }

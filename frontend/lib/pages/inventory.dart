@@ -1,11 +1,11 @@
-import 'dart:math';
-
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:tooGoodToWaste/widgets/line_chart.dart';
 import 'dart:convert';
+import 'package:flutter/src/painting/gradient.dart' as Gradient;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -14,6 +14,7 @@ import 'package:logger/logger.dart';
 import 'package:mime/mime.dart';
 import 'package:rive/rive.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:tooGoodToWaste/const/color_const.dart';
 import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import 'package:tooGoodToWaste/dto/item_allergies_enum.dart';
 import 'package:tooGoodToWaste/dto/item_category_enum.dart';
@@ -25,6 +26,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tooGoodToWaste/service/shared_items_service.dart';
 import 'package:tooGoodToWaste/widgets/category_picker.dart';
 import 'package:tooGoodToWaste/widgets/expandableFab.dart';
+import 'package:tooGoodToWaste/widgets/indicator.dart';
 import 'dart:io';
 import 'itemDetail.dart';
 import '../dto/user_item_detail_model.dart';
@@ -83,8 +85,6 @@ class _BottomTopScreenState extends State<Inventory>
   bool showSuggestList = false;
   List<UserItem> items = [];
   List<String> itemsWaste = [];
-
- 
 
   //Create Databse Object
   DBHelper dbhelper = DBHelper();
@@ -195,17 +195,17 @@ class _BottomTopScreenState extends State<Inventory>
   }
 
   bool isCategoryInEnum(String category) {
-    return ItemCategory.values.map((e) => 
-      e.toString().split('.').last.toLowerCase())
-      .contains(category);
+    return ItemCategory.values
+        .map((e) => e.toString().split('.').last.toLowerCase())
+        .contains(category);
   }
 
   String capitalizeFirstLetter(String category) {
-  if (category.isEmpty) return category; // Return input if it's empty
-  
-  // Capitalize the first letter and keep the rest unchanged
-  return '${category[0].toUpperCase()}${category.substring(1)}';
-}
+    if (category.isEmpty) return category; // Return input if it's empty
+
+    // Capitalize the first letter and keep the rest unchanged
+    return '${category[0].toUpperCase()}${category.substring(1)}';
+  }
 
   Future<void> pickImage(bool isCamera) async {
     XFile? image;
@@ -232,36 +232,35 @@ class _BottomTopScreenState extends State<Inventory>
 
       UserItemService userItemService = UserItemService();
       User? currentUser = FirebaseAuth.instance.currentUser;
-       if (currentUser == null) {
-          throw Exception('You should Login first!');
-        } else {
-          for (final item in items) {
+      if (currentUser == null) {
+        throw Exception('You should Login first!');
+      } else {
+        for (final item in items) {
+          if (item.name == null) {
+            logger.e('Item name is null');
+            continue;
+          } else if (isCategoryInEnum(item.category.name)) {
+            logger.e('Item category is not recognised');
+            continue;
+          } else {
+            //insert new data into cloud firebase first and get the auto-generated id
+            item.category =
+                ItemCategory.parse(capitalizeFirstLetter(item.category.name));
+            var id = await userItemService.addUserItem(currentUser.uid, item);
 
-            if (item.name == null) {
-              logger.e('Item name is null');
-              continue;
-            } else if (isCategoryInEnum(item.category.name)){
-              logger.e('Item category is not recognised');
-              continue;
+            if (id == null) {
+              logger.w('Failed to insert food into local database');
             } else {
-              //insert new data into cloud firebase first and get the auto-generated id 
-              item.category = ItemCategory.parse(capitalizeFirstLetter(item.category.name));     
-                var id =
-                    await userItemService.addUserItem(currentUser.uid, item);
+              logger.d(item);
 
-                if (id == null) {
-                  logger.w('Failed to insert food into local database');
-                } else {
-                  logger.d(item);
+              item.id = id;
 
-                  item.id = id;
-
-                  await insertDB(item);
-                  await userItemService.updateUserItem(
-                      currentUser.uid, item.id!, item);
-                }
+              await insertDB(item);
+              await userItemService.updateUserItem(
+                  currentUser.uid, item.id!, item);
             }
           }
+        }
       }
       //TODO: Loading widget...
       const duration = Duration(seconds: 2);
@@ -271,7 +270,6 @@ class _BottomTopScreenState extends State<Inventory>
           buildList();
         });
       });
-      
     } else {
       logger.e('Cannot determine mime');
     }
@@ -289,69 +287,150 @@ class _BottomTopScreenState extends State<Inventory>
   double expiringPercentage = 0.0;
   double goodPercentage = 0.0;
 
+  late bool isShowingMainData;
+
   @override
   void initState() {
     _tooltipBehavior = TooltipBehavior(enable: true);
- 
+
     super.initState();
+    isShowingMainData = true;
     _tabController = TabController(length: 3, vsync: this);
     _fetchWasteNum();
     calculatePieChart();
   }
 
   void _fetchWasteNum() async {
-  // Fetch wasteNum asynchronously
+    // Fetch wasteNum asynchronously
     int length = await getWasteItemString('name').then((value) => value.length);
     setState(() {
       wasteNum = length; // Set the value of wasteNum
     });
   }
 
-  void calculatePieChart()  {
-
+  void calculatePieChart() {
     SharedItemService sharedItemService = SharedItemService();
 
     User? currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser == null) {
-        throw Exception('User is null but want to get statistic. Please login first.');
-        
-      } else {
-          sharedItemService.getSharedItemOfUser(currentUser.uid).then((value) async {
-            int sharedNum = value.length;
-            int wastedNum = await getWasteItemString('name').then((value) => value.length);
-            int totalNum = await dbhelper.queryAll('foods').then((value) => value.length + sharedNum);
-            int expiringNum = await dbhelper.queryAllGoodFood('expiring').then((value) => value.length);
-            double wastedPerc = (wastedNum / totalNum) * 100;
-            double sharedPerc= (sharedNum / totalNum) * 100;
-            double expiringPerc = (expiringNum / totalNum) * 100;
-            double goodPerc = 100 - wastedPerc - sharedPerc - expiringPerc;
-            logger.d('Wasted: $wastedPerc, Shared: $sharedPerc, Expiring: $expiringPerc, Good: $goodPerc');
-            
-            setState(() {
-              wastedPercentage = wastedPerc;
-              sharedPercentage = sharedPerc;
-              expiringPercentage = expiringPerc;
-              goodPercentage = goodPerc;
-            });
-            
-          });
+    if (currentUser == null) {
+      throw Exception(
+          'User is null but want to get statistic. Please login first.');
+    } else {
+      sharedItemService
+          .getSharedItemOfUser(currentUser.uid)
+          .then((value) async {
+        int sharedNum = value.length;
+        int wastedNum =
+            await getWasteItemString('name').then((value) => value.length);
+        int totalNum = await dbhelper
+            .queryAll('foods')
+            .then((value) => value.length + sharedNum);
+        int expiringNum = await dbhelper
+            .queryAllGoodFood('expiring')
+            .then((value) => value.length);
+        double wastedPerc = (wastedNum / totalNum) * 100;
+        double sharedPerc = (sharedNum / totalNum) * 100;
+        double expiringPerc = (expiringNum / totalNum) * 100;
+        double goodPerc = 100 - wastedPerc - sharedPerc - expiringPerc;
+        logger.d(
+            'Wasted: $wastedPerc, Shared: $sharedPerc, Expiring: $expiringPerc, Good: $goodPerc');
 
-        }
-   
+        setState(() {
+          wastedPercentage = wastedPerc;
+          sharedPercentage = sharedPerc;
+          expiringPercentage = expiringPerc;
+          goodPercentage = goodPerc;
+        });
+      });
+    }
   }
 
   bool isExpanded = false; // State variable to control animation
   bool toClose = false;
+  int touchedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
-     final message = ModalRoute.of(context)!.settings.arguments;
+    final message = ModalRoute.of(context)!.settings.arguments;
     if (message == null) {
       // logger.d('No Cloud Message');
-    } else {  
-       logger.d('Title: $message');
+    } else {
+      logger.d('Title: $message');
     }
-    
+
+    final _media = MediaQuery.of(context).size;
+
+    List<PieChartSectionData> showingSections() {
+      return List.generate(4, (i) {
+        final isTouched = i == touchedIndex;
+        final fontSize = isTouched ? 25.0 : 16.0;
+        final radius = isTouched ? 60.0 : 50.0;
+        const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
+        switch (i) {
+          case 0:
+            return PieChartSectionData(
+              color: Colors.red,
+              value: wastedPercentage,
+              title: '${wastedPercentage.toStringAsFixed(2)}%',
+              radius: radius,
+              titleStyle: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+                shadows: shadows,
+              ),
+            );
+          case 1:
+            return PieChartSectionData(
+              color: Colors.blue,
+              value: goodPercentage,
+              title: '${goodPercentage.toStringAsFixed(2)}%',
+              radius: radius,
+              titleStyle: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+                shadows: shadows,
+              ),
+            );
+          case 2:
+            return PieChartSectionData(
+              color: Colors.green,
+              value: sharedPercentage,
+              title: '${sharedPercentage.toStringAsFixed(2)}%',
+              radius: radius,
+              titleStyle: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+                shadows: shadows,
+              ),
+            );
+          case 3:
+            return PieChartSectionData(
+              color: Colors.yellow,
+              value: expiringPercentage,
+              title: '${expiringPercentage.toStringAsFixed(2)}%',
+              radius: radius,
+              titleStyle: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+                shadows: shadows,
+              ),
+            );
+          default:
+            throw Error();
+        }
+      });
+    }
+
+    List<String> monthNames = [
+      '', // Index 0 is empty since months start from 1
+      'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+      'September', 'October', 'November', 'December'
+    ];
+
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -364,147 +443,245 @@ class _BottomTopScreenState extends State<Inventory>
               Tab(icon: Icon(Icons.recycling), text: "Recycle"),
             ],
           )),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          Column(
-            children: [
-              const TextField(
-                decoration: InputDecoration(
-                    prefixIcon: Icon(
-                      Icons.search,
-                    ),
-                    hintText: "Search"),
-              ),
-              Expanded(child: buildList()),
-            ],
+      body: Container(
+        height: _media.height,
+        width: _media.width,
+        decoration: BoxDecoration(
+          gradient: Gradient.LinearGradient(
+            begin: FractionalOffset(0.5, 0.0),
+            end: FractionalOffset(0.6, 0.8),
+            stops: [0.0, 0.9],
+            colors: [YELLOW, BLUE],
           ),
-          Container(
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              child: ListView(
-                children: [
-                  Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          'Your Statistic',
-                          style: Theme.of(context).textTheme.headlineMedium,
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        const Text('Month: Feb 2024'),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        AnimatedContainer(
-                          duration: Duration(seconds: 1),
-                          curve: Curves.easeInOut,
-                          height: isExpanded ? 220 : 150,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width: 200,
-                                  child: GestureDetector(
-                                    onTap: () { setState(() {
-                                      isExpanded = !isExpanded;
-                                    });
-                                    },
-                                  child:
-                                  PieChart(
-                                    PieChartData(
-                                    sections: [
-                                      PieChartSectionData(
-                                          value: wastedPercentage,
-                                          title: 'Wasted',
-                                          color: Colors.red),
-                                      PieChartSectionData(
-                                          value: goodPercentage,
-                                          title: 'Used',
-                                          color: Colors.blue),
-                                      PieChartSectionData(
-                                          value: sharedPercentage,
-                                          title: 'Shared',
-                                          color: Colors.green),
-                                      PieChartSectionData(
-                                          value: expiringPercentage,
-                                          title: 'Almost Expired',
-                                          color: Colors.yellow)
-                                  ])),
-                                )),
-                              ],
-                            )),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        const Text('Period: Jan 2024 - Feb 2024'),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        SizedBox(
-                            height: 200,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width: MediaQuery.of(context).size.width -
-                                      20, // 20 is padding left + right
-                                  child: const _LineChart(),
-                                )
-                              ],
-                            )),
-                      ]),
-                ],
-              )),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: wasteNum == 0
-            ? [
-              Flexible(
-                flex: 2,
-                child: GestureDetector(
-                  child: const RiveAnimation.asset(
-                    'assets/anime/noWasted.riv',
-                  ),
-                ),
-              ),
-              Flexible(
-                flex: 1,
-                child: AnimatedTextKit(
-                  animatedTexts: [
-                    TypewriterAnimatedText(
-                      'Nothing wasted yet, keep it on!',
-                      textStyle: const TextStyle(
-                        fontSize: 32.0,
-                        fontWeight: FontWeight.bold,
+        ),
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            Column(
+              children: [
+                const TextField(
+                  decoration: InputDecoration(
+                      prefixIcon: Icon(
+                        Icons.search,
                       ),
-                      speed: const Duration(milliseconds: 100),
-                    ),
-                  ],
-                  totalRepeatCount: 4,
-                  pause: const Duration(milliseconds: 100000),
-                  displayFullTextOnTap: true,
-                  stopPauseOnTap: true,
+                      hintText: "Search"),
                 ),
-              ),
-              Flexible(
-                flex: 1,
-                child: Container(),
-              ),
-            ] : [
-              Expanded(child: buildWasteList()),
-            ],
-          ),
-        ],
+                Expanded(child: buildList()),
+              ],
+            ),
+            Container(
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                child: ListView(
+                  children: [
+                    Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            'Your Statistic',
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                              'Month: ${monthNames[timeNowDate.month]} ${timeNowDate.year}'),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                            children: <Widget>[
+                              const SizedBox(
+                                width: 15,
+                              ),
+                              AnimatedContainer(
+                                  duration: Duration(seconds: 1),
+                                  curve: Curves.easeInOut,
+                                  height: isExpanded ? 220 : 150,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                          width: 200,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                isExpanded = !isExpanded;
+                                              });
+                                            },
+                                            child: PieChart(
+                                              PieChartData(
+                                                pieTouchData: PieTouchData(
+                                                  touchCallback:
+                                                      (FlTouchEvent event,
+                                                          pieTouchResponse) {
+                                                    setState(() {
+                                                      if (!event
+                                                              .isInterestedForInteractions ||
+                                                          pieTouchResponse ==
+                                                              null ||
+                                                          pieTouchResponse
+                                                                  .touchedSection ==
+                                                              null) {
+                                                        touchedIndex = -1;
+                                                        return;
+                                                      }
+                                                      touchedIndex =
+                                                          pieTouchResponse
+                                                              .touchedSection!
+                                                              .touchedSectionIndex;
+                                                    });
+                                                  },
+                                                ),
+                                                borderData: FlBorderData(
+                                                  show: false,
+                                                ),
+                                                sectionsSpace: 0,
+                                                centerSpaceRadius: 40,
+                                                sections: showingSections(),
+                                              ),
+                                            ),
+                                          )),
+                                    ],
+                                  )),
+                              const SizedBox(
+                                width: 15,
+                              ),
+                              const Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Indicator(
+                                    color: Colors.red,
+                                    text: 'Wasted',
+                                    isSquare: true,
+                                  ),
+                                  SizedBox(
+                                    height: 4,
+                                  ),
+                                  Indicator(
+                                    color: Colors.blue,
+                                    text: 'Used',
+                                    isSquare: true,
+                                  ),
+                                  SizedBox(
+                                    height: 4,
+                                  ),
+                                  Indicator(
+                                    color: Colors.green,
+                                    text: 'Shared',
+                                    isSquare: true,
+                                  ),
+                                  SizedBox(
+                                    height: 4,
+                                  ),
+                                  Indicator(
+                                    color: Colors.yellow,
+                                    text: 'Expiring',
+                                    isSquare: true,
+                                  ),
+                                  SizedBox(
+                                    height: 18,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 50,
+                          ),
+                          const Text('Period: April 2024 - May 2024'),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.refresh,
+                                    color: Colors.black.withOpacity(
+                                        isShowingMainData ? 1.0 : 0.5),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      isShowingMainData = !isShowingMainData;
+                                    });
+                                  },
+                                ),
+                                Text(
+                                  'Show Food Saving Trend',
+                                  style: TextStyle(
+                                    color: Colors.black.withOpacity(
+                                        isShowingMainData ? 1.0 : 0.5),
+                                  ),
+                                ),
+                              ]),
+                          SizedBox(
+                              height: 200,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width -
+                                        20, // 20 is padding left + right
+                                    child: Line_Chart(
+                                        isShowingMainData: isShowingMainData),
+                                  )
+                                ],
+                              )),
+                        ]),
+                  ],
+                )),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: wasteNum == 0
+                  ? [
+                      Flexible(
+                        flex: 2,
+                        child: GestureDetector(
+                          child: const RiveAnimation.asset(
+                            'assets/anime/noWasted.riv',
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                        flex: 1,
+                        child: AnimatedTextKit(
+                          animatedTexts: [
+                            TypewriterAnimatedText(
+                              'Nothing wasted yet, keep it on!',
+                              textStyle: const TextStyle(
+                                fontSize: 32.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              speed: const Duration(milliseconds: 100),
+                            ),
+                          ],
+                          totalRepeatCount: 4,
+                          pause: const Duration(milliseconds: 100000),
+                          displayFullTextOnTap: true,
+                          stopPauseOnTap: true,
+                        ),
+                      ),
+                      Flexible(
+                        flex: 1,
+                        child: Container(),
+                      ),
+                    ]
+                  : [
+                      Expanded(child: buildWasteList()),
+                    ],
+            ),
+          ],
+        ),
       ),
       floatingActionButton: ExpandableFab(
         distance: 112.0,
-        toClose: toClose,
+        //toClose: toClose,
         children: [
           FloatingActionButton(
             tooltip: "Add item",
@@ -550,19 +727,18 @@ class _BottomTopScreenState extends State<Inventory>
   }
 
   Widget buildWasteList() {
-   return FutureBuilder(
+    return FutureBuilder(
         future: Future.wait([
           getWasteItemString('name'),
           getWasteItemDouble('quantity_num'),
           getWasteItemString('quantity_type'),
           getWasteItemString('category'),
-
         ]),
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
           if (!snapshot.hasData) {
             return const Text('Loading...'); // still loading
           }
-  
+
           if (snapshot.hasError) return const Text('Something went wrong.');
           List<String> itemsWaste = snapshot.requireData[0];
           if (itemsWaste.isEmpty) {
@@ -588,16 +764,12 @@ class _BottomTopScreenState extends State<Inventory>
                   itemCount: itemsWaste.length,
                   itemBuilder: (context, index) {
                     var item = itemsWaste[index];
-                   var foodNum = num[index];
+                    var foodNum = num[index];
                     var foodType = type[index];
 
                     var category = categoryies[index];
 
-                    return buildWasteItem(
-                        item,          
-                        foodNum,
-                        foodType,
-                        category);
+                    return buildWasteItem(item, foodNum, foodType, category);
                   }));
         });
   }
@@ -610,7 +782,7 @@ class _BottomTopScreenState extends State<Inventory>
     } else {
       categoryIconImagePath = GlobalCateIconMap[category];
     }
-   return Container(
+    return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
       padding: const EdgeInsets.all(10.0),
@@ -661,10 +833,10 @@ class _BottomTopScreenState extends State<Inventory>
                 ),
               ],
             )),
-            Flexible(
-              flex: 1,
-              child:  Image.asset('assets/images/foodWaste.png'),
-            )
+        Flexible(
+          flex: 1,
+          child: Image.asset('assets/images/foodWaste.png'),
+        )
       ]),
     );
   }
@@ -809,15 +981,14 @@ class _BottomTopScreenState extends State<Inventory>
             consumeState: 1.0,
             state: attribute,
           ));
-        
-        items.removeAt(index);
 
-        setState(() {
-          buildWasteList();
-          //build();
-        });
+      items.removeAt(index);
+
+      setState(() {
+        buildWasteList();
+        //build();
+      });
       // });
-      
     }
 
     return Card(
@@ -837,14 +1008,13 @@ class _BottomTopScreenState extends State<Inventory>
           motion: const ScrollMotion(),
 
           // A pane can dismiss the Slidable.
-          dismissible: DismissiblePane(
-            onDismissed: () {
-              updateFoodDB(index, 'wasted');
+          dismissible: DismissiblePane(onDismissed: () {
+            updateFoodDB(index, 'wasted');
 
-              // setState(() {
-              //   buildWasteList();
-              // });
-            }),
+            // setState(() {
+            //   buildWasteList();
+            // });
+          }),
 
           // All actions are defined in the children parameter.
           children: [
@@ -965,10 +1135,10 @@ class _BottomTopScreenState extends State<Inventory>
 
     //navigate to the item detail page
     Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => itemDetailPage(foodDetail: foodDetail))
-      ).then((value) {
+        context,
+        MaterialPageRoute(
+            builder: (context) => itemDetailPage(foodDetail: foodDetail))).then(
+      (value) {
         setState(() {});
       },
     );
@@ -1337,236 +1507,4 @@ class _BottomTopScreenState extends State<Inventory>
     }
     return remainingTime;
   }
-}
-
-class _LineChart extends StatelessWidget {
-  const _LineChart();
-
-  @override
-  Widget build(BuildContext context) {
-    return LineChart(
-      sampleData2,
-      duration: const Duration(milliseconds: 250),
-    );
-  }
-
-  LineChartData get sampleData2 => LineChartData(
-        lineTouchData: lineTouchData2,
-        gridData: gridData,
-        titlesData: titlesData2,
-        lineBarsData: lineBarsData2,
-        minX: 0,
-        maxX: 13,
-        maxY: 17,
-        minY: 0,
-      );
-
-  LineTouchData get lineTouchData1 => LineTouchData(
-        handleBuiltInTouches: true,
-        touchTooltipData: LineTouchTooltipData(
-          tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
-        ),
-      );
-
-  FlTitlesData get titlesData1 => FlTitlesData(
-        bottomTitles: AxisTitles(
-          sideTitles: bottomTitles,
-        ),
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        leftTitles: AxisTitles(
-          sideTitles: leftTitles(),
-        ),
-      );
-
-  LineTouchData get lineTouchData2 => const LineTouchData(
-        enabled: false,
-      );
-
-  FlTitlesData get titlesData2 => FlTitlesData(
-        bottomTitles: AxisTitles(
-          sideTitles: bottomTitles,
-        ),
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        leftTitles: AxisTitles(
-          sideTitles: leftTitles(),
-        ),
-      );
-
-  List<LineChartBarData> get lineBarsData2 => [
-        lineChartBarData2_1,
-        lineChartBarData2_2,
-        lineChartBarData2_3,
-      ];
-
-  Widget leftTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      fontSize: 10,
-    );
-    String text;
-    switch (value.toInt()) {
-      case 5:
-        text = '5kg';
-        break;
-      case 10:
-        text = '10kg';
-        break;
-      case 15:
-        text = '15kg';
-        break;
-      default:
-        return Container();
-    }
-
-    return Text(text, style: style, textAlign: TextAlign.center);
-  }
-
-  SideTitles leftTitles() => SideTitles(
-        getTitlesWidget: leftTitleWidgets,
-        showTitles: true,
-        interval: 1,
-        reservedSize: 40,
-      );
-
-  Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      fontSize: 8,
-    );
-    Widget text;
-    switch (value.toInt()) {
-      case 1:
-        text = const Text('31', style: style);
-        break;
-      case 2:
-        text = const Text('2', style: style);
-        break;
-      case 3:
-        text = const Text('5', style: style);
-        break;
-      case 4:
-        text = const Text('8', style: style);
-        break;
-      case 5:
-        text = const Text('11', style: style);
-        break;
-      case 6:
-        text = const Text('14', style: style);
-        break;
-      case 7:
-        text = const Text('17', style: style);
-        break;
-      case 8:
-        text = const Text('20', style: style);
-        break;
-      case 9:
-        text = const Text('23', style: style);
-        break;
-      case 10:
-        text = const Text('26', style: style);
-        break;
-      case 11:
-        text = const Text('29', style: style);
-        break;
-      case 12:
-        text = const Text('3', style: style);
-        break;
-      default:
-        text = const Text('');
-        break;
-    }
-
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      space: 10,
-      child: text,
-    );
-  }
-
-  SideTitles get bottomTitles => SideTitles(
-        showTitles: true,
-        reservedSize: 36,
-        interval: 1,
-        getTitlesWidget: bottomTitleWidgets,
-      );
-
-  FlGridData get gridData => const FlGridData(show: false);
-
-  LineChartBarData get lineChartBarData2_1 => LineChartBarData(
-        isCurved: true,
-        curveSmoothness: 0,
-        color: Colors.blue,
-        barWidth: 1,
-        isStrokeCapRound: true,
-        dotData: const FlDotData(show: false),
-        belowBarData: BarAreaData(show: false),
-        spots: const [
-          FlSpot(1, 1),
-          FlSpot(2, 3),
-          FlSpot(3, 4),
-          FlSpot(4, 2),
-          FlSpot(5, 1.8),
-          FlSpot(6, 4),
-          FlSpot(7, 7),
-          FlSpot(8, 5),
-          FlSpot(9, 3),
-          FlSpot(10, 2),
-          FlSpot(11, 1),
-          FlSpot(12, 2.2),
-        ],
-      );
-
-  LineChartBarData get lineChartBarData2_2 => LineChartBarData(
-        isCurved: true,
-        curveSmoothness: 0,
-        color: Colors.green,
-        barWidth: 1,
-        isStrokeCapRound: true,
-        dotData: const FlDotData(show: false),
-        spots: const [
-          FlSpot(1, 12),
-          FlSpot(2, 11),
-          FlSpot(3, 14),
-          FlSpot(4, 9),
-          FlSpot(5, 11),
-          FlSpot(6, 10),
-          FlSpot(7, 12),
-          FlSpot(8, 13),
-          FlSpot(9, 14),
-          FlSpot(10, 11),
-          FlSpot(11, 10),
-          FlSpot(12, 12),
-        ],
-      );
-
-  LineChartBarData get lineChartBarData2_3 => LineChartBarData(
-        isCurved: true,
-        curveSmoothness: 0,
-        color: Colors.red,
-        barWidth: 1,
-        isStrokeCapRound: true,
-        dotData: const FlDotData(show: false),
-        spots: const [
-          FlSpot(1, 3.8),
-          FlSpot(2, 2),
-          FlSpot(3, 1.9),
-          FlSpot(4, 2),
-          FlSpot(5, 1),
-          FlSpot(6, 5),
-          FlSpot(7, 1),
-          FlSpot(8, 2),
-          FlSpot(9, 4),
-          FlSpot(10, 3.3),
-          FlSpot(11, 2),
-          FlSpot(12, 4),
-        ],
-      );
 }

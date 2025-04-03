@@ -6,10 +6,16 @@ import 'package:logger/logger.dart';
 import 'package:tooGoodToWaste/dto/item_allergies_enum.dart';
 import 'package:tooGoodToWaste/dto/item_category_enum.dart';
 import 'package:tooGoodToWaste/dto/shared_item_model.dart';
+import 'package:tooGoodToWaste/dto/user_model.dart';
+import 'package:tooGoodToWaste/dto/user_preference_model.dart';
+import 'package:tooGoodToWaste/service/user_service.dart';
 import 'package:tooGoodToWaste/util/geo_utils.dart';
 import 'package:tooGoodToWaste/widgets/allergies_picker.dart';
 import 'package:tooGoodToWaste/widgets/category_picker.dart';
+import 'package:tooGoodToWaste/widgets/food_preference_picker.dart';
+import 'package:tooGoodToWaste/widgets/posts_card.dart';
 import 'package:tooGoodToWaste/widgets/user_location_aware_widget.dart';
+import 'package:tooGoodToWaste/dto/category_icon_map.dart';
 import '../Pages/post_page.dart';
 import '../service/shared_items_service.dart';
 
@@ -26,11 +32,24 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   final SharedItemService sharedItemService = SharedItemService();
+  final UserService userService = UserService();
 
   double radius = 1;
   ItemCategory? category;
+  FoodPreference? foodPreference;
   List<ItemAllergy> allergies = [];
   List<SharedItem> sharedItems = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getInitFoodPreference();
+  }
+
+  Future<void> _getInitFoodPreference() async {
+    TGTWUser userData = await userService.getUserData(userId);
+    foodPreference = userData.userPreference.foodPreference;
+  }
 
   void _resetSharedItems() {
     sharedItems = [];
@@ -77,6 +96,20 @@ class _HomeState extends State<Home> {
     }
   }
 
+  Future<void> _showFoodPreferenceDialog(FoodPreference? initPref) async {
+    final FoodPreference? foodPreference = await showDialog<FoodPreference>(
+        context: context,
+        builder: (context) => FoodPreferencePicker(
+              initialFoodPreference: initPref,
+            ));
+
+    setState(() {
+      _resetSharedItems();
+      this.foodPreference = foodPreference;
+      userService.setUserFoodPreference(foodPreference);
+    });
+  }
+
   Set<Marker> createMarkers(List<SharedItem> sharedItems) {
     logger.d('Created Google Map, adding ${sharedItems.length} results');
     Set<Marker> markers = {};
@@ -105,7 +138,7 @@ class _HomeState extends State<Home> {
               loader: (BuildContext context) => FractionallySizedBox(
                     widthFactor: 1.0,
                     child: SizedBox(
-                      height: 200,
+                      height: 180,
                       child: Container(
                         color: Theme.of(context).colorScheme.secondaryContainer,
                         child: const Center(
@@ -117,10 +150,12 @@ class _HomeState extends State<Home> {
               builder: (BuildContext context, GeoPoint userLocation) =>
                   StreamBuilder(
                       stream: sharedItemService.getSharedItemsWithinRadius(
-                          userLocation: userLocation,
-                          radiusInKm: radius,
-                          userId: userId,
-                          category: category),
+                        userLocation: userLocation,
+                        radiusInKm: radius,
+                        userId: userId,
+                        category: category,
+                        foodPreference: foodPreference
+                      ),
                       builder: (BuildContext context,
                           AsyncSnapshot<List<DocumentSnapshot>>
                               sharedItemSnapshot) {
@@ -128,23 +163,14 @@ class _HomeState extends State<Home> {
                                 ConnectionState.active &&
                             sharedItemSnapshot.hasData) {
                           if (sharedItemSnapshot.data != null) {
-                            List<SharedItem?> results = sharedItemService
-                                .createSharedItemList(sharedItemSnapshot.data!);
-                            for (var res in results) {
-                              if (res != null) {
-                                res.distance = GeoUtils.calculateDistance(
-                                    userLocation,
-                                    GeoPoint(res.location.latitude,
-                                        res.location.longitude));
-                                sharedItems.add(res);
-                              }
+                            sharedItems = sharedItemService
+                                .createSharedItemList(sharedItemSnapshot.requireData).nonNulls.toList();
                             }
-                          }
 
                           return FractionallySizedBox(
                             widthFactor: 1.0,
                             child: SizedBox(
-                                height: 200,
+                                height: 180,
                                 child: GoogleMap(
                                   initialCameraPosition: CameraPosition(
                                     target: LatLng(userLocation.latitude,
@@ -158,7 +184,7 @@ class _HomeState extends State<Home> {
                           return FractionallySizedBox(
                             widthFactor: 1.0,
                             child: SizedBox(
-                              height: 200,
+                              height: 180,
                               child: Container(
                                 color: Theme.of(context)
                                     .colorScheme
@@ -174,55 +200,75 @@ class _HomeState extends State<Home> {
           const SizedBox(
             height: 10,
           ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: <Widget>[
-                ActionChip(
-                  onPressed: _showCategoryDialog,
-                  avatar: const Icon(Icons.tune, size: 16),
-                  label: category != null
-                      ? Text('Category: ${category!.name}')
-                      : const Text('Category: Any'),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                ActionChip(
-                  onPressed: _showRangeDialog,
-                  avatar: const Icon(Icons.location_pin, size: 16),
-                  label: Text('Range (${radius.round().toString()} km)'),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                ActionChip(
-                    onPressed: _showAllergyDialog,
-                    avatar: const Icon(Icons.warning),
-                    label: Text('Allergies (${allergies.length})'))
-              ],
-            ),
-          ),
+          FutureBuilder(
+              future: userService.getUserData(userId),
+              builder: (BuildContext context,
+                  AsyncSnapshot<TGTWUser> userDataSnapshot) {
+                if (userDataSnapshot.connectionState == ConnectionState.done &&
+                    userDataSnapshot.hasData) {
+                  TGTWUser userData = userDataSnapshot.requireData;
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: <Widget>[
+                        ActionChip(
+                          onPressed: _showCategoryDialog,
+                          avatar: const Icon(Icons.tune, size: 16),
+                          label: category != null
+                              ? Text('Category: ${category!.name}')
+                              : const Text('Category: Any'),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        ActionChip(
+                          onPressed: _showRangeDialog,
+                          avatar: const Icon(Icons.location_pin, size: 16),
+                          label:
+                              Text('Range (${radius.round().toString()} km)'),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        ActionChip(
+                            onPressed: _showAllergyDialog,
+                            avatar: const Icon(Icons.warning),
+                            label: Text('Allergies (${allergies.length})')),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        ActionChip(
+                            onPressed: () {
+                              _showFoodPreferenceDialog(this.foodPreference ??
+                                  userData.userPreference.foodPreference);
+                            },
+                            avatar: const Icon(Icons.rice_bowl),
+                            label: Text(
+                                'Preference (${foodPreference?.name ?? "None"})')),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              }),
           const SizedBox(
-            height: 20,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                'Results',
-                style: Theme.of(context).textTheme.headlineMedium,
-              )
-            ],
+            height: 10,
           ),
           UserLocationAwareWidget(
               builder: (BuildContext context, GeoPoint userLocation) =>
                   StreamBuilder(
                       stream: sharedItemService.getSharedItemsWithinRadius(
-                          userLocation: userLocation,
-                          radiusInKm: radius,
-                          userId: userId,
-                          category: category),
+                        userLocation: userLocation,
+                        radiusInKm: radius,
+                        userId: userId,
+                        category: category,
+                        foodPreference: foodPreference,
+
+                      ),
                       builder: (BuildContext context,
                           AsyncSnapshot<List<DocumentSnapshot>>
                               sharedItemSnapshot) {
@@ -230,17 +276,8 @@ class _HomeState extends State<Home> {
                                 ConnectionState.active &&
                             sharedItemSnapshot.hasData) {
                           if (sharedItemSnapshot.data != null) {
-                            List<SharedItem?> results = sharedItemService
-                                .createSharedItemList(sharedItemSnapshot.data!);
-                            for (var res in results) {
-                              if (res != null) {
-                                res.distance = GeoUtils.calculateDistance(
-                                    userLocation,
-                                    GeoPoint(res.location.latitude,
-                                        res.location.longitude));
-                                sharedItems.add(res);
-                              }
-                            }
+                            sharedItems = sharedItemService
+                                .createSharedItemList(sharedItemSnapshot.requireData).nonNulls.toList();
                           }
 
                           if (sharedItems.isEmpty) {
@@ -249,18 +286,23 @@ class _HomeState extends State<Home> {
                           }
 
                           return Expanded(
-                              child: ListView.separated(
+                              child: GridView.builder(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 4.0,
+                              mainAxisSpacing: 4.0,
+                            ),
                             itemCount: sharedItems.length,
                             itemBuilder: (_, index) {
                               if (sharedItems[index] != null) {
                                 logger.d(
-                                    'Got items: ${sharedItems[index].toJson()}');
-                                return Post(postData: sharedItems[index]);
+                                    'Got items: ${sharedItems[index].id}');
+                                return Post(
+                                    postData: sharedItems[index],
+                                    isLikedPage: false);
                               }
                               return null;
-                            },
-                            separatorBuilder: (_, index) {
-                              return const Divider();
                             },
                           ));
                         } else if (sharedItemSnapshot.connectionState ==
@@ -327,41 +369,45 @@ class _RadiusPickerState extends State<RadiusPicker> {
   }
 }
 
-class Post extends StatelessWidget {
+class Post extends StatefulWidget {
   final SharedItem postData;
 
-  const Post({super.key, required this.postData});
+  final bool isLikedPage;
+  final BuildContext? context;
+
+  const Post(
+      {super.key,
+      required this.postData,
+      required this.isLikedPage,
+      this.context});
+
+  @override
+  State<StatefulWidget> createState() => _PostState();
+}
+
+class _PostState extends State<Post> {
+  final SharedItemService sharedItemService = SharedItemService();
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => PostPage(postData: postData)));
-        },
-        child: FractionallySizedBox(
-          widthFactor: 1.0,
-          child: Container(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Item name: ${postData.name}',
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                  Text(
-                    'Amount: ${postData.amount.nominal} ${postData.amount.unit}',
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                  Text(
-                    'Distance: ${postData.distance.toStringAsFixed(2)} m',
-                    style: const TextStyle(color: Colors.black),
-                  )
-                ],
-              )),
-        ));
+    String? categoryIconImagePath;
+
+    int remainDays =
+        DateTime.fromMillisecondsSinceEpoch(widget.postData.expireDate)
+            .difference(DateTime.now())
+            .inDays;
+    if (GlobalCateIconMap[widget.postData.category.name] == null) {
+      categoryIconImagePath = GlobalCateIconMap["Others"];
+    } else {
+      categoryIconImagePath = GlobalCateIconMap[widget.postData.category.name];
+    }
+
+    final String userId = FirebaseAuth.instance.currentUser!.uid;
+
+    bool isLiked = widget.postData.likedBy.contains(userId);
+    return widget.isLikedPage
+        ? LikedItem(postData: widget.postData, remainDays: remainDays)
+        : FoodItem(postData: widget.postData, remainDays: remainDays);
   }
 }
